@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 96fd37d8f4bc47d4fa173a25860db5bd
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 357840
+  packageName: Stylized Potions
+  packageVersion: 1.0
+  assetPath: Assets/PolyKebap/Potions/Materials/Potion_Lid.mat
+  uploadId: 852820

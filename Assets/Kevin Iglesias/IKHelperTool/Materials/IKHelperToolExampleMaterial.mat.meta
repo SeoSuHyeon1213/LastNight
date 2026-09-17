@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 1a013de5263234040a46dc88363e751b
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 148408
+  packageName: IK Helper Tool
+  packageVersion: 1.0.1
+  assetPath: Assets/Kevin Iglesias/IKHelperTool/Materials/IKHelperToolExampleMaterial.mat
+  uploadId: 930626

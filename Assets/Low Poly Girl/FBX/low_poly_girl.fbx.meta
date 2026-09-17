@@ -1,0 +1,1405 @@
+fileFormatVersion: 2
+guid: 99ea5eedb7d32f64882d40da85881906
+AssetOrigin:
+  serializedVersion: 1
+  productId: 215047
+  packageName: Low Poly Young Girl Free
+  packageVersion: 1.0
+  assetPath: Assets/Low Poly Girl/FBX/low_poly_girl .fbx
+  uploadId: 484457
+ModelImporter:
+  serializedVersion: 24200
+  internalIDToNameTable:
+  - first:
+      74: 684805777971307724
+    second: Rig|_T-Pose
+  - first:
+      74: 1428091052440120248
+    second: Rig|action_button_click
+  - first:
+      74: 192109672745846520
+    second: Rig|action_button_open_door
+  - first:
+      74: -2852257210928347803
+    second: Rig|climb_high
+  - first:
+      74: 2736353107668908467
+    second: Rig|climb_low
+  - first:
+      74: 3661532830657049331
+    second: Rig|cycle_talking
+  - first:
+      74: 4761646068954103719
+    second: Rig|expressions_angry
+  - first:
+      74: 8079510040396358710
+    second: Rig|expressions_blinking
+  - first:
+      74: 6770635348455542655
+    second: Rig|idle
+  - first:
+      74: -5896270270286208608
+    second: Rig|Idle 2
+  - first:
+      74: -4276032650742027264
+    second: Rig|Idle 3
+  - first:
+      74: -394962822340593846
+    second: Rig|idle_to_sit
+  - first:
+      74: -6251707280877223375
+    second: Rig|inspect_ground_end
+  - first:
+      74: 5688336420994294515
+    second: Rig|inspect_ground_loop
+  - first:
+      74: 523483332396792666
+    second: Rig|inspect_ground_start
+  - first:
+      74: -7195314167509295171
+    second: Rig|jump_end
+  - first:
+      74: 400160387497274313
+    second: Rig|jump_falling
+  - first:
+      74: -6357589205895725477
+    second: Rig|jump_fwd
+  - first:
+      74: -4830824902358031632
+    second: Rig|jump_loop
+  - first:
+      74: 8466897170870279006
+    second: Rig|jump_start
+  - first:
+      74: 2390264930210804960
+    second: Rig|phonemes  - A-I
+  - first:
+      74: -5200994052070401700
+    second: Rig|phonemes  - C-G-D-K-N-S-T
+  - first:
+      74: 23295257732960910
+    second: Rig|phonemes  - E
+  - first:
+      74: 6181470523027192669
+    second: Rig|phonemes  - F-V-D-Th
+  - first:
+      74: 2895157946894898630
+    second: Rig|phonemes  - I-D-Th
+  - first:
+      74: 4254285901209603438
+    second: Rig|phonemes  - M-P-B
+  - first:
+      74: 6563450777964884344
+    second: Rig|phonemes  - O
+  - first:
+      74: 1945791198652393954
+    second: Rig|phonemes  - stand
+  - first:
+      74: -3102114395866072738
+    second: Rig|phonemes  - U
+  - first:
+      74: 1919735637201925258
+    second: Rig|run
+  - first:
+      74: 6994661117545982816
+    second: Rig|sit_idle
+  - first:
+      74: 7075412484067638897
+    second: Rig|sit_to idle
+  - first:
+      74: -2261022580837840742
+    second: Rig|walk
+  - first:
+      74: 1095423526914802424
+    second: Rig|walk_fast
+  - first:
+      74: -4329288660695585297
+    second: Rig|walk_stairway_down_root
+  - first:
+      74: 6977645375247014879
+    second: Rig|walk_stairway_root
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: girl
+    second: {fileID: 2100000, guid: ef92e970f323756448718e32e736acf3, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: transp
+    second: {fileID: 2100000, guid: 6ebbb785c8ada5641b7090b8ed56c416, type: 2}
+  materials:
+    materialImportMode: 2
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    removeConstantScaleCurves: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 3
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths:
+    - Rig
+    - Rig/Hips/Spine
+    - Rig/Hips
+    - Rig/Hips/Upper_Leg_L
+    - Rig/Hips/Upper_Leg_R
+    - eyes
+    - girl
+    - hair
+    - hat
+    - mouth
+    - Rig/Hips/Spine/Spine 1
+    - Rig/Hips/Spine/Spine 1/Chest
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_L
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_L/Upper_Arm_L
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L/Hand_L
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L/Hand_L/Index_L
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L/Hand_L/Index_L/Index_1_L
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L/Hand_L/Index_L/Index_1_L/Index_2_L
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L/Hand_L/Index_L/Index_1_L/Index_2_L/Index_2_L_end
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L/Hand_L/Middle_L
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L/Hand_L/Middle_L/Middle_1_L
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L/Hand_L/Middle_L/Middle_1_L/Middle_2_L
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L/Hand_L/Middle_L/Middle_1_L/Middle_2_L/Middle_2_L_end
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L/Hand_L/Pinky_L
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L/Hand_L/Pinky_L/Pinky_1_L
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L/Hand_L/Pinky_L/Pinky_1_L/Pinky_2_L
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L/Hand_L/Pinky_L/Pinky_1_L/Pinky_2_L/Pinky_2_L_end
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L/Hand_L/Ring_R
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L/Hand_L/Ring_R/Ring_1_R
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L/Hand_L/Ring_R/Ring_1_R/Ring_2_R
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L/Hand_L/Ring_R/Ring_1_R/Ring_2_R/Ring_2_R_end
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L/Hand_L/Thumb_L
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L/Hand_L/Thumb_L/Thumb_1_L
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L/Hand_L/Thumb_L/Thumb_1_L/Thumb_2_L
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L/Hand_L/Thumb_L/Thumb_1_L/Thumb_2_L/Thumb_2_L_end
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_R
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_R/Upper_Arm_R
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R/Hand_R
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R/Hand_R/Index_R
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R/Hand_R/Index_R/Index_1_R
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R/Hand_R/Index_R/Index_1_R/Index_2_R
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R/Hand_R/Index_R/Index_1_R/Index_2_R/Index_2_R_end
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R/Hand_R/Middle_R
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R/Hand_R/Middle_R/Middle_1_R
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R/Hand_R/Middle_R/Middle_1_R/Middle_2_R
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R/Hand_R/Middle_R/Middle_1_R/Middle_2_R/Middle_2_R_end
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R/Hand_R/Pinky_R
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R/Hand_R/Pinky_R/Pinky_1_R
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R/Hand_R/Pinky_R/Pinky_1_R/Pinky_2_R
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R/Hand_R/Pinky_R/Pinky_1_R/Pinky_2_R/Pinky_2_R_end
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R/Hand_R/Ring_L
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R/Hand_R/Ring_L/Ring_1_L
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R/Hand_R/Ring_L/Ring_1_L/Ring_2_L
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R/Hand_R/Ring_L/Ring_1_L/Ring_2_L/Ring_2_L_end
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R/Hand_R/Thumb_R
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R/Hand_R/Thumb_R/Thumb_1_R
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R/Hand_R/Thumb_R/Thumb_1_R/Thumb_2_R
+    - Rig/Hips/Spine/Spine 1/Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R/Hand_R/Thumb_R/Thumb_1_R/Thumb_2_R/Thumb_2_R_end
+    - Rig/Hips/Spine/Spine 1/Chest/Neck
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/Eyebrow_L
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/Eyebrow_L/Eyebrow_1_L
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/Eyebrow_L/Eyebrow_1_L/Eyebrow_1_L_end
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/Eyebrow_R
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/Eyebrow_R/Eyebrow_1_R
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/Eyebrow_R/Eyebrow_1_R/Eyebrow_1_R_end
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/Face
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/Face/Eye_L
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/Face/Eye_L/Eye_L_end
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/Face/Eye_R
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/Face/Eye_R/Eye_R_end
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/Face/Lower_Lid_L
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/Face/Lower_Lid_L/Lower_Lid_L_end
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/Face/Lower_Lid_R
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/Face/Lower_Lid_R/Lower_Lid_R_end
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/Face/Up_Lid_L
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/Face/Up_Lid_L/Up_Lid_L_end
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/Face/Up_Lid_R
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/Face/Up_Lid_R/Up_Lid_R_end
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/Face/Upper_lip
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/Face/Upper_lip/Upper_lip_L
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/Face/Upper_lip/Upper_lip_L/Upper_lip_L_end
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/Face/Upper_lip/Upper_lip_R
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/Face/Upper_lip/Upper_lip_R/Upper_lip_R_end
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/hat 1
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/hat 1/back_hair
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/hat 1/back_hair/back_hair_1
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/hat 1/back_hair/back_hair_1/back_hair_2
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/hat 1/back_hair/back_hair_1/back_hair_2/back_hair_3
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/hat 1/back_hair/back_hair_1/back_hair_2/back_hair_3/back_hair_3_end
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/hat 1/hair_L
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/hat 1/hair_L/hair_1_L
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/hat 1/hair_L/hair_1_L/hair_2_L
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/hat 1/hair_L/hair_1_L/hair_2_L/hair_3_L
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/hat 1/hair_L/hair_1_L/hair_2_L/hair_3_L/hair_3_L_end
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/hat 1/hair_R
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/hat 1/hair_R/hair_1_R
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/hat 1/hair_R/hair_1_R/hair_2_R
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/hat 1/hair_R/hair_1_R/hair_2_R/hair_3_R
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/hat 1/hair_R/hair_1_R/hair_2_R/hair_3_R/hair_3_R_end
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/Jaw
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/Jaw/Lower_lip
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/Jaw/Lower_lip/Lower_lip_L
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/Jaw/Lower_lip/Lower_lip_L/Lower_lip_L_end
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/Jaw/Lower_lip/Lower_lip_R
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/Jaw/Lower_lip/Lower_lip_R/Lower_lip_R_end
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/Tongue
+    - Rig/Hips/Spine/Spine 1/Chest/Neck/Head/Tongue/Tongue_end
+    - Rig/Hips/Upper_Leg_L/Lower_Leg_L
+    - Rig/Hips/Upper_Leg_L/Lower_Leg_L/Foot_L
+    - Rig/Hips/Upper_Leg_L/Lower_Leg_L/Foot_L/Toes_L
+    - Rig/Hips/Upper_Leg_L/Lower_Leg_L/Foot_L/Toes_L/Toes_L_end
+    - Rig/Hips/Upper_Leg_L/skirt_2_L
+    - Rig/Hips/Upper_Leg_L/skirt_2_L/skirt_2_L_end
+    - Rig/Hips/Upper_Leg_L/skirt_L
+    - Rig/Hips/Upper_Leg_L/skirt_L/skirt_L_end
+    - Rig/Hips/Upper_Leg_R/Lower_Leg_R
+    - Rig/Hips/Upper_Leg_R/Lower_Leg_R/Foot_R
+    - Rig/Hips/Upper_Leg_R/Lower_Leg_R/Foot_R/Toes_R
+    - Rig/Hips/Upper_Leg_R/Lower_Leg_R/Foot_R/Toes_R/Toes_R_end
+    - Rig/Hips/Upper_Leg_R/skirt_2_R
+    - Rig/Hips/Upper_Leg_R/skirt_2_R/skirt_2_R_end
+    - Rig/Hips/Upper_Leg_R/skirt_R
+    - Rig/Hips/Upper_Leg_R/skirt_R/skirt_R_end
+    extraUserProperties: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: Rig|_T-Pose
+      takeName: Rig|_T-Pose
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 1
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Rig|action_button_click
+      takeName: Rig|action_button_click
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 40
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 1
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 1
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Rig|action_button_open_door
+      takeName: Rig|action_button_open_door
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 53
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 1
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 1
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Rig|climb_high
+      takeName: Rig|climb_high
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 60
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Rig|climb_low
+      takeName: Rig|climb_low
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 24
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Rig|cycle_talking
+      takeName: Rig|cycle_talking
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 30
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 1
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 1
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Rig|expressions_angry
+      takeName: Rig|expressions_angry
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 80
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 1
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 1
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Rig|expressions_blinking
+      takeName: Rig|expressions_blinking
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 80
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 1
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 1
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Rig|idle
+      takeName: Rig|idle
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 120
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 1
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 1
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Rig|Idle 2
+      takeName: Rig|Idle 2
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 160
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 1
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 1
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Rig|Idle 3
+      takeName: Rig|Idle 3
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 80
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 1
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 1
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Rig|idle_to_sit
+      takeName: Rig|idle_to_sit
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 65
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 1
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Rig|inspect_ground_end
+      takeName: Rig|inspect_ground_end
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 20
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 1
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 1
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Rig|inspect_ground_loop
+      takeName: Rig|inspect_ground_loop
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 120
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 1
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 1
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Rig|inspect_ground_start
+      takeName: Rig|inspect_ground_start
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 20
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 1
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 1
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Rig|jump_end
+      takeName: Rig|jump_end
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 21
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 1
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 1
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Rig|jump_falling
+      takeName: Rig|jump_falling
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 40
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 1
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 1
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Rig|jump_fwd
+      takeName: Rig|jump_fwd
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 35
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 1
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Rig|jump_loop
+      takeName: Rig|jump_loop
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 80
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 1
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 1
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Rig|jump_start
+      takeName: Rig|jump_start
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 18
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 1
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 0
+      keepOriginalPositionXZ: 1
+      heightFromFeet: 1
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Rig|phonemes  - A-I
+      takeName: Rig|phonemes  - A-I
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 1
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 1
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 1
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Rig|phonemes  - C-G-D-K-N-S-T
+      takeName: Rig|phonemes  - C-G-D-K-N-S-T
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 1
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 1
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 1
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Rig|phonemes  - E
+      takeName: Rig|phonemes  - E
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 1
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 1
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 1
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Rig|phonemes  - F-V-D-Th
+      takeName: Rig|phonemes  - F-V-D-Th
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 1
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 1
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 1
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Rig|phonemes  - I-D-Th
+      takeName: Rig|phonemes  - I-D-Th
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 1
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 1
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 1
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Rig|phonemes  - M-P-B
+      takeName: Rig|phonemes  - M-P-B
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 1
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 1
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 1
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Rig|phonemes  - O
+      takeName: Rig|phonemes  - O
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 1
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 1
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 1
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Rig|phonemes  - stand
+      takeName: Rig|phonemes  - stand
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 1
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 1
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 1
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Rig|phonemes  - U
+      takeName: Rig|phonemes  - U
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 1
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 1
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 1
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Rig|run
+      takeName: Rig|run
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 23
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 1
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 1
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Rig|sit_idle
+      takeName: Rig|sit_idle
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 120
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 1
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 1
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Rig|sit_to idle
+      takeName: Rig|sit_to idle
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 47
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 1
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 1
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Rig|walk
+      takeName: Rig|walk
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 35
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 1
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 1
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Rig|walk_fast
+      takeName: Rig|walk_fast
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 31
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 1
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 1
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Rig|walk_stairway_down_root
+      takeName: Rig|walk_stairway_down_root
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 30
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 0
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 1
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Rig|walk_stairway_root
+      takeName: Rig|walk_stairway_root
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 30
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 0
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 1
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    isReadable: 0
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    useSRGBMaterialColor: 1
+    sortHierarchyByName: 1
+    importPhysicalCameras: 1
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    nodeNameCollisionStrategy: 0
+    fileIdsGeneration: 2
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    keepQuads: 0
+    weldVertices: 1
+    bakeAxisConversion: 0
+    preserveHierarchy: 0
+    skinWeightsMode: 0
+    maxBonesPerVertex: 4
+    minBoneWeight: 0.001
+    optimizeBones: 1
+    generateMeshLods: 0
+    meshLodGenerationFlags: 0
+    maximumMeshLod: -1
+    meshOptimizationFlags: -1
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVMarginMethod: 1
+    secondaryUVMinLightmapResolution: 40
+    secondaryUVMinObjectScale: 1
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+    strictVertexDataChecks: 0
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  referencedClips: []
+  importAnimation: 1
+  humanDescription:
+    serializedVersion: 3
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    globalScale: 1
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+    hasExtraRoot: 1
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  autoGenerateAvatarMappingIfUnspecified: 1
+  animationType: 3
+  humanoidOversampling: 1
+  avatarSetup: 1
+  addHumanoidExtraRootOnlyWhenUsingAvatar: 1
+  importBlendShapeDeformPercent: 0
+  remapMaterialsIfMaterialImportModeIsNone: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

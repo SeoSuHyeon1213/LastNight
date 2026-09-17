@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: a9e61810448c4394d92f341a80513181
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 148408
+  packageName: IK Helper Tool
+  packageVersion: 1.0.1
+  assetPath: Assets/Kevin Iglesias/IKHelperTool/Scripts/IKHelperTool.cs
+  uploadId: 930626

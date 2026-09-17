@@ -1,0 +1,82 @@
+Apocalypse Cones Damage Set - Official Documentation (Plain Text Format)
+Publisher: ANNEX3D Contact: yotatautakata@gmail.com Last Updated: October 22, 2025
+
+1. Product Overview
+1.1 Product Purpose and Use
+The "Apocalypse Cones Damage Set" is a collection of high-quality 3D models ready for immediate placement in film production and game development projects. The asset specializes in post-apocalyptic and damaged aesthetics, and all models are fully optimized for the Universal Render Pipeline (URP).
+
+1.2 Technical Requirements and Compatibility
+Minimum Unity Version: 6000.2.6f2
+
+Render Pipeline: Universal Render Pipeline (URP) only
+
+Scale Standard: 1 Unit : 1 Meter
+
+Technology Used: Custom Shader Graph Shader
+
+Third-Party Licenses: None included (A Third-Party Notices.txt file is not required)
+
+2. Quick Start & Setup
+2.1 Import Procedure
+Download the package from the Unity Asset Store.
+
+Import the package into your project.
+
+Upon import, all files will be located in the Assets/Apocalypse Cones Damage Set folder.
+
+2.2 Initial Configuration and Placement
+No special setup procedures are required.
+
+The models in this asset are provided as Prefabs with optimized custom materials applied for the URP environment. Simply drag and drop the Prefabs from the _Prefab folder into your scene for immediate use.
+
+2.3 Model Standards
+Scale: All Prefabs are standardized to a 1:1 Meter Scale.
+
+Pivot: The pivot point is set to the logical center of the model base: Bottom Center (X=0, Y=0, Z=0).
+
+3. Asset Structure and Folder Organization
+All assets are organized within the following single root folder:
+
+Root Folder Name: Apocalypse Cones Damage Set
+
+_FBX: Contains the original mesh data (.fbx) files.
+
+_Materials: Contains the pre-configured materials corresponding to each model.
+
+_Prefab: Contains the ready-to-place Prefabs for use in your scene.
+
+_shede graph: Contains the original Shader Graph assets.
+
+_Texture: Contains the PBR-compliant texture maps (Albedo, Normal, Metallic, etc.).
+
+_Utility Models: Contains other necessary supporting model data.
+
+4. Custom Shader Parameters (Original Shader Parameters)
+The materials in this asset use a unique Shader Graph shader designed to enrich the model's appearance. A key feature of this shader is the ability to customize the visual representation of the model's inner side (backface) visible through damage transparency.
+
+The following parameters can be adjusted in the "Shader Inputs" section of the Material Inspector.
+
+backsid color [Inner Color Adjustment]
+
+Function: Adjusts the color of the inner surface (backface) of the model when transparency is applied.
+
+Application: Individually sets the color of the inner surface exposed by the damaged edges. Note: This setting does not affect the color or texture of the model's outer (front) surface.
+
+backmap [Texture Map]
+
+Function: Sets the main texture map applied to the model globally.
+
+Application: Defines the basic texture and detail for both the exterior and interior of the model.
+
+alpha threshold [Transparency Threshold]
+
+Function: Adjusts the alpha testing threshold, controlling the degree to which transparency is applied to the model.
+
+Application: Controls the sharpness of the edges surrounding the damage/transparent areas.
+
+5. Support & Contact
+Should you have any technical issues, bug reports, or questions regarding this asset, please feel free to contact the support channel below.
+
+ANNEX3D Support:
+
+Email: yotatautakata@gmail.com

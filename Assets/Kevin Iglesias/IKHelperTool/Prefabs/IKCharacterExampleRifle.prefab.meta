@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 5ffef8cd5247f8b4ab099cc0d1566e26
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 148408
+  packageName: IK Helper Tool
+  packageVersion: 1.0.1
+  assetPath: Assets/Kevin Iglesias/IKHelperTool/Prefabs/IKCharacterExampleRifle.prefab
+  uploadId: 930626

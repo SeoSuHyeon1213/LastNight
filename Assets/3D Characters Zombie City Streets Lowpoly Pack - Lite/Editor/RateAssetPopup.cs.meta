@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 9bd8d3ac3d7963c4dac4f8f646c7b803
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 277409
+  packageName: 3D Characters Zombie City Streets Lowpoly Pack - Lite
+  packageVersion: 1.01
+  assetPath: Assets/3D Characters Zombie City Streets Lowpoly Pack - Lite/Editor/RateAssetPopup.cs
+  uploadId: 707786

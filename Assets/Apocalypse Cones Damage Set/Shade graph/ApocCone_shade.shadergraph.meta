@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 8560cbb772344da4892e9bbf46d3e339
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 625f186215c104763be7675aa2d941aa, type: 3}
+AssetOrigin:
+  serializedVersion: 1
+  productId: 340964
+  packageName: Apocalypse Cones Damage Set
+  packageVersion: 1.0
+  assetPath: Assets/Apocalypse Cones Damage Set/Shade graph/ApocCone_shade.shadergraph
+  uploadId: 808720

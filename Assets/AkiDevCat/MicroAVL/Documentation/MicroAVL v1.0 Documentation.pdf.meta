@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: ce99a7f99d87cc14385fcf050912b1e5
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 266587
+  packageName: MicroAVL [URP] - Volumetric Lights
+  packageVersion: 1.0
+  assetPath: Assets/AkiDevCat/MicroAVL/Documentation/MicroAVL v1.0 Documentation.pdf
+  uploadId: 678285
