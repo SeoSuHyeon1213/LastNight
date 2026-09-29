@@ -24,6 +24,9 @@ public sealed class SurvivalHud : MonoBehaviour {
     private readonly Vector3[] directions = { Vector3.forward, Vector3.right, Vector3.back, Vector3.left };
     private readonly RectTransform[] cardinals = new RectTransform[4];
     private PlayerShooter shooter;
+    private PlankInventory plankInventory;
+    private Text materialsText;
+    private int lastMaterials = -2;
     [Header("Existing UI / migrated from UIManager")]
     [SerializeField] private Text legacyAmmoText;
     [SerializeField] private Text scoreText;
@@ -80,6 +83,9 @@ public sealed class SurvivalHud : MonoBehaviour {
             return;
         }
         shooter = player.GetComponent<PlayerShooter>();
+        plankInventory = player.GetComponent<PlankInventory>();
+        if (plankInventory == null)
+            Debug.LogWarning("SurvivalHud: 플레이어에 PlankInventory가 없어 재료 수를 표시할 수 없습니다.", this);
 
         if (viewCamera == null) viewCamera = Camera.main;
         if (hudFont == null) hudFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
@@ -101,6 +107,10 @@ public sealed class SurvivalHud : MonoBehaviour {
         visibility = root.GetComponent<CanvasGroup>();
         visibility.interactable = visibility.blocksRaycasts = false;
         BuildRadar();
+        Image materialsPanel = Box("Barricade Materials", root.transform, Vector2.zero,
+            new Vector2(155, 315), new Vector2(240, 54), Panel);
+        materialsText = Label("Wood Count", materialsPanel.transform, Vector2.zero, new Vector2(220, 44), 24);
+        UpdateMaterials();
         Image panel = Box("Health", root.transform, new Vector2(0.5f, 0), new Vector2(0, 78), new Vector2(430, 100), Panel);
         healthText = Label("Health Value", panel.transform, new Vector2(0, 20), new Vector2(400, 40), 28);
         Image track = Box("Track", panel.transform, Vector2.one * 0.5f, new Vector2(0, -20), new Vector2(390, 20), Color.black);
@@ -165,6 +175,7 @@ public sealed class SurvivalHud : MonoBehaviour {
     }
     private void Update() {
         if (root == null || player == null) return;
+        UpdateMaterials();
 
         float max = Mathf.Max(0, player.startingHealth);
         float hp = Mathf.Clamp(player.health, 0, max);
@@ -208,6 +219,14 @@ public sealed class SurvivalHud : MonoBehaviour {
         }
         UpdateRadar();
     }
+    private void UpdateMaterials() {
+        int count = plankInventory != null ? plankInventory.Count : -1;
+        if (count == lastMaterials) return;
+        materialsText.text = count < 0 ? "WOOD  --" : $"WOOD  {count}";
+        materialsText.color = count == 0 ? Danger : Ink;
+        lastMaterials = count;
+    }
+
     private void UpdateRadar() {
         float yaw = viewCamera != null ? viewCamera.transform.eulerAngles.y : player.transform.eulerAngles.y;
         Quaternion toView = Quaternion.Euler(0, -yaw, 0);

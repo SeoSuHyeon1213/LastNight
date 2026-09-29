@@ -6,6 +6,14 @@ public class PlayerInput : MonoBehaviour, Cinemachine.AxisState.IInputAxisProvid
     [SerializeField] private string lookXAxisName = "Mouse X";
     [SerializeField] private string lookYAxisName = "Mouse Y";
 
+    private void Start() {
+        PlayerMovement movement = GetComponent<PlayerMovement>();
+        if (movement == null || movement.FreeLookCamera == null) return;
+        // FreeLook과 플레이어가 별도 오브젝트여도 감도가 적용된 입력을 사용한다.
+        movement.FreeLookCamera.m_XAxis.SetInputAxisProvider(0, this);
+        movement.FreeLookCamera.m_YAxis.SetInputAxisProvider(1, this);
+    }
+
     // 카메라가 축을 갱신할 때 읽어 Update 실행 순서에 따른 입력 지연을 피한다.
     public float GetAxisValue(int axis) {
         GameSessionManager session = GameSessionManager.instance;
@@ -15,9 +23,9 @@ public class PlayerInput : MonoBehaviour, Cinemachine.AxisState.IInputAxisProvid
             return 0f;
 
         if (axis == 0)
-            return Input.GetAxisRaw(lookXAxisName);
+            return Input.GetAxisRaw(lookXAxisName) * (session != null ? session.MouseSensitivityX : 1f);
         if (axis == 1)
-            return Input.GetAxisRaw(lookYAxisName);
+            return Input.GetAxisRaw(lookYAxisName) * (session != null ? session.MouseSensitivityY : 1f);
         return 0f;
     }
     public string moveAxisName = "Vertical"; // 앞뒤 움직임을 위한 입력축 이름

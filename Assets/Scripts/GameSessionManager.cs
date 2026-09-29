@@ -45,6 +45,19 @@ public class GameSessionManager : MonoBehaviour {
     private BindingAction? rebindingAction;
     private bool fullscreenMode;
 
+    [Header("Mouse Sensitivity")]
+    [SerializeField] private Slider mouseSensitivityXSlider;
+    [SerializeField] private Slider mouseSensitivityYSlider;
+    [SerializeField] private Text mouseSensitivityXText;
+    [SerializeField] private Text mouseSensitivityYText;
+    private const float MinSensitivity = 0.1f;
+    private const float MaxSensitivity = 3f;
+    private const string SensitivityXKey = "MouseSensitivity.X";
+    private const string SensitivityYKey = "MouseSensitivity.Y";
+    private bool sensitivityDirty;
+    public float MouseSensitivityX { get; private set; } = 1f;
+    public float MouseSensitivityY { get; private set; } = 1f;
+
     public float MoveInput => GetAxis(forwardKey, backwardKey);
     public float StrafeInput => GetAxis(rightKey, leftKey);
     public bool IsRunning => Input.GetKey(runKey);
@@ -60,6 +73,7 @@ public class GameSessionManager : MonoBehaviour {
         instance = this;
         ValidateUiReferences();
         LoadBindings();
+        InitializeMouseSensitivity();
         fullscreenMode = PlayerPrefs.GetInt("DisplayFullscreen", 1) == 1;
         ApplyDisplayMode();
         RefreshSettingsLabels();
@@ -81,10 +95,16 @@ public class GameSessionManager : MonoBehaviour {
             return;
 
         instance = null;
+        if (mouseSensitivityXSlider != null)
+            mouseSensitivityXSlider.onValueChanged.RemoveListener(SetMouseSensitivityX);
+        if (mouseSensitivityYSlider != null)
+            mouseSensitivityYSlider.onValueChanged.RemoveListener(SetMouseSensitivityY);
+        SaveMouseSensitivity();
         Time.timeScale = 1f;
     }
 
     public void SetPaused(bool paused) {
+        if (!paused) SaveMouseSensitivity();
         IsPaused = paused;
         rebindingAction = null;
         Time.timeScale = paused ? 0f : 1f;
@@ -115,6 +135,7 @@ public class GameSessionManager : MonoBehaviour {
     }
 
     public void CloseSettings() {
+        SaveMouseSensitivity();
         rebindingAction = null;
         SetRebindingMessage("조작 설정");
 
@@ -209,6 +230,7 @@ public class GameSessionManager : MonoBehaviour {
     }
 
     private void RefreshSettingsLabels() {
+        RefreshMouseSensitivityUi();
         RefreshBindingTexts();
         RefreshDisplayModeIndicators();
     }
@@ -297,6 +319,66 @@ public class GameSessionManager : MonoBehaviour {
         foreach (BindingAction action in Enum.GetValues(typeof(BindingAction)))
             PlayerPrefs.SetString($"KeyBinding.{action}", GetBinding(action).ToString());
         PlayerPrefs.Save();
+    }
+
+    private void InitializeMouseSensitivity() {
+        MouseSensitivityX = ClampSensitivity(PlayerPrefs.GetFloat(SensitivityXKey, 1f));
+        MouseSensitivityY = ClampSensitivity(PlayerPrefs.GetFloat(SensitivityYKey, 1f));
+        ConfigureSensitivitySlider(mouseSensitivityXSlider, MouseSensitivityX);
+        ConfigureSensitivitySlider(mouseSensitivityYSlider, MouseSensitivityY);
+        if (mouseSensitivityXSlider != null)
+            mouseSensitivityXSlider.onValueChanged.AddListener(SetMouseSensitivityX);
+        if (mouseSensitivityYSlider != null)
+            mouseSensitivityYSlider.onValueChanged.AddListener(SetMouseSensitivityY);
+        if (mouseSensitivityXSlider == null || mouseSensitivityYSlider == null)
+            Debug.LogWarning("GameSessionManager: X/Y 감도 Slider를 Inspector에 연결하세요.", this);
+    }
+
+    private static float ClampSensitivity(float value) {
+        return float.IsNaN(value) || float.IsInfinity(value) ? 1f : Mathf.Clamp(value, MinSensitivity, MaxSensitivity);
+    }
+
+    private static void ConfigureSensitivitySlider(Slider slider, float value) {
+        if (slider == null) return;
+        slider.minValue = MinSensitivity;
+        slider.maxValue = MaxSensitivity;
+        slider.wholeNumbers = false;
+        slider.SetValueWithoutNotify(value);
+    }
+
+    public void SetMouseSensitivityX(float value) {
+        MouseSensitivityX = ClampSensitivity(value);
+        PlayerPrefs.SetFloat(SensitivityXKey, MouseSensitivityX);
+        sensitivityDirty = true;
+        RefreshMouseSensitivityUi();
+    }
+
+    public void SetMouseSensitivityY(float value) {
+        MouseSensitivityY = ClampSensitivity(value);
+        PlayerPrefs.SetFloat(SensitivityYKey, MouseSensitivityY);
+        sensitivityDirty = true;
+        RefreshMouseSensitivityUi();
+    }
+
+    private void RefreshMouseSensitivityUi() {
+        if (mouseSensitivityXSlider != null) mouseSensitivityXSlider.SetValueWithoutNotify(MouseSensitivityX);
+        if (mouseSensitivityYSlider != null) mouseSensitivityYSlider.SetValueWithoutNotify(MouseSensitivityY);
+        if (mouseSensitivityXText != null) mouseSensitivityXText.text = $"X  {MouseSensitivityX:0.00}x";
+        if (mouseSensitivityYText != null) mouseSensitivityYText.text = $"Y  {MouseSensitivityY:0.00}x";
+    }
+
+    private void SaveMouseSensitivity() {
+        if (!sensitivityDirty) return;
+        PlayerPrefs.Save();
+        sensitivityDirty = false;
+    }
+
+    private void OnApplicationFocus(bool focused) {
+        if (instance == this && !focused) SaveMouseSensitivity();
+    }
+
+    private void OnApplicationQuit() {
+        if (instance == this) SaveMouseSensitivity();
     }
 
     private void ValidateUiReferences() {
