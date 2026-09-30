@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 3063090853232260951}
   - component: {fileID: 6640054689317133668}
   - component: {fileID: 3503489347223851240}
+  - component: {fileID: 7692978571188618074}
   m_Layer: 0
   m_Name: Ammo
   m_TagString: Untagged
@@ -70,6 +71,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AmmoPack
   ammo: 30
+--- !u!114 &7692978571188618074
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4549149983006180730}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff95fa9bf920c4865be8f3673b77e5a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Rotator
+  rotationSpeed: 60
 --- !u!1001 &3566887742655520824
 PrefabInstance:
   m_ObjectHideFlags: 0
