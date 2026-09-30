@@ -17,8 +17,6 @@ public sealed class Barricade : LivingEntity {
     public bool CanInstall => isActiveAndEnabled && plankPrefab != null && PlankCount < Capacity;
     public bool IsBlocking => isActiveAndEnabled && !dead && PlankCount > 0;
     public Vector3 WorkPosition => transform.position + Vector3.up;
-    //public Canvas barricade;
-    //public Text barricadeHp;
     
     private void Awake() {
         blocker = GetComponent<BoxCollider>();

@@ -213,6 +213,7 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
+  - component: {fileID: 8891000000000123456}
   - component: {fileID: 4216164309617465048}
   - component: {fileID: 6348960568053665866}
   - component: {fileID: 4322052326685399296}
@@ -921,3 +922,34 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 3335217554707375096}
   m_PrefabAsset: {fileID: 0}
+
+--- !u!114 &8891000000000123456
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2950039824188038330}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c739bb2e04284d95a9f36032f4115f90, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  leftHand: {fileID: 6152071590616271580}
+  rightHand: {fileID: 1273138721722614383}
+  leftPositionOffset: {x: 0, y: 0, z: 0}
+  rightPositionOffset: {x: 0, y: 0, z: 0}
+  leftRotationOffset: {x: 0, y: 0, z: 0}
+  rightRotationOffset: {x: 0, y: 0, z: 0}
+  leftPositionWeight: 1
+  rightPositionWeight: 1
+  leftRotationWeight: 1
+  rightRotationWeight: 1
+  leftElbowOffset: {x: -0.12, y: -0.08, z: 0}
+  rightElbowOffset: {x: 0.12, y: -0.08, z: 0}
+  elbowWeight: 0.5
+  blendSeconds: 0.2
+  reloadLeftWeight: 0
+  reloadRightWeight: 1
+  fingerWeight: 1
+  fingerPose: []
