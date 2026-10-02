@@ -16,6 +16,7 @@ public class PlayerHealth : LivingEntity {
     private PlayerShooter playerShooter; // 플레이어 슈터 컴포넌트
 
     private void Awake() {
+        if (GetComponent<GrenadeInventory>() == null) gameObject.AddComponent<GrenadeInventory>();
         if (GetComponent<PlankInventory>() == null) gameObject.AddComponent<PlankInventory>();
         if (GetComponent<BarricadeBuilder>() == null) gameObject.AddComponent<BarricadeBuilder>();
         // 사용할 컴포넌트를 가져오기

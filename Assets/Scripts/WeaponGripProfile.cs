@@ -5,6 +5,10 @@ using UnityEngine;
 public sealed class WeaponGripProfile : MonoBehaviour {
     public Transform leftHand;
     public Transform rightHand;
+    [Tooltip("애니메이션의 오른손 위치에 Right Handle을 맞춥니다. 권총 자세에 사용합니다.")]
+    public bool anchorAtAnimatedRightHand;
+    [Tooltip("오른손 기준 장착 시 손과 무기에 함께 적용하는 캐릭터 로컬 위치 보정")]
+    public Vector3 animatedHandAnchorOffset;
     public Vector3 leftPositionOffset;
     public Vector3 rightPositionOffset;
     public Vector3 leftRotationOffset;

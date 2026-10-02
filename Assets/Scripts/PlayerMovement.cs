@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour {
     public float moveSpeed = 5f;
+    [SerializeField, Min(1f)] private float runSpeedMultiplier = 2f;
     public float rotateSpeed = 180f;
     [SerializeField] private Camera viewCamera;
     [SerializeField] private CinemachineFreeLook freeLookCamera;
@@ -17,6 +18,7 @@ public class PlayerMovement : MonoBehaviour {
     internal CinemachineFreeLook FreeLookCamera => freeLookCamera;
     private static readonly int MoveId = Animator.StringToHash("Move");
     private static readonly int StrafeId = Animator.StringToHash("Rotate");
+    private static readonly int MovementSpeedId = Animator.StringToHash("MovementSpeed");
 
     private void Awake() {
         playerInput = GetComponent<PlayerInput>();
@@ -69,16 +71,20 @@ public class PlayerMovement : MonoBehaviour {
         if (projected.sqrMagnitude > 0.0001f) viewForward = projected.normalized;
         Vector2 input = Vector2.ClampMagnitude(new Vector2(playerInput.rotate, playerInput.move), 1f);
         Vector3 direction = viewForward * input.y + Vector3.Cross(Vector3.up, viewForward) * input.x;
-        playerRigidbody.MovePosition(playerRigidbody.position + direction * moveSpeed * Time.fixedDeltaTime);
+        float speed = moveSpeed * (playerInput.IsRunning ? runSpeedMultiplier : 1f);
+        playerRigidbody.MovePosition(playerRigidbody.position + direction * speed * Time.fixedDeltaTime);
         playerRigidbody.MoveRotation(Quaternion.RotateTowards(playerRigidbody.rotation,
             Quaternion.LookRotation(viewForward), rotateSpeed * Time.fixedDeltaTime));
-        Vector3 localMove = Quaternion.Inverse(playerRigidbody.rotation) * direction;
-        playerAnimator.SetFloat(MoveId, localMove.z);
-        playerAnimator.SetFloat(StrafeId, localMove.x);
+        // 대각선에서도 걷기/달리기의 Blend Tree 반경을 각각 0.5/1로 유지한다.
+        float animationScale = playerInput.IsRunning ? 1f : 0.5f;
+        playerAnimator.SetFloat(MoveId, input.y * animationScale);
+        playerAnimator.SetFloat(StrafeId, input.x * animationScale);
+        playerAnimator.SetFloat(MovementSpeedId, input.magnitude * animationScale);
     }
 
     private void OnValidate() {
         moveSpeed = Mathf.Max(0f, moveSpeed);
+        runSpeedMultiplier = Mathf.Max(1f, runSpeedMultiplier);
         rotateSpeed = Mathf.Max(0f, rotateSpeed);
     }
 

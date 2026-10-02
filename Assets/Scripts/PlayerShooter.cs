@@ -8,9 +8,10 @@ public class PlayerShooter : MonoBehaviour {
     [FormerlySerializedAs("gun"), SerializeField] private Gun legacyGun;
     public Transform leftHandMount;
     public Transform rightHandMount;
-
     private readonly Gun[] weapons = new Gun[2];
     private readonly Gun[] sources = new Gun[2];
+    private static readonly int PistolId = Animator.StringToHash("Pistol");
+    private static readonly int MeleeId = Animator.StringToHash("Melee");  
     private PlayerInput playerInput;
     private Animator playerAnimator;
     private PlayerAimController aim;
@@ -20,6 +21,7 @@ public class PlayerShooter : MonoBehaviour {
     private WeaponGripProfile grip;
     private Transform leftElbowBone;
     private Transform rightElbowBone;
+    private Transform rightHandBone;
     private float leftBlend;
     private float rightBlend;
     private float fingerBlend;
@@ -51,6 +53,7 @@ public class PlayerShooter : MonoBehaviour {
         }
         leftElbowBone = playerAnimator.GetBoneTransform(HumanBodyBones.LeftLowerArm);
         rightElbowBone = playerAnimator.GetBoneTransform(HumanBodyBones.RightLowerArm);
+        rightHandBone = playerAnimator.GetBoneTransform(HumanBodyBones.RightHand);
         originalCulling = playerAnimator.cullingMode;
         playerAnimator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
         if (primaryGun != null) {
@@ -101,6 +104,7 @@ public class PlayerShooter : MonoBehaviour {
         if (gun != null) gun.gameObject.SetActive(false);
         activeSlot = index;
         gun.gameObject.SetActive(isActiveAndEnabled);
+        UpdateWeaponAnimation();
         grip = gun.GetComponent<WeaponGripProfile>();
         leftHandMount = grip != null && grip.leftHand != null ? grip.leftHand : FindHandle("Left Handle");
         rightHandMount = grip != null && grip.rightHand != null ? grip.rightHand : FindHandle("Right Handle");
@@ -111,11 +115,18 @@ public class PlayerShooter : MonoBehaviour {
         fingerBase = new Quaternion[fingerPoses.Length];
         for (int i = 0; i < fingers.Length; i++)
             if (WeaponGripProfile.IsFinger(fingerPoses[i].bone)) fingers[i] = playerAnimator.GetBoneTransform(fingerPoses[i].bone);
-        if (aim != null) {
+        if (aim != null && !(gun is MeleeWeapon)) {
             if (!aimInitialized) aimInitialized = aim.Initialize(gun, gunPivot);
             else aim.SetWeapon(gun);
             gun.SetAimController(aim);
         }
+    }
+
+    private void UpdateWeaponAnimation() {
+        if (playerAnimator == null) return;
+
+        playerAnimator.SetBool(PistolId, gun is Pistol);
+        playerAnimator.SetBool(MeleeId, gun is MeleeWeapon);
     }
 
     private Transform FindHandle(string mountName) => WeaponGrip.FindMount(gun, mountName);
@@ -144,13 +155,36 @@ public class PlayerShooter : MonoBehaviour {
         UIManager ui = UIManager.instance;
         if (gun != null && ui != null && ui.ammoText != null)
             ui.UpdateAmmoText(gun.magAmmo, gun.ammoRemain, gun.HasInfiniteAmmo);
+        
     }
 
     private void OnAnimatorIK(int layerIndex) {
         if (!isActiveAndEnabled || gun == null || playerAnimator == null || layerIndex != gripIkLayer) return;
-        if (weaponAnchor != null && !weaponAnchor.IsChildOf(gunPivot)) gunPivot.position = weaponAnchor.position;
+        if (gun is MeleeWeapon) {
+            // 근접 무기는 손이 애니메이션을 따르고, 배트가 손을 따라간다.
+            playerAnimator.SetIKPositionWeight(AvatarIKGoal.LeftHand, 0f);
+            playerAnimator.SetIKRotationWeight(AvatarIKGoal.LeftHand, 0f);
+            playerAnimator.SetIKPositionWeight(AvatarIKGoal.RightHand, 0f);
+            playerAnimator.SetIKRotationWeight(AvatarIKGoal.RightHand, 0f);
+            playerAnimator.SetIKHintPositionWeight(AvatarIKHint.LeftElbow, 0f);
+            playerAnimator.SetIKHintPositionWeight(AvatarIKHint.RightElbow, 0f);
+            return;
+        }
+        bool handAnchor = grip != null && grip.anchorAtAnimatedRightHand &&
+            rightHandBone != null && rightHandMount != null;
+        Vector3 animatedHandPosition = handAnchor ? rightHandBone.position : Vector3.zero;
+        if (handAnchor) animatedHandPosition += transform.TransformDirection(grip.animatedHandAnchorOffset);
+        if (handAnchor) gunPivot.position = animatedHandPosition;
+        else if (weaponAnchor != null && !weaponAnchor.IsChildOf(gunPivot)) gunPivot.position = weaponAnchor.position;
         else if (rightElbowBone != null) gunPivot.position = rightElbowBone.position;
         if (aim != null) aim.ApplyWeaponAim();
+        if (handAnchor) {
+            // 총구 정렬로 변한 손잡이 위치를 손목에 되돌리고, 변경된 총구 위치에서 조준을 다시 계산한다.
+            for (int i = 0; i < 3; i++) {
+                gunPivot.position += animatedHandPosition - rightHandMount.TransformPoint(grip.rightPositionOffset);
+                if (aim != null) aim.ApplyWeaponAim();
+            }
+        }
         bool reloading = gun.state == Gun.State.Reloading;
         float step = Time.deltaTime / (grip != null ? Mathf.Max(0.01f, grip.blendSeconds) : 0.2f);
         leftBlend = Mathf.MoveTowards(leftBlend, reloading ? (grip != null ? grip.reloadLeftWeight : 0f) : 1f, step);
@@ -191,8 +225,24 @@ public class PlayerShooter : MonoBehaviour {
             (session != null && (session.IsPaused || session.IsRebinding)) ||
             (GameManager.instance != null && GameManager.instance.isGameover)) return;
         // IK가 실행된 프레임에는 총을 다시 회전시키지 않는다.
-        if (gripFrame != Time.frameCount && aim != null) aim.ApplyWeaponAim();
-        ApplyFingers();
+        if (gun is MeleeWeapon melee) {
+            AlignMeleeWeaponToHand();
+            melee.SampleHitbox();
+        } else {
+            if (gripFrame != Time.frameCount && aim != null) aim.ApplyWeaponAim();
+            ApplyFingers();
+        }
         if (Time.timeScale > 0f && playerInput.fire && !playerInput.reload) gun.Fire();
+    }
+
+    private void AlignMeleeWeaponToHand() {
+        if (rightHandBone == null || rightHandMount == null) return;
+        Vector3 positionOffset = grip != null ? grip.rightPositionOffset : Vector3.zero;
+        Quaternion rotationOffset = Quaternion.Euler(grip != null ? grip.rightRotationOffset : Vector3.zero);
+        Quaternion targetRotation = rightHandMount.rotation * rotationOffset;
+        gunPivot.rotation = rightHandBone.rotation * Quaternion.Inverse(targetRotation) * gunPivot.rotation;
+        Vector3 handPosition = rightHandBone.position;
+        if (grip != null) handPosition += transform.TransformDirection(grip.animatedHandAnchorOffset);
+        gunPivot.position += handPosition - (rightHandMount.position + rightHandMount.rotation * positionOffset);
     }
 }

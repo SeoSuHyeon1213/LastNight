@@ -1,7 +1,9 @@
 using UnityEngine;
+using Cinemachine;
 
 // UI 조준 기준을 월드 목표로 바꾸고, 손 IK 전에 무기 전체를 정렬한다.
 [DisallowMultipleComponent]
+[DefaultExecutionOrder(100)]
 public class PlayerAimController : MonoBehaviour {
     [SerializeField] private Camera viewCamera;
     [SerializeField] private RectTransform aimDot;
@@ -11,6 +13,16 @@ public class PlayerAimController : MonoBehaviour {
     [SerializeField, Range(1f, 179f)] private float maxYaw = 100f;
     [SerializeField, Min(0.001f)] private float muzzleClearance = 0.02f;
     [SerializeField, Min(0.01f)] private float alignmentTolerance = 1f;
+    [Header("Aim Zoom")]
+    [SerializeField] private CinemachineFreeLook aimCamera;
+    [SerializeField, Range(1f, 179f)] private float aimFieldOfView = 30f;
+    [SerializeField, Min(1f), Tooltip("초당 FOV 변화량")]
+    private float fieldOfViewChangeSpeed = 120f;
+    private PlayerInput playerInput;
+    private bool fieldOfViewOverridden;
+    private float originalFieldOfView;
+    private readonly CinemachineVirtualCamera[] zoomRigs = new CinemachineVirtualCamera[3];
+    private readonly float[] originalRigFieldOfView = new float[3];
     private Gun gun;
     private Transform pivot;
     private Canvas canvas;
@@ -21,6 +33,80 @@ public class PlayerAimController : MonoBehaviour {
     private readonly RaycastHit[] hits = new RaycastHit[32];
     private readonly Collider[] overlaps = new Collider[32];
     public Vector3 AimTarget { get; private set; }
+
+    private void Awake() {
+        playerInput = GetComponent<PlayerInput>();
+    }
+
+    private void Start() {
+        if (viewCamera == null) viewCamera = Camera.main;
+        if (aimCamera == null) {
+            PlayerMovement movement = GetComponent<PlayerMovement>();
+            if (movement != null) aimCamera = movement.FreeLookCamera;
+        }
+        if (aimCamera == null && viewCamera != null && viewCamera.GetComponent<CinemachineBrain>() != null)
+            Debug.LogWarning("PlayerAimController: Aim Camera에 플레이어의 Cinemachine FreeLook을 연결하세요.", this);
+    }
+
+    private void Update() {
+        UpdateAimFieldOfView();
+    }
+
+    public void UpdateAimFieldOfView() {
+        GameSessionManager session = GameSessionManager.instance;
+        if (!isActiveAndEnabled || playerInput == null || !playerInput.isActiveAndEnabled ||
+            !Application.isFocused || Time.timeScale == 0f ||
+            (GameManager.instance != null && GameManager.instance.isGameover) ||
+            (session != null && (session.IsPaused || session.IsRebinding))) {
+            RestoreFieldOfView();
+            return;
+        }
+        // Cinemachine가 있는 카메라는 실제 Camera 값을 매 프레임 덮어쓰므로 Lens를 조절한다.
+        bool aiming = playerInput.IsAiming;
+        if (!fieldOfViewOverridden) {
+            if (!aiming || (aimCamera == null && viewCamera == null)) return;
+            if (aimCamera != null) {
+                originalFieldOfView = aimCamera.m_Lens.FieldOfView;
+                for (int i = 0; i < zoomRigs.Length; i++) {
+                    zoomRigs[i] = aimCamera.GetRig(i);
+                    if (zoomRigs[i] != null) originalRigFieldOfView[i] = zoomRigs[i].m_Lens.FieldOfView;
+                }
+            } else originalFieldOfView = viewCamera.fieldOfView;
+            fieldOfViewOverridden = true;
+        }
+        float step = fieldOfViewChangeSpeed * Time.deltaTime;
+        float target = aiming ? aimFieldOfView : originalFieldOfView;
+        bool restored;
+        if (aimCamera != null) {
+            aimCamera.m_Lens.FieldOfView = Mathf.MoveTowards(aimCamera.m_Lens.FieldOfView, target, step);
+            restored = Mathf.Approximately(aimCamera.m_Lens.FieldOfView, originalFieldOfView);
+            if (!aimCamera.m_CommonLens) {
+                for (int i = 0; i < zoomRigs.Length; i++) {
+                    if (zoomRigs[i] == null) continue;
+                    float rigTarget = aiming ? aimFieldOfView : originalRigFieldOfView[i];
+                    zoomRigs[i].m_Lens.FieldOfView = Mathf.MoveTowards(zoomRigs[i].m_Lens.FieldOfView, rigTarget, step);
+                    restored &= Mathf.Approximately(zoomRigs[i].m_Lens.FieldOfView, originalRigFieldOfView[i]);
+                }
+            }
+        } else if (viewCamera != null) {
+            viewCamera.fieldOfView = Mathf.MoveTowards(viewCamera.fieldOfView, target, step);
+            restored = Mathf.Approximately(viewCamera.fieldOfView, originalFieldOfView);
+        } else {
+            RestoreFieldOfView();
+            return;
+        }
+        if (!aiming && restored) RestoreFieldOfView();
+    }
+
+    private void RestoreFieldOfView() {
+        if (!fieldOfViewOverridden) return;
+        if (aimCamera != null) {
+            aimCamera.m_Lens.FieldOfView = originalFieldOfView;
+            for (int i = 0; i < zoomRigs.Length; i++)
+                if (zoomRigs[i] != null) zoomRigs[i].m_Lens.FieldOfView = originalRigFieldOfView[i];
+        } else if (viewCamera != null) viewCamera.fieldOfView = originalFieldOfView;
+        fieldOfViewOverridden = false;
+    }
 
     public bool Initialize(Gun weapon, Transform weaponPivot) {
         if (initialized) return gun == weapon && pivot == weaponPivot;
@@ -150,12 +236,15 @@ public class PlayerAimController : MonoBehaviour {
     }
 
     private void OnDisable() {
+        RestoreFieldOfView();
         validAim = false;
         aimFrame = -1;
         if (initialized && pivot != null) pivot.localRotation = initialRotation;
     }
 
     private void OnValidate() {
+        aimFieldOfView = Mathf.Clamp(aimFieldOfView, 1f, 179f);
+        fieldOfViewChangeSpeed = Mathf.Max(1f, fieldOfViewChangeSpeed);
         maxPitch = Mathf.Clamp(maxPitch, 1f, 89f);
         maxYaw = Mathf.Clamp(maxYaw, 1f, 179f);
         muzzleClearance = Mathf.Max(0.001f, muzzleClearance);

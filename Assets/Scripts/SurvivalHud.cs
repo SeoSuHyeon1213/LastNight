@@ -11,8 +11,10 @@ public sealed class SurvivalHud : MonoBehaviour {
     [SerializeField, Min(1f)] private float radarRange = 25f;
     [SerializeField, Min(0.05f)] private float scanInterval = 0.25f;
     [SerializeField, Range(0f, 1f)] private float lowHealthRatio = 0.25f;
-    [SerializeField] private WeaponIcon[] weaponIcons;
-    [System.Serializable] private struct WeaponIcon { public GunData weaponData; public Sprite icon; }
+    [Header("Grenade Display")]
+    [SerializeField] private Sprite grenadeIcon;
+    private int grenadeCount = -1;
+    private int lastGrenadeCount = -2;
     private const float RadarRadius = 86f;
     private static readonly Color Panel = new Color(0.07f, 0.08f, 0.07f, 0.85f);
     private static readonly Color Ink = new Color(0.9f, 0.88f, 0.74f);
@@ -25,6 +27,7 @@ public sealed class SurvivalHud : MonoBehaviour {
     private readonly RectTransform[] cardinals = new RectTransform[4];
     private PlayerShooter shooter;
     private PlankInventory plankInventory;
+    private GrenadeInventory grenadeInventory;
     private Text materialsText;
     private int lastMaterials = -2;
     [Header("Existing UI / migrated from UIManager")]
@@ -62,7 +65,8 @@ public sealed class SurvivalHud : MonoBehaviour {
     }
     private GameObject root;
     private RectTransform radar;
-    private Image healthFill, weaponImage;
+    private Image healthFill, grenadeImage;
+    private Text grenadeCountText;
     private Text healthText, weaponText, ammoText;
     private CanvasGroup visibility;
     private float nextScan;
@@ -84,6 +88,8 @@ public sealed class SurvivalHud : MonoBehaviour {
         }
         shooter = player.GetComponent<PlayerShooter>();
         plankInventory = player.GetComponent<PlankInventory>();
+        grenadeInventory = player.GetComponent<GrenadeInventory>();
+        if (grenadeInventory != null) SetGrenadeCount(grenadeInventory.Count);
         if (plankInventory == null)
             Debug.LogWarning("SurvivalHud: 플레이어에 PlankInventory가 없어 재료 수를 표시할 수 없습니다.", this);
 
@@ -119,8 +125,17 @@ public sealed class SurvivalHud : MonoBehaviour {
         panel = Box("Weapon", root.transform, new Vector2(1, 0), new Vector2(-225, 98), new Vector2(390, 140), Panel);
         weaponText = Label("Weapon Name", panel.transform, new Vector2(0, 42), new Vector2(370, 30), 23);
         ammoText = Label("Ammo", panel.transform, new Vector2(50, -15), new Vector2(265, 70), 30);
-        weaponImage = Box("Weapon Icon", panel.transform, Vector2.one * 0.5f, new Vector2(-135, -15), new Vector2(95, 60), Ink);
-        weaponImage.preserveAspect = true;
+        grenadeImage = Box("Grenade Icon", panel.transform, Vector2.one * 0.5f,
+            new Vector2(-135, 0), new Vector2(40, 40), Color.white);
+        grenadeImage.sprite = grenadeIcon;
+        grenadeImage.preserveAspect = true;
+        grenadeImage.enabled = grenadeIcon != null;
+        if (grenadeIcon == null) {
+            Text fallback = Label("Grenade Label", panel.transform, new Vector2(-135, 0), new Vector2(100, 28), 15);
+            fallback.text = "GRENADE";
+        }
+        grenadeCountText = Label("Grenade Count", panel.transform, new Vector2(-135, -37), new Vector2(95, 28), 23);
+        RefreshGrenadeCount();
         HideLegacy();
     }
 
@@ -176,6 +191,7 @@ public sealed class SurvivalHud : MonoBehaviour {
     private void Update() {
         if (root == null || player == null) return;
         UpdateMaterials();
+        if (grenadeInventory != null) SetGrenadeCount(grenadeInventory.Count);
 
         float max = Mathf.Max(0, player.startingHealth);
         float hp = Mathf.Clamp(player.health, 0, max);
@@ -193,11 +209,6 @@ public sealed class SurvivalHud : MonoBehaviour {
         Gun active = shooter != null ? shooter.gun : null;
         if (!displayInitialized || active != lastWeapon) {
             weaponText.text = active == null ? "NO WEAPON" : active.gunData != null ? active.gunData.displayName : active.name;
-            Sprite icon = null;
-            if (active != null && weaponIcons != null) foreach (WeaponIcon entry in weaponIcons)
-                if (entry.weaponData == active.gunData) { icon = entry.icon; break; }
-            weaponImage.sprite = icon;
-            weaponImage.enabled = icon != null;
         }
         int ammo = active != null ? active.magAmmo : -1;
         int reserve = active != null ? active.ammoRemain : -1;
@@ -205,7 +216,7 @@ public sealed class SurvivalHud : MonoBehaviour {
         bool reloading = active != null && active.state == Gun.State.Reloading;
         if (!displayInitialized || active != lastWeapon || ammo != lastAmmo || reserve != lastReserve ||
             infinite != lastInfinite || reloading != lastReloading) {
-            ammoText.text = active == null ? "-- / --" : $"{ammo} / {(infinite ? "INF" : reserve.ToString())}" +
+            ammoText.text = active == null ? "-- / --" : !active.UsesAmmo ? "MELEE" : $"{ammo} / {(infinite ? "INF" : reserve.ToString())}" +
                 (reloading ? "\nRELOADING" : "");
             lastAmmo = ammo; lastReserve = reserve; lastInfinite = infinite; lastReloading = reloading;
         }
@@ -219,6 +230,19 @@ public sealed class SurvivalHud : MonoBehaviour {
         }
         UpdateRadar();
     }
+    // 수류탄 인벤토리가 초기화되거나 획득/사용될 때 실제 보유량을 전달한다.
+    public void SetGrenadeCount(int count) {
+        grenadeCount = Mathf.Max(0, count);
+        RefreshGrenadeCount();
+    }
+
+    private void RefreshGrenadeCount() {
+        if (grenadeCountText == null || lastGrenadeCount == grenadeCount) return;
+        grenadeCountText.text = grenadeCount < 0 ? "--" : $"x{grenadeCount}";
+        grenadeCountText.color = grenadeCount == 0 ? Danger : Ink;
+        lastGrenadeCount = grenadeCount;
+    }
+
     private void UpdateMaterials() {
         int count = plankInventory != null ? plankInventory.Count : -1;
         if (count == lastMaterials) return;

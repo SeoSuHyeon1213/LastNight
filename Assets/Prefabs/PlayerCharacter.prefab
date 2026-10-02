@@ -616,7 +616,7 @@ Light:
   m_Type: 2
   m_Color: {r: 0.4245283, g: 0.4245283, b: 0.4245283, a: 1}
   m_Intensity: 1
-  m_Range: 10
+  m_Range: 5
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
   m_CookieSize2D: {x: 0.5, y: 0.5}
@@ -654,7 +654,7 @@ Light:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingLayerMask: 1
-  m_Lightmapping: 4
+  m_Lightmapping: 1
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
@@ -4852,6 +4852,7 @@ GameObject:
   - component: {fileID: 2740824553073290283}
   - component: {fileID: 8250935838753833730}
   - component: {fileID: 4971886445054763911}
+  - component: {fileID: 98150355394393932}
   m_Layer: 9
   m_Name: PlayerCharacter
   m_TagString: Player
@@ -5042,6 +5043,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   moveSpeed: 5
+  runSpeedMultiplier: 2
   rotateSpeed: 180
   viewCamera: {fileID: 0}
   freeLookCamera: {fileID: 0}
@@ -5075,7 +5077,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a558a9e6e5e01c842a3d56a3e825e54e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerShooter
-  primaryGun: {fileID: 4766485307077727047, guid: e765d30d0e9874e738700c6ba652d683,
+  primaryGun: {fileID: 6297529521400363051, guid: e1364dd5af068984a902d418574d96ed,
     type: 3}
   secondaryGun: {fileID: 8331821144373277938, guid: 165ff8c1475b64f218fe7ef0f716e4d7,
     type: 3}
@@ -5083,6 +5085,8 @@ MonoBehaviour:
   legacyGun: {fileID: 0}
   leftHandMount: {fileID: 0}
   rightHandMount: {fileID: 0}
+  weaponAnchor: {fileID: 0}
+  gripIkLayer: 1
 --- !u!114 &2740824553073290283
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5146,6 +5150,19 @@ CapsuleCollider:
   m_Height: 1.8
   m_Direction: 1
   m_Center: {x: 0, y: 0.85, z: 0}
+--- !u!114 &98150355394393932
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8843637787957688676}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f94dce17d7fd4cfc9466298e9d700be6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GrenadeInventory
+  capacity: 5
 --- !u!1 &8915284272443541378
 GameObject:
   m_ObjectHideFlags: 0

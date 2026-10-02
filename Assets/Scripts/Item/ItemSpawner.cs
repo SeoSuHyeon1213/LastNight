@@ -21,6 +21,9 @@ public class ItemSpawner : MonoBehaviour {
         GameObject planks = Resources.Load<GameObject>("Barricade/Plank Pickup");
         if (planks != null && !valid.Contains(planks)) valid.Add(planks);
         else if (planks == null) Debug.LogWarning("ItemSpawner: Tools/Zombie/Create Barricade Assets로 판자 픽업을 생성하세요.", this);
+        GameObject grenadePickup = Resources.Load<GameObject>("Grenade Pickup");
+        if (grenadePickup != null && !valid.Contains(grenadePickup)) valid.Add(grenadePickup);
+        else if (grenadePickup == null) Debug.LogWarning("ItemSpawner: Resources/Grenade Pickup 프리팹을 찾을 수 없습니다.", this);
         items = valid.ToArray();
         if (items.Length == 0) {
             Debug.LogError("ItemSpawner: 생성 가능한 아이템이 없습니다.", this);

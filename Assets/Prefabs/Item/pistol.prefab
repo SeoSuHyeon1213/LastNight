@@ -255,7 +255,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.5, y: 1, z: 1}
+  m_LocalScale: {x: 0.75, y: 1.25, z: 1.25}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 143667503156284508}
@@ -280,6 +280,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   leftHand: {fileID: 5100065875299798016}
   rightHand: {fileID: 7448952646506240016}
+  anchorAtAnimatedRightHand: 1
+  animatedHandAnchorOffset: {x: 0.1, y: 0.05, z: 0.06}
   leftPositionOffset: {x: 0, y: 0, z: 0}
   rightPositionOffset: {x: 0, y: 0, z: 0}
   leftRotationOffset: {x: 0, y: 0, z: 0}
@@ -411,7 +413,7 @@ SkinnedMeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4235842757123595903}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -767,7 +769,7 @@ SkinnedMeshRenderer:
   - {fileID: 8877663299023246579}
   - {fileID: 3711218210968822826}
   m_BlendShapeWeights: []
-  m_RootBone: {fileID: 0}
+  m_RootBone: {fileID: 5796668007797152339}
   m_AABB:
     m_Center: {x: 0.0032896, y: 0.011649885, z: -0.0015270233}
     m_Extent: {x: 0.0011214932, y: 0.0016897982, z: 0.0011589655}

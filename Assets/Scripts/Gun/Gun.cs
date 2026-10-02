@@ -21,6 +21,8 @@ public class Gun : MonoBehaviour {
     private LineRenderer bulletLineRenderer; // 총알 궤적을 그리기 위한 렌더러
     [SerializeField, Min(0.01f)] private float shotEffectDuration = 0.03f;
     private int shotEffectVersion;
+    protected float ShotEffectDuration => shotEffectDuration;
+    protected virtual bool UsesSingleShotLine => true;
 
     [SerializeField] private AudioSource gunAudioPlayer; // 비워두면 같은 오브젝트의 출력을 사용
 
@@ -31,6 +33,7 @@ public class Gun : MonoBehaviour {
     public float FireDistance => fireDistance;
     // 예비 탄약의 무한 여부. 탄창은 모든 무기에서 소모한다.
     public virtual bool HasInfiniteAmmo => false;
+    public virtual bool UsesAmmo => true;
 
     public void SetAimController(PlayerAimController controller) {
         aimController = controller;
@@ -71,7 +74,7 @@ public class Gun : MonoBehaviour {
     }
 
     // 발사 시도
-    public void Fire() {
+    public virtual void Fire() {
         if (!isActiveAndEnabled || gunData == null || fireTransform == null) return;
         // 현재 상태가 발사 가능한 상태
         // && 마지막 총 발사 시점에서 timeBetFire 이상의 시간이 지남
@@ -162,7 +165,7 @@ public class Gun : MonoBehaviour {
         // 총격 소리 재생
         PlaySound(gunData.shotClip);
 
-        if (bulletLineRenderer == null) yield break;
+        if (!UsesSingleShotLine || bulletLineRenderer == null) yield break;
 
         // 선의 시작점은 총구의 위치
         bulletLineRenderer.SetPosition(0, fireTransform.position);

@@ -16,9 +16,63 @@ public sealed class Shotgun : Gun {
 
     private readonly Dictionary<IDamageable, PelletDamage> damageByTarget =
         new Dictionary<IDamageable, PelletDamage>();
+    private readonly List<LineRenderer> pelletLines = new List<LineRenderer>();
+    private LineRenderer lineTemplate;
+    private float linesUntil;
+    protected override bool UsesSingleShotLine => false;
+
+    protected override void Awake() {
+        base.Awake();
+        lineTemplate = GetComponent<LineRenderer>();
+        if (lineTemplate == null)
+            Debug.LogWarning("Shotgun: 산탄 궤적 표시에는 같은 오브젝트의 LineRenderer가 필요합니다.", this);
+    }
+
+    private void EnsureLines() {
+        if (lineTemplate == null) return;
+        while (pelletLines.Count < pelletCount) {
+            var child = new GameObject("Pellet Line " + (pelletLines.Count + 1));
+            child.layer = gameObject.layer;
+            child.transform.SetParent(transform, false);
+            var line = child.AddComponent<LineRenderer>();
+            line.sharedMaterials = lineTemplate.sharedMaterials;
+            line.widthCurve = lineTemplate.widthCurve;
+            line.widthMultiplier = lineTemplate.widthMultiplier;
+            line.colorGradient = lineTemplate.colorGradient;
+            line.numCapVertices = lineTemplate.numCapVertices;
+            line.numCornerVertices = lineTemplate.numCornerVertices;
+            line.alignment = lineTemplate.alignment;
+            line.textureMode = lineTemplate.textureMode;
+            line.sortingLayerID = lineTemplate.sortingLayerID;
+            line.sortingOrder = lineTemplate.sortingOrder;
+            line.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            line.receiveShadows = false;
+            line.useWorldSpace = true;
+            line.positionCount = 2;
+            line.enabled = false;
+            pelletLines.Add(line);
+        }
+        HideLines();
+    }
+
+    private void HideLines() {
+        foreach (LineRenderer line in pelletLines) if (line != null) line.enabled = false;
+    }
+
+    private void Update() {
+        if (Time.time >= linesUntil) HideLines();
+    }
+
+    protected override void OnDisable() {
+        base.OnDisable();
+        HideLines();
+        damageByTarget.Clear();
+    }
 
     protected override Vector3 ResolveShot(bool hasHit, RaycastHit firstHit, Vector3 hitPosition) {
         damageByTarget.Clear();
+        EnsureLines();
+        linesUntil = Time.time + ShotEffectDuration;
         Vector3 origin = fireTransform.position;
         Vector3 effectEnd = origin + fireTransform.forward * FireDistance;
         float coneRadius = Mathf.Tan(spreadAngle * Mathf.Deg2Rad);
@@ -28,8 +82,14 @@ public sealed class Shotgun : Gun {
             Vector3 direction = (fireTransform.forward + fireTransform.right * spread.x +
                 fireTransform.up * spread.y).normalized;
             bool pelletHit = TryGetDirectionalShotHit(direction, out RaycastHit hit);
-            // 기본 Gun의 단일 궤적은 첫 번째 산탄을 표시한다.
-            if (i == 0) effectEnd = pelletHit ? hit.point : origin + direction * FireDistance;
+            // 표시와 피해 판정에 같은 레이캐스트 결과를 사용한다.
+            Vector3 endpoint = pelletHit ? hit.point : origin + direction * FireDistance;
+            if (i == 0) effectEnd = endpoint;
+            if (i < pelletLines.Count) {
+                pelletLines[i].SetPosition(0, origin);
+                pelletLines[i].SetPosition(1, endpoint);
+                pelletLines[i].enabled = true;
+            }
             if (!pelletHit) continue;
 
             IDamageable target = hit.collider.GetComponentInParent<IDamageable>();
