@@ -67,5 +67,5 @@
         "*.sln": "*.csproj",
         "*.slnx": "*.csproj"
     },
-    "dotnet.defaultSolution": "Zombie - 복사본.slnx"
+    "dotnet.defaultSolution": "LastNight.slnx"
 }

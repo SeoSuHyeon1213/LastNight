@@ -5,7 +5,8 @@ using UnityEngine;
 using TMPro;
 
 
-// 5, 10, 15... 웨이브 시작 시 Empty 위치에 새 무기를 생성한다.
+// 5, 10, 15... 웨이브에 Empty 위치에 새 무기를 생성한다.
+// 일반 웨이브는 생성 시작 시, 빅웨이브는 준비 진입 시 한 번만 지급하고 전투 시작 때는 지급하지 않는다.
 public sealed class RandomWeaponSpawner : MonoBehaviour {
     public enum WeaponSlot { Primary = 1, Secondary = 2 }
 
@@ -19,12 +20,14 @@ public sealed class RandomWeaponSpawner : MonoBehaviour {
     public Entry[] weapons;
     public ZombieSpawner waveSpawner;
     public TextMeshProUGUI spawnNotification;
-    private const int WaveInterval = 5;
+    [SerializeField, Min(1)] private int supplyWaveInterval = 5;
     [SerializeField, Min(0.1f)] private float pickupRadius = 0.8f;
     [SerializeField] private Vector3 displayOffset = new Vector3(0f, 0.5f, 0f);
     private readonly List<Entry> available = new List<Entry>();
     private GameObject currentPickup;
-    private int lastObservedWave = -1;
+    private int lastSuppliedWave = -1; // 같은 웨이브 중복 지급 방지
+    private bool started;
+    private bool subscribed;
     private bool isWeaponSpawned = false;
     private Coroutine hideCoroutine;
 
@@ -58,17 +61,38 @@ public sealed class RandomWeaponSpawner : MonoBehaviour {
         if (available.Count == 0) {
             Debug.LogError("RandomWeaponSpawner: 유효한 무기 프리팹을 하나 이상 연결하세요.", this);
             enabled = false;
+            return;
         }
-
+        started = true;
+        Subscribe();
     }
 
-    private void Update() {
-        if (Time.timeScale <= 0f || (GameManager.instance != null && GameManager.instance.isGameover)) return;
-        if (waveSpawner == null || available.Count == 0) return;
-        int wave = waveSpawner.wave;
-        if (wave == lastObservedWave) return;
-        lastObservedWave = wave;
-        if (wave <= 0 || wave % WaveInterval != 0) return;
+    private void OnEnable() {
+        if (started) Subscribe();
+    }
+
+    private void Subscribe() {
+        if (subscribed || waveSpawner == null) return;
+        waveSpawner.PhaseChanged += HandleWavePhaseChanged;
+        subscribed = true;
+    }
+
+    private void Unsubscribe() {
+        if (!subscribed) return;
+        if (waveSpawner != null) waveSpawner.PhaseChanged -= HandleWavePhaseChanged;
+        subscribed = false;
+    }
+
+    private void HandleWavePhaseChanged(WaveStatus status) {
+        if (available.Count == 0 || (GameManager.instance != null && GameManager.instance.isGameover)) return;
+        bool supplyMoment = status.IsBigWave ? status.Phase == WavePhase.Preparing : status.Phase == WavePhase.Spawning;
+        if (!supplyMoment || status.Wave <= 0 || status.Wave % supplyWaveInterval != 0) return;
+        if (status.Wave == lastSuppliedWave) return;
+        lastSuppliedWave = status.Wave;
+        SupplyWeapon();
+    }
+
+    private void SupplyWeapon() {
         // 한 생성기에는 한 자루만 남겨 다음 보급 때 미획득 무기를 교체한다.
         if (currentPickup != null) {
             currentPickup.SetActive(false);
@@ -135,6 +159,7 @@ public sealed class RandomWeaponSpawner : MonoBehaviour {
     }
 
     private void OnDisable() {
+        Unsubscribe();
         if (hideCoroutine != null) {
             StopCoroutine(hideCoroutine);
             hideCoroutine = null;

@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.AI;
 
 [RequireComponent(typeof(BoxCollider))]
 public sealed class Barricade : LivingEntity {
@@ -9,6 +10,7 @@ public sealed class Barricade : LivingEntity {
     [Min(0.1f)] public float installSeconds = 1.5f;
     private GameObject[] planks;
     private BoxCollider blocker;
+    [SerializeField] private NavMeshObstacle navigationObstacle;
     public int PlankCount { get; private set; }
     public int DamageRevision { get; private set; }
     public int Capacity => plankSockets == null ? 0 : plankSockets.Length;
@@ -20,6 +22,7 @@ public sealed class Barricade : LivingEntity {
     
     private void Awake() {
         blocker = GetComponent<BoxCollider>();
+        if (navigationObstacle == null) navigationObstacle = GetComponent<NavMeshObstacle>();
         blocker.isTrigger = false;
         if (plankPrefab == null || Capacity == 0) {
             Debug.LogError("Barricade: Plank Prefab과 Plank Sockets를 연결하세요.", this);
@@ -55,6 +58,7 @@ public sealed class Barricade : LivingEntity {
 
     private void OnDisable() {
         if (blocker != null) blocker.enabled = false;
+        if (navigationObstacle != null) navigationObstacle.enabled = false;
     }
 
     public bool TryInstall(PlankInventory inventory) {
@@ -91,6 +95,7 @@ public sealed class Barricade : LivingEntity {
         if (planks != null)
             for (int i = 0; i < planks.Length; i++) planks[i].SetActive(i < PlankCount);
         blocker.enabled = isActiveAndEnabled && PlankCount > 0;
+        if (navigationObstacle != null) navigationObstacle.enabled = blocker.enabled;
     }
 
     private void OnValidate() {

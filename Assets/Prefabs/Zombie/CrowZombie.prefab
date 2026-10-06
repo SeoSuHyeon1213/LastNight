@@ -2314,23 +2314,28 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 819
   attackHeight: 1
+  detectionRadius: 8
+  sightBlockingLayers:
+    serializedVersion: 2
+    m_Bits: 4294967291
+  loseTargetSeconds: 3
+  chaseSearchSeconds: 4
+  hearingProfile: {fileID: 0}
+  drawStateGizmo: 1
   zombieDatas:
   - {fileID: 11400000, guid: a63bb0910a62b41dd8be25a6fddf3775, type: 2}
   - {fileID: 11400000, guid: 98d77de1e43e841ed852b3bac5e1b712, type: 2}
   - {fileID: 11400000, guid: f5f86298be1e74b2984cd6464d8e5785, type: 2}
-  spawnPoints:
-  - {fileID: 8102853027708391698}
-  - {fileID: 61647844511259691}
-  - {fileID: 61647844511259691}
-  - {fileID: 1215255299925779686}
   zombiePrefab:
   - {fileID: 5325570615448733692, guid: 1024ba28c22af4ecd941246cfc1ebf8b, type: 3}
   - {fileID: 2521455219382686584, guid: 181a9e4f8b90d4fdc98ddceb184649c3, type: 3}
-  zombies: []
-  spawnEffect: {fileID: 4425129568604114668, guid: 996166858328d4c509aeba2a890a2854,
+  summonProfile: {fileID: 11400000, guid: 69ccdf28c5966524fa31d54109491f6a, type: 2}
+  telegraphMarkerPrefab: {fileID: 6181825064965692790, guid: 2eb045437f8f428418d2ec49269ec49d,
     type: 3}
+  summonerAura: {fileID: 0}
   spawnAudio: {fileID: 8246072014306468047}
   spawnSound: {fileID: 8300000, guid: 519ad2e4de69341948a938bf2a31e33b, type: 3}
+  telegraphSound: {fileID: 0}
 --- !u!195 &3895146112644083494
 NavMeshAgent:
   m_ObjectHideFlags: 0

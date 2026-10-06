@@ -43,14 +43,17 @@ public class LivingEntity : MonoBehaviour, IDamageable {
 
     // 사망 처리
     public virtual void Die() {
+        // 중복 사망 처리 방지
+        if (dead) return;
+
+        // 사망 콜백 안에서도 이미 사망 상태로 보이도록 이벤트보다 먼저 설정
+        dead = true;
+
         // onDeath 이벤트에 등록된 메서드가 있다면 실행
         if (onDeath != null)
         {
             onDeath();
         }
-
-        // 사망 상태를 참으로 변경
-        dead = true;
     }
 
 }

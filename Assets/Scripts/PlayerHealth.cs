@@ -1,9 +1,12 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI; // UI 관련 코드
 
 // 플레이어 캐릭터의 생명체로서의 동작을 담당
 public class PlayerHealth : LivingEntity {
     public Slider healthSlider; // 체력을 표시할 UI 슬라이더
+    // 아이템을 사용(획득)하고 획득음을 재생한 직후 호출된다. 소음 발생기가 구독한다.
+    public event Action ItemPickedUp;
 
     public AudioClip deathClip; // 사망 소리
     public AudioClip hitClip; // 피격 소리
@@ -68,6 +71,8 @@ public class PlayerHealth : LivingEntity {
 
     // 사망 처리
     public override void Die() {
+        // 이미 사망했다면 사망 연출·조작 비활성화를 반복하지 않음
+        if (dead) return;
         // LivingEntity의 Die() 실행(사망 적용)
         base.Die();
 
@@ -99,6 +104,7 @@ public class PlayerHealth : LivingEntity {
                 item.Use(gameObject);
                 // 아이템 습득 소리 재생
                 playerAudioPlayer.PlayOneShot(itemPickupClip);
+                ItemPickedUp?.Invoke();
             }
         }
     }

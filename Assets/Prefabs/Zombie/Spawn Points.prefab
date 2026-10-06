@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 1023815394839674}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -12.5, y: 0.5, z: 2}
+  m_LocalPosition: {x: -16.13, y: 0, z: 17.04}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -56,7 +56,7 @@ Transform:
   m_GameObject: {fileID: 1185316025262292}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.5, y: 0.5, z: -9}
+  m_LocalPosition: {x: -0.11, y: 0, z: -13.1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -87,7 +87,7 @@ Transform:
   m_GameObject: {fileID: 1651746646052356}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 9.5, y: 0.5, z: 2}
+  m_LocalPosition: {x: 23.26, y: 0, z: 23.51}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -142,9 +142,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ZombieSpawner
   zombiePrefab:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 5325570615448733692, guid: 3e832e7aafc7f804e8d14ef56082d4fe, type: 3}
+  - {fileID: 2521455219382686584, guid: 6e06e31383dbb4140bfc8f0d6e202f4f, type: 3}
+  - {fileID: 4741433368754888131, guid: ccfde5e7491672f49b6d6733c28e556b, type: 3}
   zombieDatas:
   - {fileID: 11400000, guid: a63bb0910a62b41dd8be25a6fddf3775, type: 2}
   - {fileID: 11400000, guid: 98d77de1e43e841ed852b3bac5e1b712, type: 2}
@@ -154,6 +154,10 @@ MonoBehaviour:
   - {fileID: 4008875457194926}
   - {fileID: 4821426734562698}
   - {fileID: 4984717578414758}
+  enemyRegistry: {fileID: 0}
+  spawnCountPerWave: 1.5
+  corpseDestroyDelay: 10
+  scorePerKill: 100
 --- !u!1 &1825065516638574
 GameObject:
   m_ObjectHideFlags: 0
@@ -179,7 +183,7 @@ Transform:
   m_GameObject: {fileID: 1825065516638574}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: -1.5, y: 0.5, z: 13}
+  m_LocalPosition: {x: -0.1, y: 0, z: 27.6}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

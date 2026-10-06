@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba13bab5c6f1281498c7f5a2a44303e2, type: 3}
+  m_Name: Noise Profile
+  m_EditorClassIdentifier: Assembly-CSharp::NoiseProfile
+  gunshot:
+    radius: 30
+    repeatInterval: 1
+    indoorMultiplier: 1
+  movement:
+    radius: 8
+    repeatInterval: 0.5
+    indoorMultiplier: 0.7
+  aimMovement:
+    radius: 3
+    repeatInterval: 0.5
+    indoorMultiplier: 0.7
+  stationary:
+    radius: 0
+    repeatInterval: 0.5
+    indoorMultiplier: 0.7
+  reload:
+    radius: 5
+    repeatInterval: 0
+    indoorMultiplier: 0.7
+  itemPickup:
+    radius: 4
+    repeatInterval: 0
+    indoorMultiplier: 0.7
+  barricadeWork:
+    radius: 10
+    repeatInterval: 1
+    indoorMultiplier: 0.7

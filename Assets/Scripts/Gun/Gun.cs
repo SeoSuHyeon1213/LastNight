@@ -43,6 +43,8 @@ public class Gun : MonoBehaviour {
     public int magAmmo; // 현재 탄창에 남아있는 탄약
     
     private float lastFireTime; // 총을 마지막으로 발사한 시점
+    // 실제로 발사된 시각. 소음 발생기가 발사 여부를 감지하는 데 사용한다.
+    public float LastFireTime => lastFireTime;
     private bool ammoInitialized;
     
     protected virtual void Awake() {
