@@ -8,6 +8,16 @@ public class ItemSpawner : MonoBehaviour {
 
     public float maxDistance = 5f; // 플레이어 위치로부터 아이템이 배치될 최대 반경
 
+    [Header("Spawn Location")]
+    [SerializeField, Min(0f)] private float maxHeightDifference = 0.75f;
+    [SerializeField, Min(0.01f)] private float navMeshSampleDistance = 1f;
+    [SerializeField, Min(1)] private int locationAttempts = 20;
+    [SerializeField, Min(0f)] private float groundOffset = 0.5f;
+    [SerializeField, Min(0.01f)] private float pickupClearance = 0.25f;
+    [SerializeField] private LayerMask blockingLayers = Physics.DefaultRaycastLayers;
+    [SerializeField] private int agentTypeId;
+    private NavMeshPath spawnPath;
+    private bool warnedNoSpawnPosition;
     public float timeBetSpawnMax = 7f; // 최대 시간 간격
     public float timeBetSpawnMin = 2f; // 최소 시간 간격
     private float timeBetSpawn; // 생성 간격
@@ -54,9 +64,15 @@ public class ItemSpawner : MonoBehaviour {
     // 실제 아이템 생성 처리
     private void Spawn() {
         // 플레이어 근처에서 내비메시 위의 랜덤 위치 가져오기
-        if (!TryGetRandomPointOnNavMesh(playerTransform.position, maxDistance, out Vector3 spawnPosition)) return;
-        // 바닥에서 0.5만큼 위로 올리기
-        spawnPosition += Vector3.up * 0.5f;
+        if (!TryGetRandomPointOnNavMesh(playerTransform.position, maxDistance, out Vector3 spawnPosition)) {
+            if (!warnedNoSpawnPosition)
+                Debug.LogWarning("ItemSpawner: 플레이어와 비슷한 높이의 접근 가능한 위치를 찾지 못해 이번 생성을 건너뜁니다.", this);
+            warnedNoSpawnPosition = true;
+            return;
+        }
+        warnedNoSpawnPosition = false;
+        // 검증된 바닥 위에 아이템 표시 높이를 더한다.
+        spawnPosition += Vector3.up * groundOffset;
 
         // 아이템 중 하나를 무작위로 골라 랜덤 위치에 생성
         GameObject selectedItem = items[Random.Range(0, items.Length)];
@@ -66,21 +82,39 @@ public class ItemSpawner : MonoBehaviour {
         Destroy(item, 5f);
     }
 
-    // 내비메시 위의 랜덤한 위치를 반환하는 메서드
-    // center를 중심으로 distance 반경 안에서 랜덤한 위치를 찾는다
     private bool TryGetRandomPointOnNavMesh(Vector3 center, float distance, out Vector3 position) {
-        // center를 중심으로 반지름이 maxDistance인 구 안에서의 랜덤한 위치 하나를 저장
-        // Random.insideUnitSphere는 반지름이 1인 구 안에서의 랜덤한 한 점을 반환하는 프로퍼티
-        Vector3 randomPos = Random.insideUnitSphere * distance + center;
+        position = default;
+        if (distance <= 0f) return false;
+        var filter = new NavMeshQueryFilter { agentTypeID = agentTypeId, areaMask = NavMesh.AllAreas };
+        if (!NavMesh.SamplePosition(center, out NavMeshHit playerHit, navMeshSampleDistance, filter) ||
+            Mathf.Abs(playerHit.position.y - center.y) > maxHeightDifference) return false;
+        if (spawnPath == null) spawnPath = new NavMeshPath();
 
-        // 내비메시 샘플링의 결과 정보를 저장하는 변수
-        NavMeshHit hit;
+        for (int attempt = 0; attempt < locationAttempts; attempt++) {
+            Vector2 offset = Random.insideUnitCircle * distance;
+            Vector3 candidate = center + new Vector3(offset.x, 0f, offset.y);
+            if (!NavMesh.SamplePosition(candidate, out NavMeshHit hit, navMeshSampleDistance, filter)) continue;
+            // SamplePosition은 다른 층을 고를 수 있으므로 보정된 최종 위치를 다시 검사한다.
+            if (Mathf.Abs(hit.position.y - center.y) > maxHeightDifference) continue;
+            Vector3 horizontal = hit.position - center;
+            horizontal.y = 0f;
+            if (horizontal.sqrMagnitude > distance * distance) continue;
+            if (!NavMesh.CalculatePath(playerHit.position, hit.position, filter, spawnPath) ||
+                spawnPath.status != NavMeshPathStatus.PathComplete) continue;
+            if (Physics.CheckSphere(hit.position + Vector3.up * groundOffset, pickupClearance,
+                blockingLayers, QueryTriggerInteraction.Ignore)) continue;
+            position = hit.position;
+            return true;
+        }
+        return false;
+    }
 
-        // maxDistance 반경 안에서, randomPos에 가장 가까운 내비메시 위의 한 점을 찾음
-        bool found = NavMesh.SamplePosition(randomPos, out hit, distance, NavMesh.AllAreas);
-
-        // 찾은 점 반환
-        position = hit.position;
-        return found;
+    private void OnValidate() {
+        maxDistance = Mathf.Max(0.01f, maxDistance);
+        maxHeightDifference = Mathf.Max(0f, maxHeightDifference);
+        navMeshSampleDistance = Mathf.Max(0.01f, navMeshSampleDistance);
+        locationAttempts = Mathf.Max(1, locationAttempts);
+        groundOffset = Mathf.Max(0f, groundOffset);
+        pickupClearance = Mathf.Max(0.01f, pickupClearance);
     }
 }
