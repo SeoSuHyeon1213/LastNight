@@ -200,3 +200,37 @@
 - 테스트 조작은 Play Mode에서만 수행했다. CLI 검증 중 `Application.runInBackground=true`로 실제 게임 프레임을 진행했고 원래 값 false로 복원했다. 테스트 웨이브·간격·생성물·HP·구역 변경은 씬 재시작/Play Mode 종료로 제거했다.
 - 실제 Unity 컴파일 오류 없음. 테스트 중 발견한 NavMeshPath 필드 초기화 예외는 수정 후 재검증했다. 기존 손상된 `Assets/Prefabs/Zombie.meta`와 CLI 연결/설정 실패 기록을 새 게임 런타임 오류와 구분한다.
 - 미검증: 맵 전체 수동 동선·다층 실내 카메라/물리 이동, 장시간 성능·밸런스, 이동 거점. 검증 스니펫은 일부 타격 이벤트·경계 타이머를 직접 호출하므로 전체 애니메이션 연출 검증을 대체하지 않는다.
+
+### 2026-10-06 거점 구역·보관소·NavMesh 점검
+
+코드 변경 없이 기존 코드의 구역 사용 여부를 확인하고, 사용자가 에디터에서 설정을 바꾼 내용을 기록한다. 체크는 사용자 확인 또는 코드 확인 근거가 있는 항목만 한다.
+
+- [x] 집 실내 구역 콜라이더가 코드에서 사용되는지 확인했다. (코드 확인: `SpawnLocationValidator.indoorZones`의 `ClosestPoint` 판정 → 소환·대기 군집 실내 생성 거부, `PlayerNoiseEmitter`의 `areaValidator`/`indoorZoneLayers` → 실내 소음 감쇠. 집별 ID·활성 거점 구분과 일반 웨이브 생성 검증에는 쓰이지 않음)
+- [x] 집 프리팹 상위 빈 오브젝트에 Trigger BoxCollider를 두고 Layer를 `IndoorZone`으로 지정했다. (사용자 에디터 작업. 레이캐스트·오버랩은 `QueryTriggerInteraction.Ignore`라 사격·시야·타격에 영향 없음을 코드로 확인)
+- [x] `SpawnLocationValidator` 연결 오류(`Base Target과 Indoor Zones를 연결하세요`)가 Console에 없다. (사용자 확인)
+- [ ] `Zombie.whatIsTarget`에 `IndoorZone` Layer가 포함되지 않았는지 확인한다. (20m 탐지 `OverlapSphere`만 트리거 처리를 지정하지 않음)
+- [x] `Base Storage`(1.2m Cube) 콜라이더를 Trigger로 바꿨다. (사용자 에디터 작업. 보관소 공격은 `UpdateBaseApproach`가 거리로 직접 판정하므로 Trigger여도 동작함을 코드로 확인)
+- [ ] Trigger 전환 후 좀비가 보관소 앞까지 접근해 공격하는지 Play Mode로 확인한다.
+- [ ] `IdleGroupDirector: 대기 1마리 중 0마리만 배치 (조건에 맞는 지점 0개)` 경고의 원인(후보 지점 거리·실내·경로)을 확인한다.
+- [ ] (보류) NavMesh 재설정: 현재 Agent Radius 0.05·Height 0.4·Step 0.4·Slope 60. 권장 시작값 Radius 0.25~0.3(좀비 NavMeshAgent와 동일)·Height 1.8·Step 0.4·Slope 45. 보관소·IndoorZone·바닥 장식은 `NavMeshModifier`(Ignore From Build)로 제외, 계단은 보이지 않는 경사로, 남는 틈은 `NavMeshLink`로 연결 후 재Bake.
+- 참고: `Base Storage`의 `Starting Health`(100)는 `OnEnable`에서 `Maximum Health`(1000)로 덮어써져 쓰이지 않는다.
+- 참고: 위 4.6단계 기록의 "실내 감쇠 미적용"은 리뷰 보완 5번 이후 기준으로 대체되었다.
+- 참고: 이 프로젝트 `Packages/manifest.json`에는 MCP for Unity 패키지가 없어 이번 점검에서 Unity MCP로 에디터 연결을 확인하지 못했다.
+
+### 2026-10-06 NavMesh 장식 메시 일괄 보완
+
+- [x] Unity CLI로 실제 설정을 재확인했다. `Render Meshes`, Radius 0.3 / Height 1.8 / Step 0.4 / Slope 45, Voxel Size 0.1이다. 위의 Radius 0.05 / Height 0.4 기록은 이전 상태다.
+- [x] 비교 베이크로 서쪽 계단의 끊김 원인이 `Vines_02` 장식 메시임을 확인했다. 콜라이더 없는 덩굴 3개·나뭇잎 462개를 씬 인스턴스의 `NavMeshModifier`로 제외하고 전체 재베이크·씬 저장을 완료했다.
+- [x] `NavMeshBakePreparation` 에디터 메뉴로 맵 확장 후 같은 제외 설정을 반복 적용할 수 있다. 재실행 추가 대상 0개를 확인했다. 벽·바닥·계단·나무 줄기·실제 솔리드 콜라이더·바리케이드는 유지했다.
+- [x] 주택 계단 7곳의 완전 경로와 Play Mode의 실제 좀비 프리팹 이동 8건(상승 7건·서쪽 하강 1건)을 확인했다. 이동 검사 동안 AI·Animator는 비활성화했으므로 전체 전투 동작의 완료 증거는 아니다.
+- [ ] `Level Art/FIRST FLOOR/Stairs_01` 정면 하단의 벽 배치·출입 방향을 검토한다. 나뭇잎 제외 후 중간~상단 경로는 연결되었으나, 벽이 막는 하단 진입점은 미해결이다.
+- [ ] 전체 문·통로의 수동 동선 및 바리케이드 설치·파괴별 접근을 추가 확인한다.
+- 설정·검증 상세: `NAVIGATION_SETUP.md`. NavMeshLink·숨은 경사로·콜라이더 일괄 생성은 수행하지 않았다.
+
+### House 실내 접합부 연결 준비
+
+- [x] House 3 6곳, House 1 3곳, House 1 (1) 3곳, House 2 (1) 3곳의 문턱 연결 후보를 검사했다. 높이 1.8m·몸 반경 0.4m·링크 폭 0.1m 조건에서 통과 공간과 바닥 지지를 확인했다.
+- [x] 에디터 전용 `NavMeshSeamRepair`를 작성하고 Unity 컴파일을 확인했다. 기존 링크 중복·바리케이드·실제 벽 차단·좀비 프리팹 크기 검사와 Undo를 지원한다.
+- [x] 임시 NavMeshLink 경로 검사 15건이 모두 `PathPartial` → 양방향 `PathComplete`였다. 임시 링크는 제거했다.
+- [ ] 높이 불일치 해결: 베이크 1.8m / 일부 좀비 몸·Agent 2m. 좀비 높이를 맞출지 출입구를 넓힐지 사용자 선택 대기. 몸 크기 변경은 피격 범위에도 영향을 준다.
+- [ ] 영구 씬 링크 적용·저장 및 일반/큰 좀비의 실제 양방향 통과를 확인한다.
