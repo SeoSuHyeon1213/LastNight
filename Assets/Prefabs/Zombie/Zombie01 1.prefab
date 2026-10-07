@@ -1283,7 +1283,7 @@ MonoBehaviour:
   detectionRadius: 8
   sightBlockingLayers:
     serializedVersion: 2
-    m_Bits: 4294967291
+    m_Bits: 1907
   loseTargetSeconds: 3
   chaseSearchSeconds: 4
   hearingProfile: {fileID: 11400000, guid: 552115d7d3328b04bb25485051f700ee, type: 2}

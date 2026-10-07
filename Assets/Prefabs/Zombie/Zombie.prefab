@@ -1003,6 +1003,14 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 819
   attackHeight: 1
+  detectionRadius: 10
+  sightBlockingLayers:
+    serializedVersion: 2
+    m_Bits: 1907
+  loseTargetSeconds: 3
+  chaseSearchSeconds: 4
+  hearingProfile: {fileID: 0}
+  drawStateGizmo: 1
 --- !u!195 &195116110769306434
 NavMeshAgent:
   m_ObjectHideFlags: 0

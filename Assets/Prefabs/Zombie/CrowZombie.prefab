@@ -2314,10 +2314,10 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 819
   attackHeight: 1
-  detectionRadius: 8
+  detectionRadius: 10
   sightBlockingLayers:
     serializedVersion: 2
-    m_Bits: 4294967291
+    m_Bits: 1907
   loseTargetSeconds: 3
   chaseSearchSeconds: 4
   hearingProfile: {fileID: 0}
