@@ -89,12 +89,31 @@ public sealed class Grenade : MonoBehaviour, IThrowable {
 
     private void Update() {
         if (!thrown || exploded) return;
+        // 게임오버 후에는 기폭하지 않는다. 게임오버는 timeScale을 바꾸지 않으므로 직접 멈춘다.
+        if (IsGameOver) {
+            Defuse();
+            return;
+        }
         remainingFuse -= Time.deltaTime;
         if (remainingFuse <= 0f) Explode();
     }
 
+    private static bool IsGameOver => GameManager.instance != null && GameManager.instance.isGameover;
+
+    // 기폭을 영구 취소하고 그 자리에 멈춘다. 피해·효과 없이 남는다.
+    private void Defuse() {
+        exploded = true;
+        body.linearVelocity = Vector3.zero;
+        body.angularVelocity = Vector3.zero;
+        body.isKinematic = true;
+    }
+
     private void Explode() {
         if (exploded) return;
+        if (IsGameOver) {
+            Defuse();
+            return;
+        }
         exploded = true;
         Vector3 origin = body.worldCenterOfMass;
         damagedTargets.Clear();

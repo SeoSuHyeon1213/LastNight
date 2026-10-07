@@ -183,9 +183,11 @@ public class Gun : MonoBehaviour {
         if (version == shotEffectVersion) bulletLineRenderer.enabled = false;
     }
 
+    private static bool IsGameOver => GameManager.instance != null && GameManager.instance.isGameover;
+
     // 재장전 시도
     public virtual bool Reload() {
-        if (!isActiveAndEnabled || gunData == null) return false;
+        if (!isActiveAndEnabled || gunData == null || IsGameOver) return false;
         if (state == State.Reloading ||
             (!HasInfiniteAmmo && ammoRemain <= 0) || magAmmo >= gunData.magCapacity)
         {
@@ -206,8 +208,19 @@ public class Gun : MonoBehaviour {
         // 재장전 소리 재생
         PlaySound(gunData.reloadClip);
 
-        // 재장전 소요 시간 만큼 처리를 쉬기
-        yield return new WaitForSeconds(gunData.reloadTime);
+        // 재장전 소요 시간 만큼 처리를 쉬기. Time.time 기준이라 일시정지 중에는 멈춘다.
+        // 게임오버가 되면 탄약을 옮기지 않고 재장전을 취소한다(완료 시점 소모 규칙).
+        float reloadEndTime = Time.time + gunData.reloadTime;
+        while (Time.time < reloadEndTime)
+        {
+            if (IsGameOver)
+            {
+                if (gunAudioPlayer != null) gunAudioPlayer.Stop();
+                state = magAmmo > 0 ? State.Ready : State.Empty;
+                yield break;
+            }
+            yield return null;
+        }
 
         // 탄창에 채울 탄약을 계산한다
         int ammoToFill = gunData.magCapacity - magAmmo;

@@ -52,6 +52,15 @@ public sealed class BaseStorage : LivingEntity {
         Damaged?.Invoke(applied);
     }
 
+    // 거점 전환: 같은 보관소를 새 집으로 옮겨 HP·피해 기록을 유지한다(세션 거점 내구도 공유).
+    // 좀비는 같은 참조를 유지하고 다음 경로 갱신에서 새 위치·진입로를 사용한다. 진행 중 공격은 타격 시 거리 재검사로 무효가 된다.
+    public void Relocate(Transform anchor, BaseEntryRoute[] routes) {
+        if (anchor == null) return;
+        transform.SetPositionAndRotation(anchor.position, anchor.rotation);
+        entryRoutes = routes;
+        Physics.SyncTransforms();
+    }
+
     public override void RestoreHealth(float amount) {
         if (!dead && amount > 0f && !float.IsNaN(amount) && !float.IsInfinity(amount))
             health = Mathf.Min(maximumHealth, health + amount);

@@ -278,6 +278,8 @@ public class ZombieSpawner : MonoBehaviour {
     }
 
     // 게임오버·비활성화: 남은 준비·생성을 취소한다. 이미 생성된 적은 그대로 둔다.
+    // 단계가 None이 되므로 다시 활성화되면 다음 Update에서 다음 웨이브로 넘어간다(2026-10-07 사용자 결정).
+    // 중단된 웨이브의 남은 예정 물량은 이어서 생성하지 않는다. 씬 재로드만 Awake에서 시작 웨이브로 되돌린다.
     private void StopWaves() {
         clearObservedFrame = -1;
         spawnQueue = 0;

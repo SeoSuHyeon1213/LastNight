@@ -33,9 +33,17 @@ public class GameManager : MonoBehaviour {
         }
     }
 
+    private PlayerHealth subscribedPlayer;
+
     private void Start() {
         // 플레이어 캐릭터의 사망 이벤트 발생시 게임 오버
-        FindAnyObjectByType<PlayerHealth>().onDeath += EndGame;
+        subscribedPlayer = FindAnyObjectByType<PlayerHealth>();
+        if (subscribedPlayer != null) subscribedPlayer.onDeath += EndGame;
+    }
+
+    private void OnDestroy() {
+        if (subscribedPlayer != null) subscribedPlayer.onDeath -= EndGame;
+        subscribedPlayer = null;
     }
 
     // 점수를 추가하고 UI 갱신
@@ -52,6 +60,8 @@ public class GameManager : MonoBehaviour {
 
     // 게임 오버 처리
     public void EndGame() {
+        // 플레이어 사망과 보관소 파괴가 같은 프레임에 겹쳐도 한 번만 처리한다.
+        if (isGameover) return;
         // 게임 오버 상태를 참으로 변경
         isGameover = true;
         if (GameSessionManager.instance != null) {
