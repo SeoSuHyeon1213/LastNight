@@ -1,7 +1,4 @@
-using UnityEngine;
-
-public interface ISpecialZombie 
-{
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    public void SpecialAttack(); // 특수 공격을 수행하는 메서드
+// 기존 소환자와 새 특수 좀비가 공유하는 특수 공격 호출 계약.
+public interface ISpecialZombie {
+    void SpecialAttack();
 }

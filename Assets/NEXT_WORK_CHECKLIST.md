@@ -280,3 +280,9 @@
 
 - Unity 컴파일 오류 없음, 테스트 중 Console 오류 0건. 테스트용 런타임 변경(`runInBackground`·`timeScale`·플레이어 HP)은 복원 또는 Play Mode 종료로 폐기.
 - 미검증: 실제 ESC·R·G 키 입력 경로(이번 검증은 메서드 직접 호출), 게임오버 직전 이미 진행 중인 좀비 공격 애니메이션 연출. 수류탄은 게임오버 후 제자리에 남는다(제거하지 않음).
+
+### 특수 좀비 공통 구조
+
+- [x] 코드: 기존 `ISpecialZombie.SpecialAttack()`을 유지하고 `SpecialZombie : Zombie` 추상 클래스, `ISpecialAbility`, `SpecialAbilityState`를 추가했다. 시작·진행·완료·취소, 성공 실행 1회 통지, 사망/비활성/게임오버 정리와 일시정지 진행 차단을 공통화했다. 기존 `CrowZombie`의 상속과 행동은 유지했다.
+- [x] Unity 컴파일 통과. 상속 및 기존 인터페이스 타입 호환성을 확인했다. 사용법·파생 클래스 확장 지점·프리팹 연결 절차는 `SPECIAL_ZOMBIE_SETUP.md`에 기록했다.
+- [ ] 폭발형(작은 체구·빠른 접근), 탱킹형, 딜링형의 구체 능력 구현·프리팹 연결·Play Mode 검증. 이번 구조 작성만으로 신규 특수 좀비 기능 완료로 체크하지 않는다.
