@@ -8,13 +8,14 @@
 - `SpecialZombie : Zombie, ISpecialZombie, ISpecialAbility`: 새 특수 좀비의 공통 추상 클래스.
 - `SpecialAbilityState`: `Ready`(대기), `Active`(예고/실행/회복 진행), `Dead`(사망).
 
-폭발·탱킹·딜링 종류의 실제 클래스는 다음 단계에서 `SpecialZombie`를 상속한다. 기존 소환자 `CrowZombie`는 이번에 상속 구조를 변경하지 않았다. 기존 스포너가 사용하는 `Zombie[]`, 적 등록·사망 집계와의 타입 호환성을 유지한다.
+`BombZombie`는 `SpecialZombie`를 상속해 사망 폭발을 구현했다. TankZombie는 상시 장갑·약점을 구현했다. DealerZombie는 플레이어 대상 예고·강타·회복을 구현했다. `CrowZombie`는 `SpecialZombie`를 상속하며 기존 소환 특성을 유지한다. 기존 스포너가 사용하는 `Zombie[]`, 적 등록·사망 집계와의 타입 호환성을 유지한다.
 
 ## 파생 클래스가 구현할 부분
 
 | 확장 지점 | 책임 |
 |---|---|
 | `CanBeginAbility` | 목표 유효성, 거리, 재사용 대기시간 및 종류별 조건 |
+| `TryPrepareAbility()` | 위치·예약 등 준비 확보. false면 활성화하지 않음(기본 true) |
 | `OnAbilityStarted()` | 예고와 상태 초기화. 공통 클래스가 이미 Active로 전환함 |
 | `TickAbility(float deltaTime)` | 예고·실행·회복 타이머 진행. 일시정지 때 호출되지 않음 |
 | `OnAbilityCancelled()` | 예약·예고 효과·진행 중 작업을 정리. 취소는 성공 실행이 아님 |
@@ -34,6 +35,12 @@
 
 폭발형은 사용자 방향인 작은 체구·빠른 접근을 따른다. 몸 크기와 NavMeshAgent 크기를 맞추고 속도는 기존 `ZombieData.speed`에서 조정한다. 이번 기본 구조 작업에서는 모델·크기·속도·폭발 반경·HP·등장 웨이브를 변경하거나 확정하지 않았다.
 
+## CrowZombie 적용
+
+CrowZombie의 소환 타이밍·상한·위치 검사·예약·음원 설정은 유지한다. SuccessfulSummons는 SuccessfulAbilityUses와 같은 값이며 실제 소환 성공에서 AbilityExecuted를 한 번 통지한다. SpecialAttack은 기존처럼 대기 중 다음 물리 업데이트의 시도를 앞당긴다. 소환 예고는 LocksMovementDuringAbility 재정의로 항상 이동/일반 공격을 잠근다. 상세 검증은 CROW_ZOMBIE_MIGRATION.md를 참고한다.
+
 ## 확인 범위
 
-Unity 컴파일과 타입 호환성 확인. 실제 구체 능력, 프리팹 연결, Play Mode 능력 상태 전환은 후속 구현에서 검증한다. 확인 시 중복 시작·중복 성공 이벤트·예고 중 사망·비활성 후 재활성·일시정지·게임오버와 기존 적 등록/사망 집계를 포함한다.
+Unity 컴파일과 타입 호환성 확인. CrowZombie는 기존 프리팹 참조와 Play Mode 검증 31개를 확인했다. BombZombie는 사망 폭발 스크립트와 임시 Play Mode 검증 12개를 완료했다(BOMB_ZOMBIE_SETUP.md). TankZombie는 장갑·약점 스크립트와 임시 Play Mode 검증 17개를 완료했다(TANK_ZOMBIE_SETUP.md). DealerZombie는 예고·강타 스크립트와 임시 Play Mode 검증 23개를 완료했다(DEALER_ZOMBIE_SETUP.md). 실제 특수 좀비 프리팹 연결은 후속 작업이다. 확인 시 중복 시작·중복 성공 이벤트·예고 중 사망·비활성 후 재활성·일시정지·게임오버와 기존 적 등록/사망 집계를 포함한다.
+
+사망 시 발동하는 능력은 기본 Die 통지 전에 RecordDeathAbilityExecution을 사용할 수 있다. NavMesh·일반 공격 상태로 사망 반응을 제한하지 않으며, 파생 클래스에서 중복 사망과 게임 종료 시 정리를 먼저 방지한다. 일반 실행형 능력은 기존 RecordAbilityExecution을 유지한다.

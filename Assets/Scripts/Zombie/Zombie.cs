@@ -261,8 +261,7 @@ public class Zombie : LivingEntity {
             LivingEntity livingEntity = colliders[i].GetComponentInParent<LivingEntity>();
 
             // LivingEntity 컴포넌트가 존재하며, 해당 LivingEntity가 살아있다면,
-            if (livingEntity != null && !(livingEntity is Zombie) && !(livingEntity is Barricade) &&
-                !(livingEntity is BaseStorage) && !livingEntity.dead && CanSee(livingEntity))
+            if (CanChaseTarget(livingEntity) && CanSee(livingEntity))
             {
                 // 추적 대상을 해당 LivingEntity로 설정
                 targetEntity = livingEntity;
@@ -272,6 +271,11 @@ public class Zombie : LivingEntity {
                 break;
             }
         }
+    }
+
+    protected virtual bool CanChaseTarget(LivingEntity target) {
+        return target != null && !(target is Zombie) && !(target is Barricade) &&
+            !(target is BaseStorage) && !target.dead && target.isActiveAndEnabled;
     }
 
     private void UpdateApproach() {
@@ -389,6 +393,11 @@ public class Zombie : LivingEntity {
         if ((other.ClosestPoint(transform.position) - transform.position).sqrMagnitude >
             attackReach * attackReach) return;
 
+        BeginMeleeAttack(attackTarget, other);
+    }
+
+    // 종류별 공격 시작만 확장하고 일반 좀비의 타격/종료 이벤트는 유지한다.
+    protected virtual void BeginMeleeAttack(LivingEntity attackTarget, Collider other) {
         currentAttackTarget = attackTarget;
         currentAttackCollider = other;
         isAttacking = true;

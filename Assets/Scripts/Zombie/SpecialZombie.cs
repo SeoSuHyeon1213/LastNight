@@ -22,16 +22,21 @@ public abstract class SpecialZombie : Zombie, ISpecialZombie, ISpecialAbility {
         (GameSessionManager.instance == null ||
             (!GameSessionManager.instance.IsPaused && !GameSessionManager.instance.IsRebinding));
 
-    public void SpecialAttack() {
+    public virtual void SpecialAttack() {
         TryUseAbility();
     }
 
     public bool TryUseAbility() {
-        if (!CanUseAbility) return false;
+        if (!CanUseAbility || !TryPrepareAbility()) return false;
         executionRecorded = false;
         AbilityState = SpecialAbilityState.Active;
-        if (lockMovementDuringAbility) SetMovementLocked(true);
-        OnAbilityStarted();
+        if (LocksMovementDuringAbility) SetMovementLocked(true);
+        try {
+            OnAbilityStarted();
+        } catch {
+            CancelAbility();
+            throw;
+        }
         return true;
     }
 
@@ -39,6 +44,23 @@ public abstract class SpecialZombie : Zombie, ISpecialZombie, ISpecialAbility {
     protected bool RecordAbilityExecution() {
         if (AbilityState != SpecialAbilityState.Active || executionRecorded ||
             dead || !isActiveAndEnabled || !CanAdvanceAbility) return false;
+        return RecordExecution();
+    }
+
+    // 사망 폭발은 NavMesh·공격·일시정지 상태와 무관한 동기 반응이다.
+    // 파생 클래스의 중복 사망 방지 이후, 기본 Die의 사망 통지 전에만 호출한다.
+    protected bool RecordDeathAbilityExecution() {
+        if (dead || !isActiveAndEnabled || changingAbility || AbilityState == SpecialAbilityState.Dead)
+            return false;
+        if (AbilityState == SpecialAbilityState.Ready) {
+            executionRecorded = false;
+            AbilityState = SpecialAbilityState.Active;
+        }
+        if (executionRecorded) return false;
+        return RecordExecution();
+    }
+
+    private bool RecordExecution() {
         executionRecorded = true;
         SuccessfulAbilityUses++;
         AbilityExecuted?.Invoke(this);
@@ -48,7 +70,7 @@ public abstract class SpecialZombie : Zombie, ISpecialZombie, ISpecialAbility {
     protected void CompleteAbility() {
         if (AbilityState != SpecialAbilityState.Active) return;
         AbilityState = SpecialAbilityState.Ready;
-        if (lockMovementDuringAbility) SetMovementLocked(false);
+        if (LocksMovementDuringAbility) SetMovementLocked(false);
     }
 
     public void CancelAbility() {
@@ -58,7 +80,7 @@ public abstract class SpecialZombie : Zombie, ISpecialZombie, ISpecialAbility {
         try {
             OnAbilityCancelled();
         } finally {
-            if (lockMovementDuringAbility) SetMovementLocked(false);
+            if (LocksMovementDuringAbility) SetMovementLocked(false);
             changingAbility = false;
         }
     }
@@ -101,6 +123,9 @@ public abstract class SpecialZombie : Zombie, ISpecialZombie, ISpecialAbility {
     }
 
     // 거리·목표·재사용 대기시간은 각 종류에서 판정한다.
+    protected virtual bool LocksMovementDuringAbility => lockMovementDuringAbility;
+    // 준비 실패는 능력 활성화나 성공 횟수를 소비하지 않는다.
+    protected virtual bool TryPrepareAbility() { return true; }
     protected abstract bool CanBeginAbility { get; }
     protected abstract void OnAbilityStarted();
     protected abstract void TickAbility(float deltaTime);

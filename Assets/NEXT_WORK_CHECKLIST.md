@@ -286,3 +286,42 @@
 - [x] 코드: 기존 `ISpecialZombie.SpecialAttack()`을 유지하고 `SpecialZombie : Zombie` 추상 클래스, `ISpecialAbility`, `SpecialAbilityState`를 추가했다. 시작·진행·완료·취소, 성공 실행 1회 통지, 사망/비활성/게임오버 정리와 일시정지 진행 차단을 공통화했다. 기존 `CrowZombie`의 상속과 행동은 유지했다.
 - [x] Unity 컴파일 통과. 상속 및 기존 인터페이스 타입 호환성을 확인했다. 사용법·파생 클래스 확장 지점·프리팹 연결 절차는 `SPECIAL_ZOMBIE_SETUP.md`에 기록했다.
 - [ ] 폭발형(작은 체구·빠른 접근), 탱킹형, 딜링형의 구체 능력 구현·프리팹 연결·Play Mode 검증. 이번 구조 작성만으로 신규 특수 좀비 기능 완료로 체크하지 않는다.
+## 2026-10-11 Intro 메뉴 기존 SceneChange 확장
+
+- [x] 코드: SceneChangeToOne의 Game 씬 시작을 유지하고 기존 SceneChange에 설정창·종료 확인/취소·키 변경·감도·화면 설정 기능 추가. GameSessionManager의 저장 키와 호환.
+- [x] 검증: Unity 컴파일 오류 없음. 임시 Editor Preview에서 상태 전환·저장값·입력 대기 취소·감도 경계 등 19개 확인 통과. 테스트 중 변경한 사용자 저장값 복원.
+- [x] 에디터 연결: Canvas의 SceneChange 하나로 통일. MainMenu 그룹·종료 확인창·설정 닫기/입력 취소 버튼 추가. 키/화면/메뉴 이벤트, 키 텍스트 순서, 별도 화면 모드 표시를 수정하고 Intro 저장.
+- [x] Play Mode 버튼 이벤트: 창 상태 10개, 화면 모드 2개, 키 표시 8개, START→Game 설정 전달, 확인 버튼의 Editor 종료 검증. 1280×720 화면 확인. 연결/검증 상세는 `INTRO_MENU_SETUP.md` 참조.
+- [ ] 물리 입력/빌드: 키보드 새 키 캡처와 Escape, Windows 빌드 종료 검증.
+## 2026-10-11 CrowZombie 추상 클래스 적용
+
+- [x] 코드: CrowZombie가 SpecialZombie를 상속. 기존 소환 지연/상한/위치/귀속/효과/호출 특성을 유지하고 준비·예고·성공·완료·취소 훅으로 연결. 실제 성공만 공통 카운트/이벤트 1회 기록.
+- [x] 에디터 연결: 기존 CrowZombie 프리팹의 소환 데이터/프리팹/프로필/예고 표시/음원 참조 유지 확인. 새로운 필수 연결 없음.
+- [x] 검증: Unity 컴파일 및 Game NavMesh 위 런타임 검증 31개 통과. 정상·부분/전부 실패·상한·중복·일시정지·게임오버·비활성/재활성·사망 예약 정리와 생성물 생존 확인. 세부 조건은 CROW_ZOMBIE_MIGRATION.md 참고.
+- [ ] 추가 수동 확인: 자연 시간의 예고/재사용 연출, 두 소환자 동시 실행, 능력 이벤트 재진입, 음원 청취.
+## 폭발형 사망 폭발 스크립트 (2026-10-11)
+
+- [x] BombZombie가 SpecialZombie를 상속하고 사망 시 플레이어·다른 좀비에 폭발 피해 적용.
+- [x] 벽 차단, 다중 Collider 단일 피해, 연쇄 폭발·중복 사망 방지, 비활성 무폭발, 재활성 초기화.
+- [x] Unity 컴파일 및 임시 Play Mode 경계 검증 12개 통과. 상세 범위: BOMB_ZOMBIE_SETUP.md.
+- [ ] 실제 BombZombie 프리팹 컴포넌트·참조 연결과 전용 ZombieData(낮은 HP·빠른 속도) 설정.
+- [ ] 실제 플레이어 사망/HUD·최종 적 처치 동시 패배 판정·음원/효과·작은 체구 NavMesh 이동 확인.
+- [ ] 사망 시 반드시 폭발하는 최신 규칙에 맞춰 능력 사용 전 처치 도전의 대상 정책 결정.
+
+## 탱킹형 장갑·약점 스크립트 (2026-10-11)
+
+- [x] TankZombie가 SpecialZombie를 상속하고 상시 장갑 피해 감소와 위치 기반 약점을 적용.
+- [x] 장갑을 실행형 능력 횟수/이벤트에서 제외하고 잘못된 피해·중복 사망·재활성 상태 처리.
+- [x] Unity 컴파일과 임시 Play Mode 검증 17개 통과. 실제 Raycast 타격 위치의 약점 판정 포함.
+- [ ] 실제 TankZombie 프리팹 연결, 약점 Center/Radius·시각 표시·몸 Collider와 큰 체구 Agent 설정.
+- [ ] 전용 ZombieData의 높은 HP·느린 속도와 스포너 연결, 실제 총격·폭발·추적·근접 연출 검증.
+- 기존 Shotgun의 대상별 합산 피해는 대표 hitPoint 하나로 장갑/약점을 판정한다. 상세 범위: TANK_ZOMBIE_SETUP.md.
+
+## 딜링형 예고·강타 스크립트 (2026-10-11)
+
+- [x] DealerZombie가 SpecialZombie를 상속하고 플레이어 탐지·예고·방향 고정 강타·회복·쿨다운을 구현.
+- [x] 타격 시 거리·각도·차단물·대상 상태 검사, 중복 피해 방지, 사망/비활성/게임오버 취소.
+- [x] Zombie의 탐지·공격 시작 확장 훅을 추가하고 기존 일반 근접 공격을 유지.
+- [x] Unity 컴파일과 실제 NavMesh 위 임시 Play Mode 검증 23개 통과. 타이머 직접 진행 검증이며 상세 범위는 DEALER_ZOMBIE_SETUP.md.
+- [ ] 실제 DealerZombie 프리팹의 컴포넌트·공격 Trigger·예고 표시/음원·전용 ZombieData와 스포너 연결.
+- [ ] 자연 시간의 예고/타격 애니메이션 일치, 실제 플레이어 HUD·사망과 바리케이드 경로 통합 확인.

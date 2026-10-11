@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI; // AI, 내비게이션 시스템 관련 코드를 가져오기
 
@@ -14,7 +14,7 @@ public enum SummonerState {
 
 // 소환형 좀비. 횟수·간격·예고·귀속/전체 상한을 SummonProfile로 관리한다.
 // 슬롯은 예고 시작 시 EnemyRegistry에 예약하고, 소환 완료 시 확정하며, 실패·취소·사망 시 반환한다.
-public class CrowZombie : Zombie, ISpecialZombie, IEnemyRegistryClient {
+public class CrowZombie : SpecialZombie, IEnemyRegistryClient {
 
     public ZombieData[] zombieDatas; // 소환할 좀비 데이터
     public Zombie[] zombiePrefab; // 소환할 좀비 원본 프리팹
@@ -31,7 +31,7 @@ public class CrowZombie : Zombie, ISpecialZombie, IEnemyRegistryClient {
     [SerializeField] private AudioClip telegraphSound;
 
     public SummonerState SummonState { get; private set; } = SummonerState.Moving;
-    public int SuccessfulSummons { get; private set; }
+    public int SuccessfulSummons => SuccessfulAbilityUses;
 
     private EnemyRegistry enemyRegistry; // 이 소환자를 등록한 레지스트리 (등록 시 전달받음)
     private bool configChecked;
@@ -48,146 +48,168 @@ public class CrowZombie : Zombie, ISpecialZombie, IEnemyRegistryClient {
 
     private const float CapsuleGroundOffset = 0.15f;
 
-    // 소환자는 소음을 무시한다 (기획서 6.5: 변수 증가 방지)
-    protected override bool ListensToNoise => false;
+    // 소환 예고 동안에는 기존처럼 이동과 일반 공격을 항상 잠근다.
+    protected override bool LocksMovementDuringAbility => true;
+    protected override bool CanBeginAbility => SummonState == SummonerState.Waiting &&
+        IsConfigured() && Time.time >= nextActionTime &&
+        SuccessfulSummons < summonProfile.MaxSuccessfulSummons;
 
     public void BindRegistry(EnemyRegistry registry)
     {
+        if (enemyRegistry != registry) CancelAbility();
         enemyRegistry = registry;
         summonAgent = GetComponent<NavMeshAgent>();
+        configChecked = false;
+        configValid = false;
     }
 
-    protected override void OnEnable()
-    {
-        base.OnEnable();
-        ResetSummonState();
-    }
+    protected override void OnAbilityReset() { ResetSummonState(); }
 
-    protected override void OnDisable()
+    protected override void OnAbilityCancelled()
     {
         CancelTelegraph();
-        base.OnDisable();
+        if (AbilityState == SpecialAbilityState.Dead) {
+            SummonState = SummonerState.Dead;
+            SetAura(false);
+        }
+        else if (SummonState == SummonerState.Telegraphing || SummonState == SummonerState.Summoning) {
+            SummonState = SummonerState.Waiting;
+        }
     }
 
-    // 예고 중 사망하면 소환·예약·표시를 모두 취소한다. 이미 소환된 적은 그대로 둔다.
+    // 이미 소환된 적은 유지하고, 사망 시 예약·표시는 공통 클래스가 먼저 취소한다.
     public override void Die()
     {
         if (dead) return;
-        CancelTelegraph();
         SummonState = SummonerState.Dead;
         SetAura(false);
         base.Die();
     }
 
-    // ISpecialZombie: 대기 중이면 다음 예고를 바로 시도하게 한다.
-    public void SpecialAttack()
+    // 기존 호출 계약: 대기 중이면 다음 물리 업데이트에서 예고를 시도한다.
+    public override void SpecialAttack()
     {
         if (SummonState == SummonerState.Waiting) nextActionTime = Time.time;
     }
 
-    // 물리 시간 기준이라 일시정지(timeScale 0) 중에는 호출되지 않는다.
     public void FixedUpdate()
     {
-        if (dead || !IsConfigured()) return;
-
-        if (GameManager.instance != null && GameManager.instance.isGameover)
-        {
-            if (SummonState == SummonerState.Telegraphing)
-            {
-                CancelTelegraph();
-                SummonState = SummonerState.Waiting;
-            }
-            return;
-        }
+        if (dead || Time.timeScale <= 0f || !IsConfigured() ||
+            (GameManager.instance != null && GameManager.instance.isGameover) ||
+            (GameSessionManager.instance != null &&
+                (GameSessionManager.instance.IsPaused || GameSessionManager.instance.IsRebinding))) return;
 
         switch (SummonState)
         {
             case SummonerState.Moving:
-                if (IsAgentReady)
-                {
+                if (IsAgentReady) {
                     SummonState = SummonerState.Waiting;
                     nextActionTime = Time.time + summonProfile.FirstDelaySeconds;
                 }
                 break;
             case SummonerState.Waiting:
-                if (Time.time >= nextActionTime && !IsAttacking) TryBeginTelegraph();
-                break;
-            case SummonerState.Telegraphing:
-                if (Time.time >= telegraphEndTime) CompleteSummon();
+                TryUseAbility();
                 break;
         }
     }
 
-    // 귀속 상한·전체 상한 안에서 위치와 슬롯을 먼저 확보한 뒤에만 예고를 시작한다.
-    private void TryBeginTelegraph()
+    protected override void OnAbilityStarted()
     {
-        int ownedRoom = summonProfile.MaxOwnedAlive - enemyRegistry.OwnedAliveCount(this);
-        int wanted = Mathf.Min(summonProfile.SummonCount, ownedRoom);
-        if (wanted <= 0)
-        {
-            ScheduleRetry();
-            return;
-        }
-
-        FindSpawnPositions(wanted);
-        reservations.Clear();
-        for (int i = 0; i < plannedPositions.Count; i++)
-        {
-            // 웨이브 예정 생성이 대기 중이면 그쪽에 슬롯 우선권을 준다
-            if (!enemyRegistry.TryReserve(out EnemyRegistry.SpawnReservation reservation, true)) break;
-            reservations.Add(reservation);
-        }
-        if (plannedPositions.Count > reservations.Count)
-            plannedPositions.RemoveRange(reservations.Count, plannedPositions.Count - reservations.Count);
-
-        if (reservations.Count == 0)
-        {
-            plannedPositions.Clear();
-            ScheduleRetry();
-            return;
-        }
-
         SummonState = SummonerState.Telegraphing;
         telegraphEndTime = Time.time + summonProfile.TelegraphSeconds;
-        SetMovementLocked(true);
         if (telegraphMarkerPrefab != null)
             foreach (Vector3 position in plannedPositions)
                 markers.Add(Instantiate(telegraphMarkerPrefab, position, Quaternion.identity));
         if (spawnAudio != null && telegraphSound != null) spawnAudio.PlayOneShot(telegraphSound);
     }
 
+    protected override void TickAbility(float deltaTime)
+    {
+        if (SummonState == SummonerState.Telegraphing && Time.time >= telegraphEndTime)
+            CompleteSummon();
+    }
+
+    // 귀속 상한·전체 상한 안에서 위치와 슬롯을 먼저 확보한 뒤에만 예고를 시작한다.
+    protected override bool TryPrepareAbility()
+    {
+        int ownedRoom = summonProfile.MaxOwnedAlive - enemyRegistry.OwnedAliveCount(this);
+        int wanted = Mathf.Min(summonProfile.SummonCount, ownedRoom);
+        if (wanted <= 0)
+        {
+            ScheduleRetry();
+            return false;
+        }
+
+        try {
+            FindSpawnPositions(wanted);
+            reservations.Clear();
+            for (int i = 0; i < plannedPositions.Count; i++)
+            {
+                // 웨이브 예정 생성이 대기 중이면 그쪽에 슬롯 우선권을 준다
+                if (!enemyRegistry.TryReserve(out EnemyRegistry.SpawnReservation reservation, true)) break;
+                reservations.Add(reservation);
+            }
+            if (plannedPositions.Count > reservations.Count)
+                plannedPositions.RemoveRange(reservations.Count, plannedPositions.Count - reservations.Count);
+
+            if (reservations.Count == 0)
+            {
+                plannedPositions.Clear();
+                ScheduleRetry();
+                return false;
+            }
+
+        } catch {
+            CancelTelegraph();
+            ScheduleRetry();
+            throw;
+        }
+
+        return true;
+    }
+
     // 예고 완료 시 위치를 다시 검사해 유효한 곳만 생성한다. 하나라도 생성하면 횟수 1을 쓰고, 전부 실패하면 횟수를 유지하고 재시도한다.
     private void CompleteSummon()
     {
+        if (AbilityState != SpecialAbilityState.Active || SummonState != SummonerState.Telegraphing) return;
         SummonState = SummonerState.Summoning;
         int spawned = 0;
-        for (int i = 0; i < reservations.Count; i++)
-        {
-            Vector3 position = plannedPositions[i];
-            if (IsValidSpawnPosition(position) && SpawnAt(position, reservations[i])) spawned++;
-            else enemyRegistry.Release(reservations[i]);
+        try {
+            while (reservations.Count > 0 && AbilityState == SpecialAbilityState.Active && !dead) {
+                Vector3 position = plannedPositions[0];
+                EnemyRegistry.SpawnReservation reservation = reservations[0];
+                plannedPositions.RemoveAt(0);
+                reservations.RemoveAt(0);
+                bool committed = false;
+                try {
+                    committed = IsValidSpawnPosition(position) && SpawnAt(position, reservation);
+                }
+                finally {
+                    if (!committed) enemyRegistry.Release(reservation);
+                }
+                if (committed) {
+                    spawned++;
+                    // 첫 실제 생성 성공 때만 집계한다. 이벤트에서 취소/사망해도 남은 예약은 반환된다.
+                    RecordAbilityExecution();
+                }
+            }
         }
-        reservations.Clear();
-        plannedPositions.Clear();
-        ClearMarkers();
-        SetMovementLocked(false);
-
-        if (spawned == 0)
-        {
-            ScheduleRetry();
-            return;
+        finally {
+            CancelTelegraph();
+            if (AbilityState == SpecialAbilityState.Active) {
+                if (spawned == 0) ScheduleRetry();
+                else if (SuccessfulSummons >= summonProfile.MaxSuccessfulSummons) {
+                    SummonState = SummonerState.Exhausted;
+                    SetAura(false);
+                }
+                else {
+                    SummonState = SummonerState.Waiting;
+                    nextActionTime = Time.time + summonProfile.CooldownSeconds;
+                }
+                CompleteAbility();
+            }
         }
-
-        SpawnEffect(transform.position);
-        SuccessfulSummons++;
-        if (SuccessfulSummons >= summonProfile.MaxSuccessfulSummons)
-        {
-            SummonState = SummonerState.Exhausted;
-            SetAura(false);
-            return;
-        }
-        SummonState = SummonerState.Waiting;
-        nextActionTime = Time.time + summonProfile.CooldownSeconds;
+        if (spawned > 0 && !dead) SpawnEffect(transform.position);
     }
 
     private bool SpawnAt(Vector3 position, EnemyRegistry.SpawnReservation reservation)
@@ -293,7 +315,7 @@ public class CrowZombie : Zombie, ISpecialZombie, IEnemyRegistryClient {
             pathBuffer.status == NavMeshPathStatus.PathComplete;
     }
 
-    // 예약 반환·표시 제거·이동 잠금 해제. 상태 전환은 호출자가 정한다.
+    // 예약 반환·표시 제거. 이동 잠금은 SpecialZombie의 완료/취소 경로가 관리한다.
     private void CancelTelegraph()
     {
         if (enemyRegistry != null)
@@ -301,8 +323,6 @@ public class CrowZombie : Zombie, ISpecialZombie, IEnemyRegistryClient {
         reservations.Clear();
         plannedPositions.Clear();
         ClearMarkers();
-        if (SummonState == SummonerState.Telegraphing || SummonState == SummonerState.Summoning)
-            SetMovementLocked(false);
     }
 
     private void ClearMarkers()
@@ -315,7 +335,8 @@ public class CrowZombie : Zombie, ISpecialZombie, IEnemyRegistryClient {
     private void ResetSummonState()
     {
         SummonState = SummonerState.Moving;
-        SuccessfulSummons = 0;
+        configChecked = false;
+        configValid = false;
         nextActionTime = 0f;
         telegraphEndTime = 0f;
         reservations.Clear();
