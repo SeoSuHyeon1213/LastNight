@@ -213,8 +213,8 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 8891000000000123456}
   - component: {fileID: 4216164309617465048}
+  - component: {fileID: 8891000000000123456}
   - component: {fileID: 6348960568053665866}
   - component: {fileID: 4322052326685399296}
   - component: {fileID: 1752040002140791577}
@@ -246,6 +246,98 @@ Transform:
   - {fileID: 2065419455842922851}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8891000000000123456
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2950039824188038330}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c739bb2e04284d95a9f36032f4115f90, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  leftHand: {fileID: 6152071590616271580}
+  rightHand: {fileID: 1273138721722614383}
+  anchorAtAnimatedRightHand: 0
+  animatedHandAnchorOffset: {x: 0, y: 0, z: 0}
+  leftPositionOffset: {x: 0, y: 0, z: 0}
+  rightPositionOffset: {x: 0, y: 0, z: 0}
+  leftRotationOffset: {x: 0, y: 0, z: 0}
+  rightRotationOffset: {x: 0, y: 0, z: 0}
+  leftPositionWeight: 1
+  rightPositionWeight: 1
+  leftRotationWeight: 1
+  rightRotationWeight: 1
+  leftElbowOffset: {x: -0.12, y: -0.08, z: 0}
+  rightElbowOffset: {x: 0.12, y: -0.08, z: 0}
+  elbowWeight: 0.5
+  blendSeconds: 0.2
+  reloadLeftWeight: 0
+  reloadRightWeight: 1
+  fingerWeight: 1
+  fingerPose:
+  - bone: 24
+    localEulerAngles: {x: 344.23352, y: 311.04694, z: 16.249674}
+  - bone: 25
+    localEulerAngles: {x: 347.4403, y: 14.726146, z: 3.0147777}
+  - bone: 26
+    localEulerAngles: {x: 356.36703, y: 4.1764445, z: 2.7255526}
+  - bone: 27
+    localEulerAngles: {x: 345.85168, y: 352.6475, z: 4.965146}
+  - bone: 28
+    localEulerAngles: {x: 350.95532, y: 1.7995807, z: 4.311082}
+  - bone: 29
+    localEulerAngles: {x: 359.1526, y: 0.65928966, z: 4.550432}
+  - bone: 30
+    localEulerAngles: {x: 342.97543, y: 357.98145, z: 2.1685698}
+  - bone: 31
+    localEulerAngles: {x: 354.56976, y: 2.5776703, z: 9.313186}
+  - bone: 32
+    localEulerAngles: {x: 352.43912, y: 0.4270886, z: 355.16043}
+  - bone: 33
+    localEulerAngles: {x: 338.5434, y: 4.9239717, z: 354.97058}
+  - bone: 34
+    localEulerAngles: {x: 1.5396792, y: 0.39115584, z: 14.294896}
+  - bone: 35
+    localEulerAngles: {x: 353.6771, y: 0.81859195, z: 8.581932}
+  - bone: 36
+    localEulerAngles: {x: 351.61166, y: 14.660453, z: 345.52164}
+  - bone: 37
+    localEulerAngles: {x: 354.06995, y: 357.33682, z: 19.90624}
+  - bone: 38
+    localEulerAngles: {x: 354.233, y: 356.01108, z: 1.7320791}
+  - bone: 39
+    localEulerAngles: {x: 344.23355, y: 48.95305, z: 343.75037}
+  - bone: 40
+    localEulerAngles: {x: 347.44028, y: 345.27386, z: 356.98523}
+  - bone: 41
+    localEulerAngles: {x: 356.36703, y: 355.82355, z: 357.27444}
+  - bone: 42
+    localEulerAngles: {x: 345.85168, y: 7.3525167, z: 355.03485}
+  - bone: 43
+    localEulerAngles: {x: 350.95532, y: 358.2004, z: 355.6889}
+  - bone: 44
+    localEulerAngles: {x: 359.1526, y: 359.3407, z: 355.4496}
+  - bone: 45
+    localEulerAngles: {x: 342.97543, y: 2.0185394, z: 357.83142}
+  - bone: 46
+    localEulerAngles: {x: 354.56976, y: 357.42233, z: 350.6868}
+  - bone: 47
+    localEulerAngles: {x: 352.43912, y: 359.5729, z: 4.8395624}
+  - bone: 48
+    localEulerAngles: {x: 338.54343, y: 355.07602, z: 5.029431}
+  - bone: 49
+    localEulerAngles: {x: 1.5396767, y: 359.60886, z: 345.7051}
+  - bone: 50
+    localEulerAngles: {x: 353.6771, y: 359.1814, z: 351.41806}
+  - bone: 51
+    localEulerAngles: {x: 351.61166, y: 345.33954, z: 14.478379}
+  - bone: 52
+    localEulerAngles: {x: 354.06995, y: 2.6631827, z: 340.09375}
+  - bone: 53
+    localEulerAngles: {x: 354.233, y: 3.9888885, z: 358.2679}
 --- !u!82 &6348960568053665866
 AudioSource:
   m_ObjectHideFlags: 0
@@ -360,6 +452,10 @@ MonoBehaviour:
   shellEjectEffect: {fileID: 2168626181550600095}
   shotEffectDuration: 0.03
   gunAudioPlayer: {fileID: 6348960568053665866}
+  shotSound: {fileID: 8300000, guid: ada2ae050ed4f114eba3fab31db4313e, type: 3}
+  shotVolume: 1
+  reloadSound: {fileID: 8300000, guid: b36593ecec3d81d4a959516b91c8f25e, type: 3}
+  reloadVolume: 1
   gunData: {fileID: 11400000, guid: d46bb14204e94eb38e20669343348c13, type: 2}
   fireDistance: 50
   ammoRemain: 100
@@ -922,34 +1018,3 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 3335217554707375096}
   m_PrefabAsset: {fileID: 0}
-
---- !u!114 &8891000000000123456
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2950039824188038330}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c739bb2e04284d95a9f36032f4115f90, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
-  leftHand: {fileID: 6152071590616271580}
-  rightHand: {fileID: 1273138721722614383}
-  leftPositionOffset: {x: 0, y: 0, z: 0}
-  rightPositionOffset: {x: 0, y: 0, z: 0}
-  leftRotationOffset: {x: 0, y: 0, z: 0}
-  rightRotationOffset: {x: 0, y: 0, z: 0}
-  leftPositionWeight: 1
-  rightPositionWeight: 1
-  leftRotationWeight: 1
-  rightRotationWeight: 1
-  leftElbowOffset: {x: -0.12, y: -0.08, z: 0}
-  rightElbowOffset: {x: 0.12, y: -0.08, z: 0}
-  elbowWeight: 0.5
-  blendSeconds: 0.2
-  reloadLeftWeight: 0
-  reloadRightWeight: 1
-  fingerWeight: 1
-  fingerPose: []

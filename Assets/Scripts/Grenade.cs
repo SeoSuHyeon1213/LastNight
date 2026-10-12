@@ -21,6 +21,10 @@ public sealed class Grenade : MonoBehaviour, IThrowable {
     [SerializeField] private GameObject explosionEffectPrefab;
     [SerializeField, Min(0.1f)] private float explosionEffectLifetime = 5f;
 
+    [Header("Explosion Sound")]
+    [SerializeField] private AudioClip explosionSound;
+    [SerializeField, Range(0f, 1f)] private float explosionVolume = 1f;
+
     private Rigidbody body;
     private GameObject thrower;
     private Collider[] grenadeColliders;
@@ -137,6 +141,9 @@ public sealed class Grenade : MonoBehaviour, IThrowable {
                 particles.Play(false);
             Destroy(effect, explosionEffectLifetime);
         }
+        // 본체가 제거된 뒤에도 폭발 위치에서 클립 재생을 완료한다.
+        if (explosionSound != null)
+            AudioSource.PlayClipAtPoint(explosionSound, origin, explosionVolume);
         Destroy(gameObject);
     }
 

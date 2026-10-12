@@ -2322,6 +2322,7 @@ MonoBehaviour:
   chaseSearchSeconds: 4
   hearingProfile: {fileID: 0}
   drawStateGizmo: 1
+  lockMovementDuringAbility: 1
   zombieDatas:
   - {fileID: 11400000, guid: a63bb0910a62b41dd8be25a6fddf3775, type: 2}
   - {fileID: 11400000, guid: 98d77de1e43e841ed852b3bac5e1b712, type: 2}
@@ -2332,9 +2333,10 @@ MonoBehaviour:
   summonProfile: {fileID: 11400000, guid: 69ccdf28c5966524fa31d54109491f6a, type: 2}
   telegraphMarkerPrefab: {fileID: 6181825064965692790, guid: 2eb045437f8f428418d2ec49269ec49d,
     type: 3}
-  summonerAura: {fileID: 0}
+  summonerAura: {fileID: 4425129568585013132, guid: bbeeb0ddc21369746aaaae5c5c1c09cf,
+    type: 3}
   spawnAudio: {fileID: 8246072014306468047}
-  spawnSound: {fileID: 8300000, guid: 519ad2e4de69341948a938bf2a31e33b, type: 3}
+  spawnSound: {fileID: 0}
   telegraphSound: {fileID: 0}
 --- !u!195 &3895146112644083494
 NavMeshAgent:

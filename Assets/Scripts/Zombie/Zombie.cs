@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.AI; // AI, 내비게이션 시스템 관련 코드를 가져오기
 
 // 좀비 AI 구현 //부모 클래스가 monobehavier 클래스를 상속 받기 때문에 단일 상속 상태 임에도 컴포넌트 기능 사용 가능
@@ -11,8 +12,27 @@ public class Zombie : LivingEntity {
     private NavMeshAgent navMeshAgent; // 경로계산 AI 에이전트
 
     public ParticleSystem hitEffect; // 피격시 재생할 파티클 효과
-    public AudioClip deathSound; // 사망시 재생할 소리
-    public AudioClip hitSound; // 피격시 재생할 소리
+    // 기존 프리팹 연결은 배열 설정 전까지 호환용으로 유지한다.
+    [SerializeField, HideInInspector, FormerlySerializedAs("deathSound")]
+    private AudioClip legacyDeathSound;
+    [SerializeField, HideInInspector, FormerlySerializedAs("hitSound")]
+    private AudioClip legacyHurtSound;
+
+    [Header("Sound Variations")]
+    [SerializeField] private AudioClip[] idleSounds;
+    [SerializeField] private AudioClip[] attackSounds;
+    [SerializeField] private AudioClip[] hurtSounds;
+    [SerializeField] private AudioClip[] deathSounds;
+    [SerializeField] private AudioClip[] footstepSounds;
+    [SerializeField] private AudioClip[] bodyFallSounds;
+    [SerializeField, Min(0.1f)] private float idleSoundMinInterval = 4f;
+    [SerializeField, Min(0.1f)] private float idleSoundMaxInterval = 9f;
+    [SerializeField, Min(0f)] private float hurtSoundCooldown = 0.25f;
+    private float nextIdleSoundTime;
+    private float nextHurtSoundTime;
+    private AudioClip lastIdleSound, lastAttackSound, lastHurtSound;
+    private AudioClip lastDeathSound, lastFootstepSound, lastBodyFallSound;
+    private bool bodyFallPlayed;
 
     private Animator zombieAnimator; // 애니메이터 컴포넌트
     private AudioSource zombieAudioPlayer; // 오디오 소스 컴포넌트
@@ -118,6 +138,9 @@ public class Zombie : LivingEntity {
     protected override void OnEnable()
     {
         base.OnEnable();
+        nextIdleSoundTime = Time.time + Random.Range(0.1f, Mathf.Max(0.1f, idleSoundMaxInterval));
+        nextHurtSoundTime = 0f;
+        bodyFallPlayed = false;
         ResetNoiseState();
         movementLocked = false;
         ClearAttack();
@@ -127,6 +150,7 @@ public class Zombie : LivingEntity {
 
     protected virtual void OnDisable()
     {
+        if (zombieAudioPlayer != null) zombieAudioPlayer.Stop();
         if (pathRoutine != null) StopCoroutine(pathRoutine);
         pathRoutine = null;
         ClearAttack();
@@ -186,6 +210,7 @@ public class Zombie : LivingEntity {
         if (Time.timeScale <= 0f || (GameManager.instance != null && GameManager.instance.isGameover)) return;
         if (!dead)
         {
+            TickIdleSound();
             if (State == ZombieState.Chase)
             {
                 if (Time.time >= nextVisionCheck) {
@@ -344,7 +369,10 @@ public class Zombie : LivingEntity {
             hitEffect.Play(); //이펙트 재생
 
             // 피격 효과음 재생
-            zombieAudioPlayer.PlayOneShot(hitSound);
+            if (Time.time >= nextHurtSoundTime) {
+                PlayVariation(hurtSounds, ref lastHurtSound, legacyHurtSound);
+                nextHurtSoundTime = Time.time + Mathf.Max(0f, hurtSoundCooldown);
+            }
         }
 
         // LivingEntity의 OnDamage()를 실행하여 데미지 적용
@@ -375,7 +403,8 @@ public class Zombie : LivingEntity {
         // 사망 애니메이션 재생
         zombieAnimator.SetTrigger("Die");
         // 사망 효과음 재생
-        zombieAudioPlayer.PlayOneShot(deathSound);
+        if (zombieAudioPlayer != null) zombieAudioPlayer.Stop();
+        PlayVariation(deathSounds, ref lastDeathSound, legacyDeathSound);
     }
 
     private void OnTriggerStay(Collider other)
@@ -412,6 +441,62 @@ public class Zombie : LivingEntity {
             transform.rotation = Quaternion.LookRotation(direction);
 
         zombieAnimator.SetTrigger(AttackTrigger);
+        PlayAttackSound();
+    }
+
+    protected void PlayAttackSound() {
+        PlayVariation(attackSounds, ref lastAttackSound);
+    }
+
+    // 이동 클립에서 발이 지면에 닿는 프레임에 연결한다.
+    public void OnFootstep() {
+        if (CanPlayLivingSound && IsAgentReady && !movementLocked && !isAttacking &&
+            navMeshAgent.velocity.sqrMagnitude > 0.01f)
+            PlayVariation(footstepSounds, ref lastFootstepSound);
+    }
+
+    public void OnBodyFall() {
+        if (!isActiveAndEnabled || !dead || bodyFallPlayed || !CanAdvanceSound) return;
+        bodyFallPlayed = true;
+        PlayVariation(bodyFallSounds, ref lastBodyFallSound);
+    }
+
+    private bool CanAdvanceSound => Time.timeScale > 0f &&
+        (GameManager.instance == null || !GameManager.instance.isGameover) &&
+        (GameSessionManager.instance == null ||
+            (!GameSessionManager.instance.IsPaused && !GameSessionManager.instance.IsRebinding));
+    private bool CanPlayLivingSound => isActiveAndEnabled && !dead && CanAdvanceSound;
+
+    private void TickIdleSound() {
+        if (!CanPlayLivingSound || movementLocked || isAttacking ||
+            zombieAudioPlayer == null || zombieAudioPlayer.isPlaying || Time.time < nextIdleSoundTime) return;
+        PlayVariation(idleSounds, ref lastIdleSound);
+        float minimum = Mathf.Max(0.1f, idleSoundMinInterval);
+        nextIdleSoundTime = Time.time + Random.Range(minimum, Mathf.Max(minimum, idleSoundMaxInterval));
+    }
+
+    private void PlayVariation(AudioClip[] clips, ref AudioClip previous, AudioClip fallback = null) {
+        if (zombieAudioPlayer == null || !CanAdvanceSound) return;
+        int alternatives = 0;
+        AudioClip single = null;
+        if (clips != null) {
+            foreach (AudioClip clip in clips) {
+                if (clip == null) continue;
+                single = clip;
+                if (clip != previous) alternatives++;
+            }
+        }
+        AudioClip selected = single != null ? single : fallback;
+        if (alternatives > 0) {
+            int choice = Random.Range(0, alternatives);
+            foreach (AudioClip clip in clips) {
+                if (clip == null || clip == previous) continue;
+                if (choice-- == 0) { selected = clip; break; }
+            }
+        }
+        if (selected == null) return;
+        previous = selected;
+        zombieAudioPlayer.PlayOneShot(selected);
     }
 
     // 지금 공격해도 되는 대상: 추적 중이면 앞을 막는 바리케이드 또는 추적 대상, 거점 공격 중이면 보관소

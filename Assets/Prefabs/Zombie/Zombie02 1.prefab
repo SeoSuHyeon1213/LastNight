@@ -456,7 +456,6 @@ Transform:
   m_Children:
   - {fileID: 4885639029005366966}
   - {fileID: 9043586910035447554}
-  - {fileID: 6453618635943262667}
   - {fileID: 3348178221695279191}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -470,7 +469,7 @@ Animator:
   m_GameObject: {fileID: 2189042113655438863}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: 885eac34fd0d577439e6670a7ca3777e, type: 3}
-  m_Controller: {fileID: 9100000, guid: 8eebe7519312a5c4eaeed6cd5ebb0411, type: 2}
+  m_Controller: {fileID: 9100000, guid: 5ff1589dd5539b243a7ee1ffb01598d2, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
   m_ApplyRootMotion: 1
@@ -502,11 +501,11 @@ AudioSource:
   Spatialize: 0
   SpatializePostEffects: 0
   Priority: 128
-  DopplerLevel: 1
-  MinDistance: 1
-  MaxDistance: 500
+  DopplerLevel: 0
+  MinDistance: 2
+  MaxDistance: 20
   Pan2D: 0
-  rolloffMode: 0
+  rolloffMode: 1
   BypassEffects: 0
   BypassListenerEffects: 0
   BypassReverbZones: 0
@@ -641,8 +640,28 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 512
   hitEffect: {fileID: 3226341301156331691}
-  deathSound: {fileID: 8300000, guid: b86f03005ed394911b43027aeaaedeb7, type: 3}
-  hitSound: {fileID: 8300000, guid: c3d8accfc053f004ca665a1c8c4a6919, type: 3}
+  legacyDeathSound: {fileID: 8300000, guid: b86f03005ed394911b43027aeaaedeb7, type: 3}
+  legacyHurtSound: {fileID: 8300000, guid: c3d8accfc053f004ca665a1c8c4a6919, type: 3}
+  idleSounds:
+  - {fileID: 8300000, guid: 8b8be6e6b3dd044d782ae23b59519a28, type: 3}
+  attackSounds:
+  - {fileID: 8300000, guid: 2c536cff31c3a402898ac356ebd96aba, type: 3}
+  hurtSounds:
+  - {fileID: 8300000, guid: 05ae1d9a2e157974dbc9be54f55ca3d5, type: 3}
+  - {fileID: 8300000, guid: 4465642c5117df348b9bf367e188d53f, type: 3}
+  - {fileID: 8300000, guid: 2258bf4da19d6f2408cfc00ee94087dc, type: 3}
+  deathSounds:
+  - {fileID: 8300000, guid: 7876ad3615bcb514dae9ca464a23f421, type: 3}
+  - {fileID: 8300000, guid: be0722a3388bd4f4681aaed154aa0d2c, type: 3}
+  - {fileID: 8300000, guid: 3d90aa537e994da45945520c1d18dd9e, type: 3}
+  footstepSounds:
+  - {fileID: 8300000, guid: 80e9f3f626b53418ebb33bcc0bf2e7fd, type: 3}
+  - {fileID: 8300000, guid: 8503c42970d2247a89300b4be374668c, type: 3}
+  bodyFallSounds:
+  - {fileID: 8300000, guid: 763a323b04dbb4cbf99082a82ef3cb54, type: 3}
+  idleSoundMinInterval: 4
+  idleSoundMaxInterval: 9
+  hurtSoundCooldown: 0.25
   damage: 10
   timeBetAttack: 1
   attackReach: 1.5
@@ -2366,88 +2385,4 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4000013488956786, guid: da33d2f1d5c4b41689d8063e19e3a7dc,
     type: 3}
   m_PrefabInstance: {fileID: 3348755797873231141}
-  m_PrefabAsset: {fileID: 0}
---- !u!1001 &7270758207598686823
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 4416541113702083419}
-    m_Modifications:
-    - target: {fileID: 2189429763845914923, guid: 996166858328d4c509aeba2a890a2854,
-        type: 3}
-      propertyPath: m_Materials.Array.size
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4425129568584715180, guid: 996166858328d4c509aeba2a890a2854,
-        type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4425129568584715180, guid: 996166858328d4c509aeba2a890a2854,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4425129568584715180, guid: 996166858328d4c509aeba2a890a2854,
-        type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4425129568584715180, guid: 996166858328d4c509aeba2a890a2854,
-        type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4425129568584715180, guid: 996166858328d4c509aeba2a890a2854,
-        type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4425129568584715180, guid: 996166858328d4c509aeba2a890a2854,
-        type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4425129568584715180, guid: 996166858328d4c509aeba2a890a2854,
-        type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4425129568584715180, guid: 996166858328d4c509aeba2a890a2854,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4425129568584715180, guid: 996166858328d4c509aeba2a890a2854,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4425129568584715180, guid: 996166858328d4c509aeba2a890a2854,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4425129568585013132, guid: 996166858328d4c509aeba2a890a2854,
-        type: 3}
-      propertyPath: m_Name
-      value: CFXR2 Poison Cloud
-      objectReference: {fileID: 0}
-    - target: {fileID: 4425129568604026700, guid: 996166858328d4c509aeba2a890a2854,
-        type: 3}
-      propertyPath: m_Materials.Array.size
-      value: 1
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 996166858328d4c509aeba2a890a2854, type: 3}
---- !u!4 &6453618635943262667 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 4425129568584715180, guid: 996166858328d4c509aeba2a890a2854,
-    type: 3}
-  m_PrefabInstance: {fileID: 7270758207598686823}
   m_PrefabAsset: {fileID: 0}

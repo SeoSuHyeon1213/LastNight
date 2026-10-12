@@ -580,6 +580,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   leftHand: {fileID: 8752593320803641815}
   rightHand: {fileID: 7539293796206892177}
+  anchorAtAnimatedRightHand: 0
+  animatedHandAnchorOffset: {x: 0, y: 0, z: 0}
   leftPositionOffset: {x: 0, y: 0, z: 0}
   rightPositionOffset: {x: 0, y: 0, z: 0}
   leftRotationOffset: {x: 0, y: 0, z: 0}
@@ -595,7 +597,67 @@ MonoBehaviour:
   reloadLeftWeight: 0
   reloadRightWeight: 1
   fingerWeight: 1
-  fingerPose: []
+  fingerPose:
+  - bone: 24
+    localEulerAngles: {x: 344.23352, y: 311.04694, z: 16.249674}
+  - bone: 25
+    localEulerAngles: {x: 347.4403, y: 14.726146, z: 3.0147777}
+  - bone: 26
+    localEulerAngles: {x: 356.36703, y: 4.1764445, z: 2.7255526}
+  - bone: 27
+    localEulerAngles: {x: 345.85168, y: 352.6475, z: 4.965146}
+  - bone: 28
+    localEulerAngles: {x: 350.95532, y: 1.7995807, z: 4.311082}
+  - bone: 29
+    localEulerAngles: {x: 359.1526, y: 0.65928966, z: 4.550432}
+  - bone: 30
+    localEulerAngles: {x: 342.97543, y: 357.98145, z: 2.1685698}
+  - bone: 31
+    localEulerAngles: {x: 354.56976, y: 2.5776703, z: 9.313186}
+  - bone: 32
+    localEulerAngles: {x: 352.43912, y: 0.4270886, z: 355.16043}
+  - bone: 33
+    localEulerAngles: {x: 338.5434, y: 4.9239717, z: 354.97058}
+  - bone: 34
+    localEulerAngles: {x: 1.5396792, y: 0.39115584, z: 14.294896}
+  - bone: 35
+    localEulerAngles: {x: 353.6771, y: 0.81859195, z: 8.581932}
+  - bone: 36
+    localEulerAngles: {x: 351.61166, y: 14.660453, z: 345.52164}
+  - bone: 37
+    localEulerAngles: {x: 354.06995, y: 357.33682, z: 19.90624}
+  - bone: 38
+    localEulerAngles: {x: 354.233, y: 356.01108, z: 1.7320791}
+  - bone: 39
+    localEulerAngles: {x: 344.23355, y: 48.95305, z: 343.75037}
+  - bone: 40
+    localEulerAngles: {x: 347.44028, y: 345.27386, z: 356.98523}
+  - bone: 41
+    localEulerAngles: {x: 356.36703, y: 355.82355, z: 357.27444}
+  - bone: 42
+    localEulerAngles: {x: 345.85168, y: 7.3525167, z: 355.03485}
+  - bone: 43
+    localEulerAngles: {x: 350.95532, y: 358.2004, z: 355.6889}
+  - bone: 44
+    localEulerAngles: {x: 359.1526, y: 359.3407, z: 355.4496}
+  - bone: 45
+    localEulerAngles: {x: 342.97543, y: 2.0185394, z: 357.83142}
+  - bone: 46
+    localEulerAngles: {x: 354.56976, y: 357.42233, z: 350.6868}
+  - bone: 47
+    localEulerAngles: {x: 352.43912, y: 359.5729, z: 4.8395624}
+  - bone: 48
+    localEulerAngles: {x: 338.54343, y: 355.07602, z: 5.029431}
+  - bone: 49
+    localEulerAngles: {x: 1.5396767, y: 359.60886, z: 345.7051}
+  - bone: 50
+    localEulerAngles: {x: 353.6771, y: 359.1814, z: 351.41806}
+  - bone: 51
+    localEulerAngles: {x: 351.61166, y: 345.33954, z: 14.478379}
+  - bone: 52
+    localEulerAngles: {x: 354.06995, y: 2.6631827, z: 340.09375}
+  - bone: 53
+    localEulerAngles: {x: 354.233, y: 3.9888885, z: 358.2679}
 --- !u!120 &9100244209532090833
 LineRenderer:
   serializedVersion: 3
@@ -721,6 +783,10 @@ MonoBehaviour:
   shellEjectEffect: {fileID: 3758401462688719351}
   shotEffectDuration: 0.03
   gunAudioPlayer: {fileID: 5922863446622790870}
+  shotSound: {fileID: 8300000, guid: cd381f6073f4a8b44b199a6f8ab76aeb, type: 3}
+  shotVolume: 1
+  reloadSound: {fileID: 8300000, guid: 0131125a5e370054d8c35f9d76872305, type: 3}
+  reloadVolume: 1
   gunData: {fileID: 11400000, guid: 1434946e82f8c4a21aee591d6e79a406, type: 2}
   fireDistance: 50
   ammoRemain: 100
@@ -736,7 +802,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 8300000, guid: b82a66dab749415458d1f6600c997095, type: 3}
+  m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1

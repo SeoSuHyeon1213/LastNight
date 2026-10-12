@@ -26,6 +26,14 @@ public class Gun : MonoBehaviour {
 
     [SerializeField] private AudioSource gunAudioPlayer; // 비워두면 같은 오브젝트의 출력을 사용
 
+    [Header("Weapon Sounds")]
+    [Tooltip("이 총의 사격음입니다. 비워 두면 Gun Data의 Shot Clip을 사용합니다.")]
+    [SerializeField] private AudioClip shotSound;
+    [SerializeField, Range(0f, 1f)] private float shotVolume = 1f;
+    [Tooltip("이 총의 재장전음입니다. 비워 두면 Gun Data의 Reload Clip을 사용합니다.")]
+    [SerializeField] private AudioClip reloadSound;
+    [SerializeField, Range(0f, 1f)] private float reloadVolume = 1f;
+
     public GunData gunData; // 총의 현재 데이터
     
     [SerializeField, Min(0.1f)] private float fireDistance = 50f;
@@ -165,7 +173,7 @@ public class Gun : MonoBehaviour {
         if (shellEjectEffect != null) shellEjectEffect.Play();
 
         // 총격 소리 재생
-        PlaySound(gunData.shotClip);
+        PlaySound(shotSound != null ? shotSound : gunData.shotClip, shotVolume);
 
         if (!UsesSingleShotLine || bulletLineRenderer == null) yield break;
 
@@ -206,7 +214,7 @@ public class Gun : MonoBehaviour {
         // 현재 상태를 재장전 중 상태로 전환
         state = State.Reloading;
         // 재장전 소리 재생
-        PlaySound(gunData.reloadClip);
+        PlaySound(reloadSound != null ? reloadSound : gunData.reloadClip, reloadVolume);
 
         // 재장전 소요 시간 만큼 처리를 쉬기. Time.time 기준이라 일시정지 중에는 멈춘다.
         // 게임오버가 되면 탄약을 옮기지 않고 재장전을 취소한다(완료 시점 소모 규칙).
@@ -253,8 +261,8 @@ public class Gun : MonoBehaviour {
         if (bulletLineRenderer != null) bulletLineRenderer.enabled = false;
     }
 
-    private void PlaySound(AudioClip clip) {
+    private void PlaySound(AudioClip clip, float volume) {
         if (clip != null && gunAudioPlayer != null && gunAudioPlayer.isActiveAndEnabled)
-            gunAudioPlayer.PlayOneShot(clip);
+            gunAudioPlayer.PlayOneShot(clip, volume);
     }
 }

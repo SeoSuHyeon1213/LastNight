@@ -469,7 +469,7 @@ Animator:
   m_GameObject: {fileID: 2189042113655438863}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: 885eac34fd0d577439e6670a7ca3777e, type: 3}
-  m_Controller: {fileID: 9100000, guid: 8eebe7519312a5c4eaeed6cd5ebb0411, type: 2}
+  m_Controller: {fileID: 9100000, guid: 5ff1589dd5539b243a7ee1ffb01598d2, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
   m_ApplyRootMotion: 1
@@ -501,11 +501,11 @@ AudioSource:
   Spatialize: 0
   SpatializePostEffects: 0
   Priority: 128
-  DopplerLevel: 1
-  MinDistance: 1
-  MaxDistance: 500
+  DopplerLevel: 0
+  MinDistance: 2
+  MaxDistance: 30
   Pan2D: 0
-  rolloffMode: 0
+  rolloffMode: 1
   BypassEffects: 0
   BypassListenerEffects: 0
   BypassReverbZones: 0
@@ -640,8 +640,28 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 512
   hitEffect: {fileID: 3226341301156331691}
-  deathSound: {fileID: 8300000, guid: b86f03005ed394911b43027aeaaedeb7, type: 3}
-  hitSound: {fileID: 8300000, guid: c3d8accfc053f004ca665a1c8c4a6919, type: 3}
+  legacyDeathSound: {fileID: 8300000, guid: b86f03005ed394911b43027aeaaedeb7, type: 3}
+  legacyHurtSound: {fileID: 8300000, guid: c3d8accfc053f004ca665a1c8c4a6919, type: 3}
+  idleSounds:
+  - {fileID: 8300000, guid: 05f860bb66f844d89908829a80c6fe13, type: 3}
+  attackSounds:
+  - {fileID: 8300000, guid: 2c536cff31c3a402898ac356ebd96aba, type: 3}
+  hurtSounds:
+  - {fileID: 8300000, guid: 381951b7e211640659f2659520c3145b, type: 3}
+  - {fileID: 8300000, guid: 4841cf5edd4b35a4ab88eb2794fd77a9, type: 3}
+  - {fileID: 8300000, guid: 9bb86207ef8e53647a7da85e5a1e6436, type: 3}
+  deathSounds:
+  - {fileID: 8300000, guid: 7876ad3615bcb514dae9ca464a23f421, type: 3}
+  - {fileID: 8300000, guid: 4f9e15e8a3a324d4eb04c62daec974f0, type: 3}
+  - {fileID: 8300000, guid: ad51bb33b6d67c84cae5e0b980230786, type: 3}
+  footstepSounds:
+  - {fileID: 8300000, guid: cfaa31361f7ba4a23b747862467ff938, type: 3}
+  - {fileID: 8300000, guid: 8503c42970d2247a89300b4be374668c, type: 3}
+  bodyFallSounds:
+  - {fileID: 8300000, guid: 763a323b04dbb4cbf99082a82ef3cb54, type: 3}
+  idleSoundMinInterval: 4
+  idleSoundMaxInterval: 9
+  hurtSoundCooldown: 0.25
   damage: 10
   timeBetAttack: 1
   attackReach: 1.5

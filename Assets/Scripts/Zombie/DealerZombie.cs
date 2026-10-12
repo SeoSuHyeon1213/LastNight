@@ -90,6 +90,7 @@ public sealed class DealerZombie : SpecialZombie {
         SetIndicator(true);
         if (hasAttackTrigger) animator.SetTrigger(attackTrigger);
         if (windupSound != null && audioSource != null) audioSource.PlayOneShot(windupSound);
+        else PlayAttackSound();
     }
 
     protected override void TickAbility(float deltaTime) {

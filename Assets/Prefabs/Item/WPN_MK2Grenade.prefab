@@ -226,6 +226,8 @@ MonoBehaviour:
   explosionEffectPrefab: {fileID: 1337198075554910, guid: 25c7aa9ad705fe143a4d71c1c8deb7d4,
     type: 3}
   explosionEffectLifetime: 5
+  explosionSound: {fileID: 8300000, guid: a98537918d51770428f1314034a17112, type: 3}
+  explosionVolume: 1
 --- !u!1 &1903831573689630489
 GameObject:
   m_ObjectHideFlags: 0
