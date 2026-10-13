@@ -1265,7 +1265,7 @@ GameObject:
   - component: {fileID: -8320942761905941481}
   - component: {fileID: 1423543853956935278}
   m_Layer: 0
-  m_Name: TankZombie
+  m_Name: TankerZombie
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

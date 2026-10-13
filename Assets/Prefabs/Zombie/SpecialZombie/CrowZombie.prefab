@@ -2305,8 +2305,17 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 512
   hitEffect: {fileID: 5860978507212446050}
-  deathSound: {fileID: 8300000, guid: b86f03005ed394911b43027aeaaedeb7, type: 3}
-  hitSound: {fileID: 8300000, guid: c3d8accfc053f004ca665a1c8c4a6919, type: 3}
+  legacyDeathSound: {fileID: 8300000, guid: b86f03005ed394911b43027aeaaedeb7, type: 3}
+  legacyHurtSound: {fileID: 8300000, guid: c3d8accfc053f004ca665a1c8c4a6919, type: 3}
+  idleSounds: []
+  attackSounds: []
+  hurtSounds: []
+  deathSounds: []
+  footstepSounds: []
+  bodyFallSounds: []
+  idleSoundMinInterval: 4
+  idleSoundMaxInterval: 9
+  hurtSoundCooldown: 0.25
   damage: 20
   timeBetAttack: 1
   attackReach: 1.5
@@ -2320,7 +2329,7 @@ MonoBehaviour:
     m_Bits: 1907
   loseTargetSeconds: 3
   chaseSearchSeconds: 4
-  hearingProfile: {fileID: 0}
+  hearingProfile: {fileID: 11400000, guid: 552115d7d3328b04bb25485051f700ee, type: 2}
   drawStateGizmo: 1
   lockMovementDuringAbility: 1
   zombieDatas:
@@ -2336,8 +2345,8 @@ MonoBehaviour:
   summonerAura: {fileID: 4425129568585013132, guid: bbeeb0ddc21369746aaaae5c5c1c09cf,
     type: 3}
   spawnAudio: {fileID: 8246072014306468047}
-  spawnSound: {fileID: 0}
-  telegraphSound: {fileID: 0}
+  spawnSound: {fileID: 8300000, guid: 4f9e15e8a3a324d4eb04c62daec974f0, type: 3}
+  telegraphSound: {fileID: 8300000, guid: f47cb9edcac7d9d43a4de84945bb4754, type: 3}
 --- !u!195 &3895146112644083494
 NavMeshAgent:
   m_ObjectHideFlags: 0

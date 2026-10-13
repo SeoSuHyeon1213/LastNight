@@ -35,7 +35,22 @@
 
 폭발형은 사용자 방향인 작은 체구·빠른 접근을 따른다. 몸 크기와 NavMeshAgent 크기를 맞추고 속도는 기존 `ZombieData.speed`에서 조정한다. 이번 기본 구조 작업에서는 모델·크기·속도·폭발 반경·HP·등장 웨이브를 변경하거나 확정하지 않았다.
 
-## CrowZombie 적용
+## 웨이브 특수 좀비 스폰 설정 (2026-10-13)
+
+Game 씬의 Spawn Points에 있는 ZombieSpawner에서 다음을 Inspector로 연결한다.
+
+1. 기존 Zombie Prefab 배열에는 일반 Zombie만 남긴다. 특수 좀비가 들어 있으면 경고를 출력하고 일반 추첨에서 제외한다.
+2. Special Spawn Chance는 백분율이며 기본값 10이다. 0은 일반만, 100은 스폰 지점 생성에 특수만 사용한다. 대기 군집은 항상 일반 좀비다.
+3. Special Zombies 배열에 항목을 추가하고 Prefab에는 BombZombie·TankZombie·DealerZombie·CrowZombie 중 사용할 프리팹을, Data에는 그 종류의 ZombieData를 연결한다. 타입별 전용 데이터가 그대로 적용된다.
+4. 유효한 특수 항목끼리는 동일 확률로 선택한다. 네 종류라면 기본 설정에서 각각 스폰 지점 생성의 약 2.5%이며, 웨이브마다 정확한 마릿수를 보장하지 않는다.
+5. 특수 생성은 기존 웨이브 예정 수의 한 마리를 대체한다. 일반·빅웨이브의 생성 간격, EnemyRegistry의 생존 상한·예약·사망 처리와 거점 목표는 기존 경로를 사용한다.
+6. 특수 목록이 비었거나 모든 항목이 잘못 연결되면 경고 후 일반만 생성한다. 일반 Prefab·Data·Spawn Points·Enemy Registry는 기존처럼 필수다.
+
+확률은 실행 중 Inspector에서 조정할 수 있다. 프리팹·데이터 목록은 Awake에서 검증·캐시하므로 목록 변경 후에는 Play Mode를 다시 시작한다. 연결 및 실제 웨이브 스폰 검증은 코드 확인과 별도로 진행한다.
+
+검증: Unity 컴파일 오류 없음. 임시 추첨 검사에서 빈 목록·NaN·음수·0%·100%·프리팹/전용 데이터 짝 유지·종류별 균등 선택을 확인했다. 고정 시드로 10만 번 추첨 시 특수 10,000회(탱커 4,910회, 폭발형 5,090회). 실제 씬 Inspector 연결과 Play Mode 웨이브 생성·사망 집계는 미검증이다.
+
+## CrowZombie 기존 능력 적용
 
 CrowZombie의 소환 타이밍·상한·위치 검사·예약·음원 설정은 유지한다. SuccessfulSummons는 SuccessfulAbilityUses와 같은 값이며 실제 소환 성공에서 AbilityExecuted를 한 번 통지한다. SpecialAttack은 기존처럼 대기 중 다음 물리 업데이트의 시도를 앞당긴다. 소환 예고는 LocksMovementDuringAbility 재정의로 항상 이동/일반 공격을 잠근다. 상세 검증은 CROW_ZOMBIE_MIGRATION.md를 참고한다.
 

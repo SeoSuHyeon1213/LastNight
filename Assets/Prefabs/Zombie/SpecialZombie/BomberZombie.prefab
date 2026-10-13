@@ -778,7 +778,7 @@ GameObject:
   - component: {fileID: 4653425645796274310}
   - component: {fileID: -206520122039195026}
   m_Layer: 0
-  m_Name: BombZombie
+  m_Name: BomberZombie
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -9,6 +9,13 @@ using Random = UnityEngine.Random;
 public class ZombieSpawner : MonoBehaviour {
     [SerializeField] private Zombie[] zombiePrefab; // 생성할 좀비 원본 프리팹
     [SerializeField] private ZombieData[] zombieDatas; // 사용할 좀비 셋업 데이터들
+    [Header("Special Zombie Spawn")]
+    [Tooltip("스폰 지점에서 생성할 한 마리를 특수 좀비로 대체할 확률(%). 대기 군집에는 적용하지 않습니다.")]
+    [SerializeField, Range(0f, 100f)] private float specialSpawnChance = 10f;
+    [Tooltip("특수 좀비 프리팹과 전용 데이터를 짝으로 연결합니다. 유효한 항목 중 동일 확률로 선택합니다.")]
+    [SerializeField] private SpecialSpawnEntry[] specialZombies = Array.Empty<SpecialSpawnEntry>();
+
+    [Header("Spawn References")]
     [SerializeField] private Transform[] spawnPoints; // 좀비 AI를 소환할 위치들
     [SerializeField] private EnemyRegistry enemyRegistry; // 살아 있는 적 집계와 생성 슬롯
     [Tooltip("선택: 대기 군집 배치와 정체 방지 각성. 비워 두면 모든 물량을 스폰 지점에서 생성한다.")]
@@ -52,6 +59,7 @@ public class ZombieSpawner : MonoBehaviour {
 
     private readonly List<Zombie> validPrefabs = new List<Zombie>();
     private readonly List<ZombieData> validDatas = new List<ZombieData>();
+    private readonly List<SpecialSpawnEntry> validSpecialZombies = new List<SpecialSpawnEntry>();
     private readonly List<Transform> validSpawnPoints = new List<Transform>();
     private readonly List<Zombie> validIdlePrefabs = new List<Zombie>(); // 대기 군집은 일반 좀비만 (소환자 등 특수 좀비 제외)
 
@@ -248,8 +256,9 @@ public class ZombieSpawner : MonoBehaviour {
         bool committed = false;
         try
         {
-            // 일반 생성은 기존과 같은 순서로 난수를 뽑는다: 데이터 → 위치 → 프리팹
-            ZombieData zombieData = validDatas[Random.Range(0, validDatas.Count)];
+            SpecialSpawnEntry special = idlePosition.HasValue ? null :
+                SelectSpecial(specialSpawnChance, validSpecialZombies);
+            ZombieData zombieData = special != null ? special.Data : validDatas[Random.Range(0, validDatas.Count)];
             if (idlePosition.HasValue)
             {
                 Quaternion rotation = Quaternion.Euler(0f, Random.Range(0f, 360f), 0f);
@@ -258,7 +267,8 @@ public class ZombieSpawner : MonoBehaviour {
             else
             {
                 Transform spawnPoint = validSpawnPoints[Random.Range(0, validSpawnPoints.Count)];
-                zombie = Instantiate(validPrefabs[Random.Range(0, validPrefabs.Count)], spawnPoint.position, spawnPoint.rotation);
+                Zombie prefab = special != null ? special.Prefab : validPrefabs[Random.Range(0, validPrefabs.Count)];
+                zombie = Instantiate(prefab, spawnPoint.position, spawnPoint.rotation);
             }
             zombie.Setup(zombieData);
             // 대기 군집은 Idle 역할, 그 밖의 웨이브 좀비는 Wave 역할 (등록 전에 지정해 첫 프레임부터 기본 상태가 맞도록)
@@ -309,7 +319,18 @@ public class ZombieSpawner : MonoBehaviour {
             valid = false;
         }
         valid &= CollectValid(zombiePrefab, validPrefabs, "Zombie Prefab");
+        // 특수 좀비를 일반 추첨에 섞으면 설정한 확률을 초과해 생성할 수 있다.
+        for (int i = validPrefabs.Count - 1; i >= 0; i--) {
+            if (!(validPrefabs[i] is ISpecialZombie)) continue;
+            Debug.LogWarning($"ZombieSpawner: '{validPrefabs[i].name}'은 특수 좀비이므로 일반 추첨에서 제외합니다. Special Zombies에 전용 Data와 함께 연결하세요.", this);
+            validPrefabs.RemoveAt(i);
+        }
+        if (validPrefabs.Count == 0) {
+            Debug.LogError("ZombieSpawner: Zombie Prefab에 일반 좀비 프리팹을 하나 이상 연결하세요.", this);
+            valid = false;
+        }
         valid &= CollectValid(zombieDatas, validDatas, "Zombie Datas");
+        ValidateSpecialZombies();
         valid &= CollectValid(spawnPoints, validSpawnPoints, "Spawn Points");
         if (baseTarget == null)
             Debug.LogError("ZombieSpawner: Base Target(보관소)이 연결되지 않아 Wave 좀비는 거점을 공격하지 않고 정지 상태로 대기합니다.", this);
@@ -319,6 +340,42 @@ public class ZombieSpawner : MonoBehaviour {
         if (idleGroupDirector != null && validIdlePrefabs.Count == 0)
             Debug.LogWarning("ZombieSpawner: 일반 좀비 프리팹이 없어 대기 군집을 배치하지 않습니다.", this);
         return valid;
+    }
+
+    private void ValidateSpecialZombies() {
+        validSpecialZombies.Clear();
+        if (specialZombies != null) {
+            for (int i = 0; i < specialZombies.Length; i++) {
+                SpecialSpawnEntry entry = specialZombies[i];
+                if (entry == null || entry.Prefab == null || entry.Data == null ||
+                    !(entry.Prefab is ISpecialZombie)) {
+                    Debug.LogWarning($"ZombieSpawner: Special Zombies[{i}]의 특수 좀비 Prefab과 Data를 확인하세요. 잘못된 항목은 제외합니다.", this);
+                    continue;
+                }
+                validSpecialZombies.Add(entry);
+            }
+        }
+        if (specialSpawnChance > 0f && validSpecialZombies.Count == 0)
+            Debug.LogWarning("ZombieSpawner: Special Zombies에 유효한 항목이 없어 일반 좀비만 생성합니다.", this);
+    }
+
+    private static SpecialSpawnEntry SelectSpecial(float chancePercent, List<SpecialSpawnEntry> entries) {
+        if (entries.Count == 0 || float.IsNaN(chancePercent) || chancePercent <= 0f) return null;
+        float chance = Mathf.Clamp(chancePercent, 0f, 100f);
+        if (chance < 100f && Random.Range(0f, 100f) >= chance) return null;
+        return entries[Random.Range(0, entries.Count)];
+    }
+
+    private void OnValidate() {
+        specialSpawnChance = float.IsNaN(specialSpawnChance) ? 10f : Mathf.Clamp(specialSpawnChance, 0f, 100f);
+    }
+
+    [Serializable]
+    private sealed class SpecialSpawnEntry {
+        [SerializeField] private Zombie prefab;
+        [SerializeField] private ZombieData data;
+        public Zombie Prefab => prefab;
+        public ZombieData Data => data;
     }
 
     // 빈 칸은 오류로 알리고 제외한다. 사용할 항목이 하나도 없으면 false.
