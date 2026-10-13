@@ -7,7 +7,6 @@ public sealed class BarricadeBuilder : MonoBehaviour {
     [SerializeField] private LayerMask blockingLayers = Physics.DefaultRaycastLayers;
     private PlankInventory inventory;
     private PlayerHealth player;
-    private Camera viewCamera;
     private Barricade target;
     private float progress;
     private bool installing;
@@ -19,11 +18,16 @@ public sealed class BarricadeBuilder : MonoBehaviour {
     public string InstallKeyLabel => installKey.ToString();
     public float Progress => target == null ? 0f : progress / target.installSeconds;
     public int Materials => inventory == null ? 0 : inventory.Count;
+    public bool CanShowPrompt => isActiveAndEnabled && player != null && !player.dead &&
+        target != null && target.isActiveAndEnabled && Time.timeScale > 0f && Application.isFocused &&
+        (target.WorkPosition - (transform.position + Vector3.up)).sqrMagnitude <= reach * reach &&
+        (GameManager.instance == null || !GameManager.instance.isGameover) &&
+        (GameSessionManager.instance == null ||
+            (!GameSessionManager.instance.IsPaused && !GameSessionManager.instance.IsRebinding));
 
     private void Awake() {
         inventory = GetComponent<PlankInventory>();
         player = GetComponent<PlayerHealth>();
-        viewCamera = Camera.main;
     }
 
     private void Update() {
@@ -39,6 +43,22 @@ public sealed class BarricadeBuilder : MonoBehaviour {
             sites = FindObjectsByType<Barricade>(FindObjectsSortMode.None);
             nextSearch = Time.time + 0.5f;
         }
+        RefreshTarget();
+        if (target == null || !target.CanInstall || inventory.Count < 1) {
+            ResetWork();
+            return;
+        }
+        if (!installing) {
+            if (!Input.GetKeyDown(installKey)) return;
+            installing = true;
+        }
+        progress += Time.deltaTime;
+        if (progress < target.installSeconds) return;
+        target.TryInstall(inventory);
+        ResetWork();
+    }
+
+    private void RefreshTarget() {
         Barricade nearest = null;
         float distance = reach * reach;
         Vector3 eye = transform.position + Vector3.up;
@@ -46,7 +66,6 @@ public sealed class BarricadeBuilder : MonoBehaviour {
             if (site == null || !site.isActiveAndEnabled) continue;
             Vector3 delta = site.WorkPosition - eye;
             if (delta.sqrMagnitude > distance) continue;
-            if (viewCamera != null && Vector3.Dot(viewCamera.transform.forward, delta.normalized) < 0.3f) continue;
             bool blocked = false;
             foreach (RaycastHit hit in Physics.RaycastAll(eye, delta.normalized, delta.magnitude,
                 blockingLayers, QueryTriggerInteraction.Ignore)) {
@@ -62,18 +81,6 @@ public sealed class BarricadeBuilder : MonoBehaviour {
             target = nearest; ResetWork();
             damageRevision = target == null ? 0 : target.DamageRevision;
         }
-        if (target == null || !target.CanInstall || inventory.Count < 1) {
-            ResetWork();
-            return;
-        }
-        if (!installing) {
-            if (!Input.GetKeyDown(installKey)) return;
-            installing = true;
-        }
-        progress += Time.deltaTime;
-        if (progress < target.installSeconds) return;
-        target.TryInstall(inventory);
-        ResetWork();
     }
 
     private void ResetWork() { installing = false; progress = 0f; }

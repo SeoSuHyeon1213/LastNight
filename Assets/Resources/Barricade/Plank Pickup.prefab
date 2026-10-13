@@ -48,6 +48,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlankPickup
   amount: 3
+  pickupClip: {fileID: 8300000, guid: 519ad2e4de69341948a938bf2a31e33b, type: 3}
 --- !u!135 &2016808690191286952
 SphereCollider:
   m_ObjectHideFlags: 0

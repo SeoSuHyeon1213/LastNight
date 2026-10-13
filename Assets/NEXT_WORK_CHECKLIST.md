@@ -121,7 +121,7 @@
 
 ### 6. 신규 특수 좀비
 
-- [ ] 폭발형 접근·기폭 예고·범위/차단 검사·대상별 1회 피해·조기 처치 시 기폭 취소를 구현한다.
+- [ ] 폭발형 접근 자폭·범위/차단 검사·대상별 1회 피해를 구현한다. (최신 사용자 규칙 2026-10-13: 조기 처치해도 사망 폭발 유지, 즉시 접근 자폭이며 별도 예고 시간 없음. 거리 조절로 회피. 코드·프리팹 몸 Collider·Play Mode 판정 검증 완료, 전체 맵 추적·밸런스는 추가 확인)
 - [ ] 탱킹형 방어 특성과 노출 약점 판정을 구현한다.
 - [ ] 딜링형 플레이어 우선 추적·공격 예고·타격·공격 후 회복을 구현한다.
 - [ ] 등장 웨이브·편성 예산·스펙을 결정하고 생존 상한·사망 집계에 연결한다. (부분: `ZombieSpawner` 스폰 지점 생성에서 기본 10% 특수 대체 추첨, Inspector 확률·프리팹/전용 Data 짝 설정, 기존 예정 수·생존 상한·사망 처리 경로 사용. 등장 웨이브 제한·종류별 가중치·씬 연결·실제 웨이브 검증은 미완료)
@@ -304,7 +304,7 @@
 - [x] BombZombie가 SpecialZombie를 상속하고 사망 시 플레이어·다른 좀비에 폭발 피해 적용.
 - [x] 벽 차단, 다중 Collider 단일 피해, 연쇄 폭발·중복 사망 방지, 비활성 무폭발, 재활성 초기화.
 - [x] Unity 컴파일 및 임시 Play Mode 경계 검증 12개 통과. 상세 범위: BOMB_ZOMBIE_SETUP.md.
-- [ ] 실제 BombZombie 프리팹 컴포넌트·참조 연결과 전용 ZombieData(낮은 HP·빠른 속도) 설정.
+- [ ] 실제 BombZombie 프리팹 컴포넌트·참조 연결과 전용 ZombieData(낮은 HP·빠른 속도) 설정. (부분 2026-10-13: BomberZombie에 비 Trigger 몸 CapsuleCollider 추가, 실제 프리팹 접근 자폭 검증 완료. 전용 데이터 밸런스·연출은 추가 확인)
 - [ ] 실제 플레이어 사망/HUD·최종 적 처치 동시 패배 판정·음원/효과·작은 체구 NavMesh 이동 확인.
 - [ ] 사망 시 반드시 폭발하는 최신 규칙에 맞춰 능력 사용 전 처치 도전의 대상 정책 결정.
 
@@ -325,3 +325,65 @@
 - [x] Unity 컴파일과 실제 NavMesh 위 임시 Play Mode 검증 23개 통과. 타이머 직접 진행 검증이며 상세 범위는 DEALER_ZOMBIE_SETUP.md.
 - [ ] 실제 DealerZombie 프리팹의 컴포넌트·공격 Trigger·예고 표시/음원·전용 ZombieData와 스포너 연결.
 - [ ] 자연 시간의 예고/타격 애니메이션 일치, 실제 플레이어 HUD·사망과 바리케이드 경로 통합 확인.
+
+## 접근 자폭·바리케이드 통행 보완 (2026-10-13)
+
+- [x] `BombZombie`의 플레이어 근접 공격을 접근 자폭으로 전환했다. `Detonation Distance` 기본 1.2m, `Explosion Radius` 기본 3m는 테스트 시작값이며 Inspector에서 조정한다. 거리 기준은 폭발 중심에서 플레이어 몸 Collider의 가장 가까운 지점이다. 치명적 총격에도 사망 폭발을 유지하며 벽·설치된 바리케이드는 기폭 및 폭발 피해를 차단한다.
+- [x] 실제 `BomberZombie.prefab`의 누락된 몸 CapsuleCollider를 Prefab Mode에서 추가·저장했다. Center (0, 1.2, 0), Height 2.4, Radius 0.45, 루트 Scale 0.7. 기존 모델·Animator·이펙트 참조는 보존했다.
+- [x] `Barricade.blockedNavigationLinks`로 설치 시 문턱 링크를 닫고, 파괴·비활성화 시 원래 활성 상태를 복구한다. Game 씬의 바리케이드 10곳에 각각 가로지르는 기존 링크 1개를 Inspector 명령으로 연결했다. carving 장애물은 기존 설정을 유지한다.
+- [x] 바리케이드 BoxCollider의 `Layer Overrides > Exclude Layers`를 Player로 지정했다(Game 씬 10곳 및 기본 `Barricade Site.prefab`). Collider 전체를 끄지 않으므로 다른 대상의 충돌·공격 판정은 유지된다. Player 몸 Collider는 Player 레이어를 사용한다.
+- [x] 방어선을 공격하는 동안 탐지 반경 안의 플레이어를 바리케이드의 시야 차단만으로 놓치지 않도록 추적을 유지한다.
+- [x] Unity 컴파일 통과. 실제 PlayerHealth를 사용한 Play Mode 판정 29개 통과: 자폭·치명타 폭발·안전거리·단일 폭발/사망 통지·일시정지/재개·바리케이드 차단, 10곳 각각 설치/파괴 링크 전환. 자연 시간 검증: PlayerHouse 문턱에서 플레이어 물리 통과 → 일반 좀비가 판자 5개 파괴 후 열린 링크 통과 → BomberZombie가 이동해 자동 자폭. 생성 직후 첫 프레임 초기화 이후 검증용 추적 대상을 지정했고, 0.5초 이후에는 실제 AI·애니메이션·물리 진행을 사용했다. 테스트 생성물 제거·편집 모드 복귀 완료.
+- [ ] 전체 집·계단·큰 특수 좀비의 통행과 실제 입력/총격/연출 및 수치 밸런스는 추가 플레이 검증한다.
+- 새 방어 지점의 에디터 설정: 기본 바리케이드 프리팹 배치 → BoxCollider의 Player 제외 확인 → carving NavMeshObstacle 연결 → 그 방어선을 가로지르는 모든 NavMeshLink를 `Blocked Navigation Links`에 연결한다. 스크립트가 주변 링크를 자동 검색하거나 생성하지 않는다.
+
+## HUD 배치·무기 슬롯 강조 (2026-10-13)
+
+- [x] 참고 이미지 기준으로 Game 씬의 웨이브 좌상단·점수 상단 중앙·레이더 좌하단·체력 하단 중앙·무기/목재/수류탄 우하단 구성을 저장했다. 어두운 반투명 패널, 얇은 올리브색 테두리, 이중 원 레이더·플레이어 방향 화살표를 적용했다.
+- [x] `SurvivalHud`의 전투 HUD 런타임 생성 코드를 에디터 배치·Inspector 참조로 옮겼다. `Assets/Prefabs/Survival HUD.prefab`과 Game 씬 연결을 저장했다. 기존 메뉴 계층·이벤트 대상은 유지하고 레거시 점수/웨이브/탄약/체력 표시는 숨긴다. UIManager의 점수·웨이브 참조도 새 표시와 일치시켰다.
+- [x] 주/보조 무기를 동시에 표시한다. 장착 아이콘은 기본 크기의 115%·불투명도 100%, 비장착은 기본 크기의 100%·불투명도 40%. `SurvivalHud > Weapon Slots > Equipped Weapon Scale / Inactive Weapon Alpha`에서 조절한다. 무기 아이콘 영역·기본 크기·색은 에디터 Image에서 지정한다.
+- [x] `GunData.HudIcon`을 추가하고 라이플·권총·샷건·저격총·근접무기 데이터에 실루엣 Sprite를 연결했다. 무기 획득/교체 시 실제 슬롯의 GunData 아이콘을 사용하며 빈 슬롯의 Image는 숨긴다. 신규 무기는 GunData Inspector의 Hud Icon을 지정한다.
+- [x] 목재와 수류탄을 무기 패널 아래로 옮겼다. 체력은 실제 비율의 Filled Image, 탄약은 장착 무기의 탄창/예비탄·무한 탄약·재장전 상태를 표시한다.
+- [x] Unity 컴파일 및 Play Mode 검증 8개 통과: 주무기 강조, 두 슬롯 아이콘 일치, 보조무기 강조, 체력 70% 표시, 일시정지 숨김, 재개 복원, 빈 보조 슬롯 숨김, 실제 무기 획득 API 이후 아이콘 갱신. 1920×1080 Overlay 캡처에서 패널 경계와 두 장착 상태를 시각 확인했다. 테스트는 편집 모드로 복귀하며 임시 플레이 수치·무기는 저장하지 않았다.
+- 레이더 마커는 에디터에 32개를 구성·연결했다. 적 상한을 늘릴 때는 `Radar Markers`에 표시용 Image를 추가 연결한다. HUD가 UI 오브젝트를 자동 생성하지 않는다.
+- 새 씬에 재사용할 때는 기존 HUD의 SurvivalHud에 새 HUD 루트·CanvasGroup·Image/Text·방위 RectTransform·마커 배열과 해당 씬 Player/View Camera를 Inspector에서 연결한다. 이번 검증 범위는 Game 씬과 1920×1080이다.
+
+## 바리케이드 아군 피해 차단·상호작용 안내 (2026-10-13)
+
+- [x] `Barricade.OnDamage`는 출처 없는 일반 피해 호출을 무시한다. 총격·근접·플레이어 수류탄으로 판자가 파괴되지 않는다. 좀비의 공유 근접 타격 경로는 `ReceiveZombieDamage`를 호출하며 판자 파괴와 통로 재개를 유지한다. 죽은/비활성 좀비, 잘못된 피해 수치, 일시정지·게임오버 중 피해는 거부한다.
+- [x] 기본 2.5m 안에서 장애물에 가려지지 않은 가장 가까운 바리케이드를 선택한다. 카메라 방향 조건을 제거하고 가까이 접근하면 `Press E : Install barricade`를 표시한다. 목재 부족은 `Need wood`, 설치 중에는 진행률, 최대 설치량에는 `Barricade full`을 표시한다. 범위 이탈·일시정지·사망·입력 설정·창 포커스 이탈 시 안내를 숨긴다.
+- [x] Game 씬 PlayerCharacter에 `BarricadeBuilder`를 에디터에서 추가했다. Install Key/Reach는 Inspector에서 변경한다. 기존 설치 시간·목재 소비·중단 규칙은 유지하며 자동 설치로 전환한 것은 아니다.
+- [x] `Survival HUD.prefab`에 하단 중앙 체력바 위의 Barricade Prompt와 Text를 에디터 명령으로 배치했다. Game 씬 SurvivalHud의 `Barricade Prompt Root / Text`를 연결·저장했다. 런타임 UI 생성은 추가하지 않았다.
+- [x] Unity 컴파일 통과. 실제 씬의 바리케이드와 Zombie01을 사용하는 Play Mode 판정 11개 통과: 일반 피해 무시, 실제 좀비 근접 타격, 무효 출처/정지 피해 차단, 목재 부족/보유 안내, 진행률, 최대 설치 상태, 정지/범위 이탈/Builder 비활성 시 숨김, 좀비 파괴 후 링크 재개. 입력은 직접 누른 검증이 아니라 실제 메서드와 설치 상태를 호출한 검증이다. 1920×1080 Overlay에서 Press E 패널을 시각 확인하고 테스트 수치·위치·생성물을 저장하지 않고 편집 모드로 복귀했다.
+- 새 씬에는 Player의 BarricadeBuilder와 HUD의 안내 루트/Text를 에디터에서 연결한다. 자동 설치·강화는 기존 미완료 항목으로 남는다.
+
+## 아이템별 획득음·실패 후 재진입 (2026-10-13)
+
+- [x] `IItem.Use(GameObject)`가 실제 획득 성공 여부를 `bool`로 반환하고 `PlayPickupSound(AudioSource)`를 제공한다. AmmoPack·HealthPack·Coin·GrenadePickup·PlankPickup·WeaponPickup에 Inspector의 `Pickup Clip`을 추가했다. 재생은 플레이어의 기존 AudioSource를 사용한다.
+- [x] PlayerHealth는 아이템 방문당 한 번만 획득을 시도하며 성공 후에만 개별 획득음과 `ItemPickedUp` 소음 이벤트를 실행한다. 실패 시 아이템·콜라이더·남은 수량을 보존한다. 머무르는 동안 재시도하지 않고 모든 해당 아이템 콜라이더를 벗어난 뒤 다시 진입하면 재판정한다.
+- [x] 여러 몸/아이템 콜라이더의 중복 진입을 묶는다. 이탈 시 실제 겹침을 검사해 몸/무기 콜라이더의 비활성화로 Exit가 누락되어도 정상적인 바깥 이동 후 재진입을 막지 않는다. 파괴된 아이템 접촉 기록은 다음 접촉 시 정리하고 PlayerHealth 비활성화·재활성화 시 초기화한다.
+- [x] 목재·수류탄은 1개 이상 받으면 성공이며 일부 획득 시 잔량을 필드에 남긴다. 회복약은 최대 체력에서 실패하고 회복량을 최대 체력까지로 제한한다. 탄약은 실제 주무기 예비탄 증가 시에만 성공한다. 중복 무기의 탄약 지급도 무한 탄약/근접무기/예비탄 포화 상태에서 효과가 없으면 실패한다. 소비 완료 아이템은 같은 프레임의 중복 호출도 거부한다.
+- [x] 기존 공통 획득음 필드를 PlayerHealth에서 제거하고 8개 아이템 프리팹의 Pickup Clip에 기존 `Assets/Audios/Pick Up.ogg`를 에디터 명령으로 연결·저장했다. Game 씬 `RandomWeaponSpawner > Weapons`의 5개 항목에 Pickup Clip을 연결해 생성된 WeaponPickup으로 전달한다. 새로운 음원은 사용자가 각 필드에서 선택한다. 비워 두면 청취용 획득음은 무음이고 성공한 획득의 AI 소음 이벤트는 유지한다.
+- [x] Unity 컴파일 통과. Play Mode의 프리팹 참조·실제 획득 API·트리거 콜백 판정 37개와 수동 Physics 시뮬레이션의 실제 Collider 진입/머무름/이탈 판정 11개 통과. 실패 시 무음/무소음, 재진입 성공, 체력/소지량 변경 중 대기, 부분 획득 잔량, 여러 콜라이더, 추가 몸 Collider 비활성화 후 재진입, 중복 소비 방지, 무효 목표, 무기 보급 음원 전달, 일시정지, 파괴된 접촉 정리를 확인했다. AudioSource 재생 상태는 확인했으며 음원 청취·볼륨 밸런스는 별도 확인한다. 임시 플레이 수치·생성물을 저장하지 않고 편집 모드로 복귀했다.
+- 에디터 설정: 각 아이템 프리팹의 Pickup Clip 지정. 무기 보급은 Game 씬 RandomWeaponSpawner의 Weapons 항목별 Pickup Clip 지정. Game 씬의 기존 플레이어 출력은 Spatial Blend 0의 2D 설정을 사용한다.
+
+## 재장전 점 애니메이션 HUD (2026-10-13)
+
+- [x] 실제 장착 무기의 `Gun.State.Reloading` 동안 `Reloading.` → `Reloading..` → `Reloading...`를 반복한다. `SurvivalHud > Reload Indicator > Reload Dot Interval` 기본 0.35초이며 Inspector에서 조절한다. 총의 재장전과 같은 `Time.time`을 사용해 게임 일시정지 중 점도 멈춘다.
+- [x] 완료·취소·무기 전환·무기 비활성화 시 표시를 지우고 다음 재장전은 점 1개부터 시작한다. 플레이어 사망·게임오버·HUD 비활성화에서도 표시를 정리한다. 재장전 시간이나 탄약 소비 로직은 변경하지 않았다.
+- [x] 기존 탄약 Text의 줄 높이를 넘던 정적 RELOADING 문구를 제거하고, 체력바 위 별도 Reloading Text를 에디터 명령으로 구성했다. Survival HUD.prefab과 Game 씬 SurvivalHud의 Reload Text 참조를 연결·저장했다. 런타임 UI 생성은 추가하지 않았다.
+- [x] Unity 컴파일 및 Play Mode 상태/표시 검증 10개 통과(점 단계는 시작 시각을 조정해 확인). 별도 자연 시간 검증에서 실제 Shotgun 재장전 코루틴 2.5초 동안 점 1/2/3/1 순환을 반복하고, 탄창이 8발로 채워지면서 표시가 자동 제거됨을 확인했다. 테스트 중에만 백그라운드 실행을 허용하고 기존 설정으로 복원했다. 1920×1080 Overlay 화면 확인 및 편집 모드 복귀 완료.
+- 새 씬에서 HUD를 연결할 때 Reload Text도 지정한다. 표시 위치·폰트·크기는 에디터의 Survival HUD/Reloading Text에서 조절한다.
+
+## 폭발 이펙트 일회 재생 (2026-10-13)
+
+- [x] BomberZombie의 SmallExplosion과 수류탄의 TinyExplosion에서 파티클 Loop/주기 2초, 이펙트 수명 5초 설정으로 0·2·4초에 반복되는 원인을 확인했다.
+- [x] `BombZombie.PlayExplosionEffect`와 `Grenade.Explode`가 생성한 폭발 인스턴스의 모든 파티클을 초기화하고 Loop·Prewarm을 끈 뒤 활성 파티클만 한 번 재생한다. Prewarm을 끄지 않으면 일회 재생의 첫 Burst까지 미리 시뮬레이션되어 사라질 수 있어 함께 처리한다. 원본 에셋이나 Inspector 참조를 바꾸지 않고 폭발 스폰의 런타임 재생 규칙만 수정했다. 폭발 피해·범위·소리·잔여 파티클을 위한 5초 제거 시간은 유지한다.
+- [x] Unity 컴파일 및 Play Mode 판정 12개 통과. 실제 BomberZombie·수류탄으로 사망/기폭 중복 호출 시 이펙트 1개 생성, 각 이펙트의 전 레이어 Loop 해제, 첫 충격파 발생, 2.1초·4.1초 시점 충격파 반복 없음 확인. 원본 반복 이펙트는 동일 시점에 반복됨을 대조 검증했다. ParticleSystem.Simulate로 시점을 진행하고 테스트 인스턴스의 Burst 수량만 1로 고정해 원본의 0~1개 무작위 발생을 배제했다. 임시 인스턴스 제거 및 편집 모드 복귀 완료.
+
+## MobileGame HUD 배치 (2026-10-13)
+
+- [x] 참고 이미지 기준으로 MobileGame 씬의 웨이브 좌상단·그 아래 레이더·점수 상단 중앙·무기/목재/수류탄 우상단·체력 하단 중앙을 에디터 RectTransform 명령으로 배치했다. 웨이브/점수 패널을 1.3배, 체력 패널을 1.075배로 조정했다. 레이더는 기존 1.08배 크기를 유지하고 이동했다.
+- [x] 무기 패널을 위쪽 기준 앵커·피벗으로 옮기고 높이를 204로 조정했다. 무기 이름과 보급 행의 간격을 맞췄다. 거점 체류·거점 변경·무기 보급 알림을 중앙 세 줄에 배치하고 빅웨이브 알림은 상단 중앙의 별도 간격에 배치했다.
+- [x] 변경은 MobileGame 씬의 프리팹 오버라이드로 저장했다. Game 씬과 Survival HUD 공용 프리팹은 작업 전후 SHA256 일치로 보존을 확인했다. 기존 HUD 데이터 연결, 재장전·바리케이드 안내, 모바일 씬의 기존 버튼은 유지했다. 이번 작업에 신규 UI 생성이나 C# 변경은 없다.
+- [x] Play Mode의 실제 Game View 해상도 1608×978(참고 이미지 비율), 2340×1080(20:9)에서 Overlay 캡처로 확인했다. 주요 패널이 화면 안에 있고 서로 겹치지 않음을 확인했다. 거점/보급 알림을 검증 중에만 표시하고 플레이 모드 종료로 원래 상태를 복원했다. 임시 해상도 프리셋 제거·기존 Game View 선택 복원 및 편집 모드 복귀 완료.

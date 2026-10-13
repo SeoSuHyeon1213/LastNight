@@ -73,8 +73,10 @@ public class PlayerShooter : MonoBehaviour {
         if (slot < 1 || slot > 2 || prefab == null || gunPivot == null) return false;
         int index = slot - 1;
         if (sources[index] == prefab && weapons[index] != null) {
+            if (duplicateAmmo <= 0 || !weapons[index].UsesAmmo || weapons[index].HasInfiniteAmmo) return false;
+            int previousAmmo = weapons[index].ammoRemain;
             weapons[index].AddAmmo(duplicateAmmo);
-            return true;
+            return weapons[index].ammoRemain > previousAmmo;
         }
         return EquipWeapon(slot, prefab);
     }

@@ -71,6 +71,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AmmoPack
   ammo: 30
+  pickupClip: {fileID: 8300000, guid: 9eca29ee7f8209e419470fcd586aec21, type: 3}
 --- !u!114 &7692978571188618074
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.AI;
+using Unity.AI.Navigation;
 
 [RequireComponent(typeof(BoxCollider))]
 public sealed class Barricade : LivingEntity {
@@ -11,6 +12,9 @@ public sealed class Barricade : LivingEntity {
     private GameObject[] planks;
     private BoxCollider blocker;
     [SerializeField] private NavMeshObstacle navigationObstacle;
+    [Tooltip("이 방어선을 가로지르는 링크. 설치 중에는 닫고 파괴 후 기존 활성 상태로 되돌립니다.")]
+    [SerializeField] private NavMeshLink[] blockedNavigationLinks;
+    private bool[] openLinkStates;
     public int PlankCount { get; private set; }
     public int DamageRevision { get; private set; }
     public int Capacity => plankSockets == null ? 0 : plankSockets.Length;
@@ -24,6 +28,11 @@ public sealed class Barricade : LivingEntity {
         blocker = GetComponent<BoxCollider>();
         if (navigationObstacle == null) navigationObstacle = GetComponent<NavMeshObstacle>();
         blocker.isTrigger = false;
+        if (blockedNavigationLinks != null) {
+            openLinkStates = new bool[blockedNavigationLinks.Length];
+            for (int i = 0; i < blockedNavigationLinks.Length; i++)
+                openLinkStates[i] = blockedNavigationLinks[i] != null && blockedNavigationLinks[i].enabled;
+        }
         if (plankPrefab == null || Capacity == 0) {
             Debug.LogError("Barricade: Plank Prefab과 Plank Sockets를 연결하세요.", this);
             enabled = false;
@@ -59,6 +68,7 @@ public sealed class Barricade : LivingEntity {
     private void OnDisable() {
         if (blocker != null) blocker.enabled = false;
         if (navigationObstacle != null) navigationObstacle.enabled = false;
+        RefreshNavigationLinks(false);
     }
 
     public bool TryInstall(PlankInventory inventory) {
@@ -70,7 +80,13 @@ public sealed class Barricade : LivingEntity {
     }
 
     public override void OnDamage(float damage, Vector3 hitPoint, Vector3 hitNormal) {
-        if (!IsBlocking || damage <= 0f) return;
+        // 출처가 없는 IDamageable 호출(플레이어 총격·근접·수류탄)은 무시한다.
+    }
+
+    public void ReceiveZombieDamage(Zombie attacker, float damage, Vector3 hitPoint, Vector3 hitNormal) {
+        if (attacker == null || attacker.dead || !attacker.isActiveAndEnabled || !IsBlocking ||
+            damage <= 0f || float.IsNaN(damage) || float.IsInfinity(damage) || Time.timeScale <= 0f ||
+            (GameManager.instance != null && GameManager.instance.isGameover)) return;
         // 한 번의 유효 타격마다 최소 한 조각이 파괴된다.
         int broken = Mathf.Clamp(Mathf.CeilToInt(damage / healthPerPlank), 1, PlankCount);
         DamageRevision++;
@@ -96,6 +112,15 @@ public sealed class Barricade : LivingEntity {
             for (int i = 0; i < planks.Length; i++) planks[i].SetActive(i < PlankCount);
         blocker.enabled = isActiveAndEnabled && PlankCount > 0;
         if (navigationObstacle != null) navigationObstacle.enabled = blocker.enabled;
+        RefreshNavigationLinks(blocker.enabled);
+    }
+
+    private void RefreshNavigationLinks(bool blocking) {
+        if (blockedNavigationLinks == null || openLinkStates == null) return;
+        for (int i = 0; i < blockedNavigationLinks.Length; i++) {
+            NavMeshLink link = blockedNavigationLinks[i];
+            if (link != null) link.enabled = !blocking && openLinkStates[i];
+        }
     }
 
     private void OnValidate() {

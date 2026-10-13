@@ -13,6 +13,7 @@ public sealed class RandomWeaponSpawner : MonoBehaviour {
     [Serializable]
     public class Entry {
         public Gun prefab;
+        public AudioClip pickupClip;
         public WeaponSlot slot = WeaponSlot.Primary;
         [Min(1)] public int duplicateAmmo = 30;
     }
@@ -128,7 +129,7 @@ public sealed class RandomWeaponSpawner : MonoBehaviour {
         currentPickup.SetActive(false);
         currentPickup.transform.SetPositionAndRotation(transform.position + displayOffset, transform.rotation);
         var pickup = currentPickup.AddComponent<WeaponPickup>();
-        pickup.Initialize(entry.prefab, (int)entry.slot, entry.duplicateAmmo);
+        pickup.Initialize(entry.prefab, (int)entry.slot, entry.duplicateAmmo, entry.pickupClip);
         var trigger = currentPickup.AddComponent<SphereCollider>();
         trigger.isTrigger = true;
         trigger.radius = pickupRadius;

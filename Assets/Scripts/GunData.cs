@@ -4,6 +4,8 @@ using UnityEngine;
 public class GunData : ScriptableObject
 {
     public string displayName = "Rifle";
+    [SerializeField] private Sprite hudIcon;
+    public Sprite HudIcon => hudIcon;
     public AudioClip shotClip; // 발사 소리
     public AudioClip reloadClip; // 재장전 소리
 

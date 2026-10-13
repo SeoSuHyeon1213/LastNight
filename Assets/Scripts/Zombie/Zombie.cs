@@ -168,6 +168,7 @@ public class Zombie : LivingEntity {
     }
 
     protected bool IsAttacking => isAttacking;
+    protected LivingEntity ChaseTarget => hasTarget ? targetEntity : null;
 
     // 대기 군집 구성원 여부. 행동은 일반 좀비와 같고(Idle + 20m 탐지 + 소음), 정체 방지 각성 대상 판정에만 쓴다.
     public bool IsIdleGroupMember { get; private set; }
@@ -500,7 +501,7 @@ public class Zombie : LivingEntity {
     }
 
     // 지금 공격해도 되는 대상: 추적 중이면 앞을 막는 바리케이드 또는 추적 대상, 거점 공격 중이면 보관소
-    private LivingEntity CurrentAttackGoal()
+    protected LivingEntity CurrentAttackGoal()
     {
         if ((hasTarget || State == ZombieState.AttackBase) && blockingBarricade != null && blockingBarricade.IsBlocking)
             return blockingBarricade;
@@ -510,7 +511,7 @@ public class Zombie : LivingEntity {
         return null;
     }
 
-    // Called only by the attack clip's impact event.
+    // 클립의 타격 이벤트 또는 이벤트가 없는 공격 상태의 보완 판정에서 호출한다.
     public void OnAttackHit()
     {
         if (!isActiveAndEnabled || dead || !isAttacking || hitApplied || Time.timeScale <= 0f ||
@@ -541,6 +542,7 @@ public class Zombie : LivingEntity {
 
         Vector3 hitNormal = transform.position - currentAttackTarget.transform.position;
         if (currentAttackTarget is BaseStorage storage) storage.ReceiveZombieDamage(this, damage, hitPoint, hitNormal);
+        else if (currentAttackTarget is Barricade barricade) barricade.ReceiveZombieDamage(this, damage, hitPoint, hitNormal);
         else currentAttackTarget.OnDamage(damage, hitPoint, hitNormal);
     }
 
@@ -692,6 +694,14 @@ public class Zombie : LivingEntity {
         if (CanSee(targetEntity))
         {
             canLoseTarget = true;
+            targetLostSince = -1f;
+            lastKnownTargetPosition = targetEntity.transform.position;
+            return;
+        }
+        // 눈앞의 방어선을 부수는 동안에는 시야 차단만으로 추적을 포기하지 않는다.
+        if (blockingBarricade != null && blockingBarricade.IsBlocking &&
+            offset.sqrMagnitude <= detectionRadius * detectionRadius)
+        {
             targetLostSince = -1f;
             lastKnownTargetPosition = targetEntity.transform.position;
             return;

@@ -1,9 +1,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// 빠른 접근과 낮은 체력은 ZombieData로 설정하고, 사망 시 주변을 폭발시킨다.
+// 플레이어에게 접근하면 자폭하며, 조기 처치되어도 같은 사망 폭발을 실행한다.
 [DisallowMultipleComponent]
 public sealed class BombZombie : SpecialZombie {
+    [Header("Contact Detonation")]
+    [Tooltip("폭발 중심에서 플레이어 몸 Collider까지의 거리. 폭발 반경보다 작게 설정합니다.")]
+    [SerializeField, Min(0.01f)] private float detonationDistance = 1.2f;
+
     [Header("Death Explosion")]
     [SerializeField, Min(0.01f)] private float explosionRadius = 3f;
     [SerializeField, Min(0f)] private float explosionDamage = 50f;
@@ -22,11 +26,35 @@ public sealed class BombZombie : SpecialZombie {
     private bool deathInProgress;
     public bool HasExploded { get; private set; }
 
-    // 사망 반응이므로 거리·NavMesh·일반 공격 상태로 발동을 제한하지 않는다.
-    protected override bool CanBeginAbility => false;
-    protected override void OnAbilityStarted() { }
+    protected override bool CanBeginAbility {
+        get {
+            if (!(ChaseTarget is PlayerHealth player) || CurrentAttackGoal() != player) return false;
+            Collider body = player.GetComponent<Collider>();
+            if (body == null || !body.enabled || body.isTrigger) return false;
+            Vector3 origin = transform.position + explosionOffset;
+            Vector3 point = body.ClosestPoint(origin);
+            float distance = Mathf.Min(detonationDistance, explosionRadius);
+            return (point - origin).sqrMagnitude <= distance * distance && !IsBlocked(origin, point);
+        }
+    }
+
+    protected override void OnAbilityStarted() {
+        health = 0f;
+        Die();
+    }
     protected override void TickAbility(float deltaTime) { }
     protected override void OnAbilityCancelled() { }
+
+    protected override void LateUpdate() {
+        base.LateUpdate();
+        TryUseAbility();
+    }
+
+    protected override void BeginMeleeAttack(LivingEntity attackTarget, Collider other) {
+        // 플레이어에게는 일반 근접 피해를 주지 않고 설정한 거리까지 접근한다.
+        if (attackTarget is PlayerHealth) TryUseAbility();
+        else base.BeginMeleeAttack(attackTarget, other);
+    }
 
     protected override void OnAbilityReset() {
         deathInProgress = false;
@@ -87,8 +115,8 @@ public sealed class BombZombie : SpecialZombie {
         if (delta.sqrMagnitude < 0.0001f) return false;
         foreach (RaycastHit hit in Physics.RaycastAll(origin, delta.normalized, delta.magnitude,
             blockingLayers, QueryTriggerInteraction.Ignore)) {
-            if (hit.transform.IsChildOf(transform) ||
-                hit.collider.GetComponentInParent<LivingEntity>() != null) continue;
+            LivingEntity entity = hit.collider.GetComponentInParent<LivingEntity>();
+            if (hit.transform.IsChildOf(transform) || entity is Zombie || entity is PlayerHealth) continue;
             return true;
         }
         return false;
@@ -97,9 +125,17 @@ public sealed class BombZombie : SpecialZombie {
     private void PlayExplosionEffect(Vector3 origin) {
         if (explosionEffectPrefab != null) {
             GameObject effect = Instantiate(explosionEffectPrefab, origin, Quaternion.identity);
+            ParticleSystem[] systems = effect.GetComponentsInChildren<ParticleSystem>(true);
+            foreach (ParticleSystem particles in systems) {
+                // 폭발은 일회성이다. 자동 재생을 초기화하고 반복 프리팹도 한 번만 재생한다.
+                particles.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
+                var main = particles.main;
+                main.loop = false;
+                main.prewarm = false;
+            }
             effect.SetActive(true);
-            foreach (ParticleSystem particles in effect.GetComponentsInChildren<ParticleSystem>())
-                particles.Play(false);
+            foreach (ParticleSystem particles in systems)
+                if (particles.gameObject.activeInHierarchy) particles.Play(false);
             Destroy(effect, explosionEffectLifetime);
         }
         if (explosionSound != null)
@@ -110,10 +146,13 @@ public sealed class BombZombie : SpecialZombie {
         base.OnDrawGizmosSelected();
         Gizmos.color = new Color(1f, 0.35f, 0f, 0.7f);
         Gizmos.DrawWireSphere(transform.position + explosionOffset, explosionRadius);
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position + explosionOffset, Mathf.Min(detonationDistance, explosionRadius));
     }
 
     private void OnValidate() {
         explosionRadius = Mathf.Max(0.01f, explosionRadius);
+        detonationDistance = Mathf.Clamp(detonationDistance, 0.01f, explosionRadius);
         explosionDamage = Mathf.Max(0f, explosionDamage);
         explosionEffectLifetime = Mathf.Max(0.1f, explosionEffectLifetime);
     }

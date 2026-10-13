@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Melee Data
   m_EditorClassIdentifier: 
   displayName: Melee
+  hudIcon: {fileID: 21300000, guid: 8ff054010663c544992d73871026b64f, type: 3}
   shotClip: {fileID: 0}
   reloadClip: {fileID: 0}
   damage: 25

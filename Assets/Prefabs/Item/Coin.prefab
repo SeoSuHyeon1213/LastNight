@@ -138,6 +138,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Coin
   score: 200
+  pickupClip: {fileID: 8300000, guid: 519ad2e4de69341948a938bf2a31e33b, type: 3}
 --- !u!136 &-5531193675613920676
 CapsuleCollider:
   m_ObjectHideFlags: 0

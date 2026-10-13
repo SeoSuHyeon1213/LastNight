@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Pistol Data
   m_EditorClassIdentifier: 
   displayName: Pistol
+  hudIcon: {fileID: 21300000, guid: db6e38ca107e9b64fb30882e775e3c0f, type: 3}
   shotClip: {fileID: 8300000, guid: b82a66dab749415458d1f6600c997095, type: 3}
   reloadClip: {fileID: 8300000, guid: 9eca29ee7f8209e419470fcd586aec21, type: 3}
   damage: 25

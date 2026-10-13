@@ -7,28 +7,25 @@ using UnityEngine.SceneManagement;
 public sealed class SurvivalHud : MonoBehaviour {
     [SerializeField] private PlayerHealth player;
     [SerializeField] private Camera viewCamera;
-    [SerializeField] private Font hudFont;
     [SerializeField, Min(1f)] private float radarRange = 25f;
     [SerializeField, Min(0.05f)] private float scanInterval = 0.25f;
     [SerializeField, Range(0f, 1f)] private float lowHealthRatio = 0.25f;
-    [Header("Grenade Display")]
-    [SerializeField] private Sprite grenadeIcon;
     private int grenadeCount = -1;
     private int lastGrenadeCount = -2;
     private const float RadarRadius = 86f;
-    private static readonly Color Panel = new Color(0.07f, 0.08f, 0.07f, 0.85f);
     private static readonly Color Ink = new Color(0.9f, 0.88f, 0.74f);
     private static readonly Color Olive = new Color(0.53f, 0.62f, 0.32f);
     private static readonly Color Danger = new Color(0.88f, 0.22f, 0.16f);
-    private readonly List<Image> markers = new List<Image>();
+    [SerializeField] private Image[] radarMarkers;
     private readonly List<Zombie> targets = new List<Zombie>();
     private readonly List<Graphic> hiddenLegacy = new List<Graphic>();
     private readonly Vector3[] directions = { Vector3.forward, Vector3.right, Vector3.back, Vector3.left };
-    private readonly RectTransform[] cardinals = new RectTransform[4];
+    [SerializeField] private RectTransform[] cardinals;
     private PlayerShooter shooter;
     private PlankInventory plankInventory;
     private GrenadeInventory grenadeInventory;
-    private Text materialsText;
+    private BarricadeBuilder barricadeBuilder;
+    [SerializeField] private Text materialsText;
     private int lastMaterials = -2;
     [Header("Existing UI / migrated from UIManager")]
     [SerializeField] private Text legacyAmmoText;
@@ -50,7 +47,7 @@ public sealed class SurvivalHud : MonoBehaviour {
         if (legacyAmmoText != null) legacyAmmoText.text = magazine + "/" + (infinite ? "INF" : reserve.ToString());
     }
     public void UpdateScoreText(int score) {
-        if (scoreText != null) scoreText.text = "Score : " + score;
+        if (scoreText != null) scoreText.text = "SCORE : " + score;
     }
     public void UpdateWaveText(int wave, int remaining) {
         if (waveText != null) waveText.text = "Wave : " + wave + "\nEnemy Left : " + remaining;
@@ -63,15 +60,33 @@ public sealed class SurvivalHud : MonoBehaviour {
         Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
-    private GameObject root;
-    private RectTransform radar;
-    private Image healthFill, grenadeImage;
-    private Text grenadeCountText;
-    private Text healthText, weaponText, ammoText;
-    private CanvasGroup visibility;
+    [Header("Editor HUD")]
+    [SerializeField] private GameObject root;
+    [SerializeField] private CanvasGroup visibility;
+    [SerializeField] private RectTransform radar;
+    [SerializeField] private Image healthFill;
+    [SerializeField] private Text healthText;
+    [SerializeField] private Text weaponText;
+    [SerializeField] private Text ammoText;
+    [SerializeField] private Text grenadeCountText;
+    [Header("Weapon Slots")]
+    [SerializeField] private Image primaryWeaponImage;
+    [SerializeField] private Image secondaryWeaponImage;
+    [SerializeField, Min(1f)] private float equippedWeaponScale = 1.15f;
+    [SerializeField, Range(0f, 1f)] private float inactiveWeaponAlpha = 0.4f;
+    [Header("Reload Indicator")]
+    [SerializeField] private Text reloadText;
+    [SerializeField, Min(0.05f)] private float reloadDotInterval = 0.35f;
+    private static readonly string[] ReloadMessages = { "Reloading.", "Reloading..", "Reloading..." };
+    private Gun reloadingWeapon;
+    private float reloadStartedAt;
+    private int lastReloadDot = -1;
+    [Header("Barricade Interaction")]
+    [SerializeField] private GameObject barricadePromptRoot;
+    [SerializeField] private Text barricadePromptText;
+    private Vector3 primaryBaseScale, secondaryBaseScale;
+    private Color primaryBaseColor, secondaryBaseColor;
     private float nextScan;
-    private Texture2D radarTexture;
-    private Sprite radarSprite;
     private int lastHp = -1, lastMaxHp = -1, lastAmmo = -1, lastReserve = -1;
     private float lastRatio = -1f;
     private Gun lastWeapon;
@@ -80,117 +95,57 @@ public sealed class SurvivalHud : MonoBehaviour {
         (node == root.transform || node.IsChildOf(root.transform));
 
     private void Start() {
-        if (player == null) player = FindAnyObjectByType<PlayerHealth>();
-        if (player == null) {
-            Debug.LogError("SurvivalHud: PlayerHealth를 찾을 수 없습니다.", this);
+        if (player == null || root == null || visibility == null || radar == null ||
+            healthFill == null || healthText == null || weaponText == null || ammoText == null ||
+            materialsText == null || grenadeCountText == null || primaryWeaponImage == null ||
+            secondaryWeaponImage == null || reloadText == null || cardinals == null || cardinals.Length != 4 ||
+            System.Array.Exists(cardinals, value => value == null) || radarMarkers == null ||
+            radarMarkers.Length == 0 || System.Array.Exists(radarMarkers, value => value == null)) {
+            Debug.LogError("SurvivalHud: Player 및 Editor HUD/Weapon Slots/Reload Indicator/레이더 참조를 Inspector에서 연결하세요.", this);
             enabled = false;
             return;
         }
         shooter = player.GetComponent<PlayerShooter>();
         plankInventory = player.GetComponent<PlankInventory>();
         grenadeInventory = player.GetComponent<GrenadeInventory>();
+        barricadeBuilder = player.GetComponent<BarricadeBuilder>();
+        ClearReloadIndicator();
+        if (barricadePromptRoot != null) barricadePromptRoot.SetActive(false);
+        primaryBaseScale = primaryWeaponImage.rectTransform.localScale;
+        secondaryBaseScale = secondaryWeaponImage.rectTransform.localScale;
+        primaryBaseColor = primaryWeaponImage.color;
+        secondaryBaseColor = secondaryWeaponImage.color;
+        root.SetActive(true);
+        foreach (Image marker in radarMarkers) marker.gameObject.SetActive(false);
         if (grenadeInventory != null) SetGrenadeCount(grenadeInventory.Count);
-        if (plankInventory == null)
-            Debug.LogWarning("SurvivalHud: 플레이어에 PlankInventory가 없어 재료 수를 표시할 수 없습니다.", this);
-
-        if (viewCamera == null) viewCamera = Camera.main;
-        if (hudFont == null) hudFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-        root = new GameObject("Survival HUD", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(CanvasGroup));
-        root.transform.SetParent(transform, false);
-        // A nested canvas does not automatically stretch its RectTransform to the screen.
-        RectTransform hudRect = (RectTransform)root.transform;
-        hudRect.anchorMin = Vector2.zero;
-        hudRect.anchorMax = Vector2.one;
-        hudRect.offsetMin = hudRect.offsetMax = Vector2.zero;
-        hudRect.localScale = Vector3.one;
-        Canvas canvas = root.GetComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        canvas.sortingOrder = 10;
-        CanvasScaler scaler = root.GetComponent<CanvasScaler>();
-        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(1920, 1080);
-        scaler.matchWidthOrHeight = 0.5f;
-        visibility = root.GetComponent<CanvasGroup>();
-        visibility.interactable = visibility.blocksRaycasts = false;
-        BuildRadar();
-        Image materialsPanel = Box("Barricade Materials", root.transform, Vector2.zero,
-            new Vector2(155, 315), new Vector2(240, 54), Panel);
-        materialsText = Label("Wood Count", materialsPanel.transform, Vector2.zero, new Vector2(220, 44), 24);
         UpdateMaterials();
-        Image panel = Box("Health", root.transform, new Vector2(0.5f, 0), new Vector2(0, 78), new Vector2(430, 100), Panel);
-        healthText = Label("Health Value", panel.transform, new Vector2(0, 20), new Vector2(400, 40), 28);
-        Image track = Box("Track", panel.transform, Vector2.one * 0.5f, new Vector2(0, -20), new Vector2(390, 20), Color.black);
-        healthFill = Box("Fill", track.transform, new Vector2(0, 0.5f), Vector2.zero, new Vector2(390, 20), Olive);
-        healthFill.rectTransform.pivot = new Vector2(0, 0.5f);
-        panel = Box("Weapon", root.transform, new Vector2(1, 0), new Vector2(-225, 98), new Vector2(390, 140), Panel);
-        weaponText = Label("Weapon Name", panel.transform, new Vector2(0, 42), new Vector2(370, 30), 23);
-        ammoText = Label("Ammo", panel.transform, new Vector2(50, -15), new Vector2(265, 70), 30);
-        grenadeImage = Box("Grenade Icon", panel.transform, Vector2.one * 0.5f,
-            new Vector2(-135, 0), new Vector2(40, 40), Color.white);
-        grenadeImage.sprite = grenadeIcon;
-        grenadeImage.preserveAspect = true;
-        grenadeImage.enabled = grenadeIcon != null;
-        if (grenadeIcon == null) {
-            Text fallback = Label("Grenade Label", panel.transform, new Vector2(-135, 0), new Vector2(100, 28), 15);
-            fallback.text = "GRENADE";
-        }
-        grenadeCountText = Label("Grenade Count", panel.transform, new Vector2(-135, -37), new Vector2(95, 28), 23);
-        RefreshGrenadeCount();
         HideLegacy();
     }
 
-    private RectTransform MakeRect(string label, Transform parent, Vector2 anchor, Vector2 position, Vector2 size) {
-        RectTransform rect = new GameObject(label, typeof(RectTransform)).GetComponent<RectTransform>();
-        rect.SetParent(parent, false);
-        rect.anchorMin = rect.anchorMax = anchor;
-        rect.anchoredPosition = position;
-        rect.sizeDelta = size;
-        return rect;
+    private void UpdateWeaponSlots() {
+        Gun primary = shooter != null ? shooter.PrimaryGun : null;
+        Gun secondary = shooter != null ? shooter.SecondaryGun : null;
+        Gun equipped = shooter != null ? shooter.gun : null;
+        UpdateWeaponSlot(primaryWeaponImage, primary, primary != null && primary == equipped,
+            primaryBaseScale, primaryBaseColor);
+        UpdateWeaponSlot(secondaryWeaponImage, secondary, secondary != null && secondary == equipped,
+            secondaryBaseScale, secondaryBaseColor);
     }
-    private Image Box(string label, Transform parent, Vector2 anchor, Vector2 position, Vector2 size, Color color) {
-        Image image = MakeRect(label, parent, anchor, position, size).gameObject.AddComponent<Image>();
-        image.color = color;
-        image.raycastTarget = false;
-        return image;
+
+    private void UpdateWeaponSlot(Image image, Gun weapon, bool equipped, Vector3 baseScale, Color baseColor) {
+        Sprite icon = weapon != null && weapon.gunData != null ? weapon.gunData.HudIcon : null;
+        image.sprite = icon;
+        image.enabled = icon != null;
+        image.rectTransform.localScale = baseScale * (equipped ? equippedWeaponScale : 1f);
+        baseColor.a *= equipped ? 1f : inactiveWeaponAlpha;
+        image.color = baseColor;
     }
-    private Text Label(string name, Transform parent, Vector2 position, Vector2 size, int fontSize) {
-        Text text = MakeRect(name, parent, Vector2.one * 0.5f, position, size).gameObject.AddComponent<Text>();
-        text.font = hudFont;
-        text.fontSize = fontSize;
-        text.alignment = TextAnchor.MiddleCenter;
-        text.color = Ink;
-        text.raycastTarget = false;
-        return text;
-    }
-    private void BuildRadar() {
-        radar = MakeRect("Radar", root.transform, Vector2.zero, new Vector2(155, 155), new Vector2(240, 240));
-        // Point filtering preserves the deliberately stepped ring at larger HUD sizes.
-        const int size = 64;
-        radarTexture = new Texture2D(size, size, TextureFormat.RGBA32, false);
-        radarTexture.filterMode = FilterMode.Point;
-        radarTexture.wrapMode = TextureWrapMode.Clamp;
-        Color[] pixels = new Color[size * size];
-        for (int y = 0; y < size; y++) for (int x = 0; x < size; x++) {
-            float radius = Vector2.Distance(new Vector2(x, y), new Vector2(31.5f, 31.5f));
-            pixels[y * size + x] = radius > 31f ? Color.clear : radius > 29f || Mathf.Abs(radius - 16f) < 0.5f ? Olive : Panel;
-        }
-        radarTexture.SetPixels(pixels);
-        radarTexture.Apply();
-        radarSprite = Sprite.Create(radarTexture, new Rect(0, 0, size, size), Vector2.one * 0.5f);
-        Box("Disc", radar, Vector2.one * 0.5f, Vector2.zero, new Vector2(240, 240), Color.white).sprite = radarSprite;
-        string[] names = { "N", "E", "S", "W" };
-        for (int i = 0; i < 4; i++) {
-            Text text = Label(names[i], radar, Vector2.zero, new Vector2(26, 26), 19);
-            text.text = names[i];
-            cardinals[i] = text.rectTransform;
-        }
-        Image playerMarker = Box("Player", radar, Vector2.one * 0.5f, Vector2.zero, new Vector2(9, 9), Ink);
-        playerMarker.rectTransform.localRotation = Quaternion.Euler(0, 0, 45);
-        Box("Forward", radar, Vector2.one * 0.5f, new Vector2(0, 11), new Vector2(3, 9), Ink);
-    }
+
     private void Update() {
         if (root == null || player == null) return;
+        UpdateBarricadePrompt();
         UpdateMaterials();
+        UpdateWeaponSlots();
         if (grenadeInventory != null) SetGrenadeCount(grenadeInventory.Count);
 
         float max = Mathf.Max(0, player.startingHealth);
@@ -198,26 +153,28 @@ public sealed class SurvivalHud : MonoBehaviour {
         float ratio = max > 0 ? hp / max : 0;
         int currentHp = Mathf.CeilToInt(hp), maximumHp = Mathf.CeilToInt(max);
         if (currentHp != lastHp || maximumHp != lastMaxHp) {
-            healthText.text = $"HP  {currentHp} / {maximumHp}";
+            healthText.text = $"{currentHp} / {maximumHp}";
             lastHp = currentHp; lastMaxHp = maximumHp;
         }
         if (ratio != lastRatio) {
-            healthFill.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 390f * ratio);
+            healthFill.fillAmount = ratio;
             lastRatio = ratio;
         }
         healthFill.color = ratio <= lowHealthRatio ? Danger : Olive;
         Gun active = shooter != null ? shooter.gun : null;
         if (!displayInitialized || active != lastWeapon) {
-            weaponText.text = active == null ? "NO WEAPON" : active.gunData != null ? active.gunData.displayName : active.name;
+            string weaponName = active == null ? "NO WEAPON" : active.gunData != null ? active.gunData.displayName : active.name;
+            weaponText.text = active == null ? weaponName :
+                $"{(shooter.ActiveSlot == 1 ? "PRIMARY" : "SECONDARY")} {weaponName.ToUpperInvariant()} ({shooter.ActiveSlot})";
         }
         int ammo = active != null ? active.magAmmo : -1;
         int reserve = active != null ? active.ammoRemain : -1;
         bool infinite = active != null && active.HasInfiniteAmmo;
         bool reloading = active != null && active.state == Gun.State.Reloading;
+        UpdateReloadIndicator(active);
         if (!displayInitialized || active != lastWeapon || ammo != lastAmmo || reserve != lastReserve ||
             infinite != lastInfinite || reloading != lastReloading) {
-            ammoText.text = active == null ? "-- / --" : !active.UsesAmmo ? "MELEE" : $"{ammo} / {(infinite ? "INF" : reserve.ToString())}" +
-                (reloading ? "\nRELOADING" : "");
+            ammoText.text = active == null ? "-- / --" : !active.UsesAmmo ? "MELEE" : $"{ammo} / {(infinite ? "INF" : reserve.ToString())}";
             lastAmmo = ammo; lastReserve = reserve; lastInfinite = infinite; lastReloading = reloading;
         }
         lastWeapon = active;
@@ -229,6 +186,49 @@ public sealed class SurvivalHud : MonoBehaviour {
                 if (!zombie.dead) targets.Add(zombie);
         }
         UpdateRadar();
+    }
+
+    private void UpdateReloadIndicator(Gun active) {
+        if (reloadText == null) return;
+        if (active == null || !active.isActiveAndEnabled || active.state != Gun.State.Reloading ||
+            player.dead || (GameManager.instance != null && GameManager.instance.isGameover)) {
+            ClearReloadIndicator();
+            return;
+        }
+        if (reloadingWeapon != active) {
+            reloadingWeapon = active;
+            reloadStartedAt = Time.time;
+            lastReloadDot = -1;
+        }
+        // 총의 재장전과 같은 게임 시간을 사용해 일시정지 중에는 점도 멈춘다.
+        int dot = Mathf.FloorToInt(Mathf.Max(0f, Time.time - reloadStartedAt) /
+            Mathf.Max(0.05f, reloadDotInterval)) % ReloadMessages.Length;
+        reloadText.enabled = true;
+        if (lastReloadDot == dot) return;
+        reloadText.text = ReloadMessages[dot];
+        lastReloadDot = dot;
+    }
+
+    private void ClearReloadIndicator() {
+        reloadingWeapon = null;
+        lastReloadDot = -1;
+        if (reloadText == null) return;
+        reloadText.enabled = false;
+        reloadText.text = string.Empty;
+    }
+
+    private void UpdateBarricadePrompt() {
+        if (barricadePromptRoot == null || barricadePromptText == null) return;
+        bool show = barricadeBuilder != null && barricadeBuilder.CanShowPrompt;
+        if (barricadePromptRoot.activeSelf != show) barricadePromptRoot.SetActive(show);
+        if (!show) return;
+        if (barricadeBuilder.IsInstalling)
+            barricadePromptText.text = $"Installing barricade {Mathf.RoundToInt(barricadeBuilder.Progress * 100f)}%";
+        else if (!barricadeBuilder.Target.CanInstall)
+            barricadePromptText.text = "Barricade full";
+        else
+            barricadePromptText.text = $"Press {barricadeBuilder.InstallKeyLabel} : Install barricade" +
+                (barricadeBuilder.Materials < 1 ? "\nNeed wood" : "");
     }
     // 수류탄 인벤토리가 초기화되거나 획득/사용될 때 실제 보유량을 전달한다.
     public void SetGrenadeCount(int count) {
@@ -246,7 +246,7 @@ public sealed class SurvivalHud : MonoBehaviour {
     private void UpdateMaterials() {
         int count = plankInventory != null ? plankInventory.Count : -1;
         if (count == lastMaterials) return;
-        materialsText.text = count < 0 ? "WOOD  --" : $"WOOD  {count}";
+        materialsText.text = count < 0 ? "--" : count.ToString();
         materialsText.color = count == 0 ? Danger : Ink;
         lastMaterials = count;
     }
@@ -264,13 +264,13 @@ public sealed class SurvivalHud : MonoBehaviour {
             Vector3 offset = zombie.transform.position - player.transform.position;
             offset.y = 0;
             if (offset.sqrMagnitude > radarRange * radarRange) continue;
-            if (used == markers.Count) markers.Add(Box("Zombie", radar, Vector2.one * 0.5f, Vector2.zero, new Vector2(7, 7), Danger));
+            if (used == radarMarkers.Length) break;
             Vector3 relative = toView * offset;
-            Image marker = markers[used++];
+            Image marker = radarMarkers[used++];
             marker.gameObject.SetActive(true);
             marker.rectTransform.anchoredPosition = new Vector2(relative.x, relative.z) * (RadarRadius / Mathf.Max(1, radarRange));
         }
-        for (int i = used; i < markers.Count; i++) markers[i].gameObject.SetActive(false);
+        for (int i = used; i < radarMarkers.Length; i++) radarMarkers[i].gameObject.SetActive(false);
     }
     private void HideLegacy() {
         if (legacyAmmoText != null) HideGraphic(legacyAmmoText);
@@ -284,15 +284,11 @@ public sealed class SurvivalHud : MonoBehaviour {
     }
     private void OnEnable() { if (root != null) { root.SetActive(true); HideLegacy(); } }
     private void OnDisable() {
+        ClearReloadIndicator();
         RestoreOtherUi();
         if (root != null) root.SetActive(false);
         foreach (Graphic graphic in hiddenLegacy) if (graphic != null) graphic.enabled = true;
         hiddenLegacy.Clear();
-    }
-    private void OnDestroy() {
-        if (root != null) Destroy(root);
-        if (radarSprite != null) Destroy(radarSprite);
-        if (radarTexture != null) Destroy(radarTexture);
     }
     private GameObject exclusivePanel;
     private readonly Dictionary<CanvasGroup, GroupState> hiddenUi = new Dictionary<CanvasGroup, GroupState>();
@@ -314,7 +310,7 @@ public sealed class SurvivalHud : MonoBehaviour {
         exclusivePanel = panel;
         if (panel == null) return;
 
-        // 전환할 때만 검색하며, 동적으로 생성된 Survival HUD Canvas도 포함한다.
+        // 메뉴 전환 시에만 다른 Canvas의 표시 상태를 보존하고 숨긴다.
         foreach (Canvas canvas in FindObjectsByType<Canvas>(FindObjectsInactive.Include, FindObjectsSortMode.None)) {
             if (canvas.isRootCanvas) HideOutsidePanel(canvas.transform, panel.transform);
         }

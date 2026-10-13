@@ -71,6 +71,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HealthPack
   health: 50
+  pickupClip: {fileID: 8300000, guid: 85ab22c5a2fc24a6cbc2497bfb42c8de, type: 3}
 --- !u!114 &-7241648859747767966
 MonoBehaviour:
   m_ObjectHideFlags: 0

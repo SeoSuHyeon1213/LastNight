@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI; // UI 관련 코드
 
@@ -10,13 +11,16 @@ public class PlayerHealth : LivingEntity {
 
     public AudioClip deathClip; // 사망 소리
     public AudioClip hitClip; // 피격 소리
-    public AudioClip itemPickupClip; // 아이템 습득 소리
 
     private AudioSource playerAudioPlayer; // 플레이어 소리 재생기
     private Animator playerAnimator; // 플레이어의 애니메이터
 
     private PlayerMovement playerMovement; // 플레이어 움직임 컴포넌트
     private PlayerShooter playerShooter; // 플레이어 슈터 컴포넌트
+    private Rigidbody playerBody;
+    private readonly Dictionary<Collider, IItem> pickupContacts = new Dictionary<Collider, IItem>();
+    private readonly Dictionary<IItem, int> overlappingItems = new Dictionary<IItem, int>();
+    private readonly List<Collider> stalePickupContacts = new List<Collider>();
 
     private void Awake() {
         if (GetComponent<GrenadeInventory>() == null) gameObject.AddComponent<GrenadeInventory>();
@@ -28,9 +32,11 @@ public class PlayerHealth : LivingEntity {
 
         playerMovement = GetComponent<PlayerMovement>();
         playerShooter = GetComponent<PlayerShooter>();
+        playerBody = GetComponent<Rigidbody>();
     }
 
     protected override void OnEnable() {
+        ClearPickupContacts();
         // LivingEntity의 OnEnable() 실행 (상태 초기화)
         base.OnEnable();
 
@@ -90,22 +96,65 @@ public class PlayerHealth : LivingEntity {
     }
 
     private void OnTriggerEnter(Collider other) {
-        // 아이템과 충돌한 경우 해당 아이템을 사용하는 처리
-        // 사망하지 않은 경우에만 아이템 사용가능
-        if (!dead)
-        {
-            // 충돌한 상대방으로 부터 Item 컴포넌트를 가져오기 시도
-            IItem item = other.GetComponent<IItem>();
-
-            // 충돌한 상대방으로부터 Item 컴포넌트가 가져오는데 성공했다면
-            if (item != null)
-            {
-                // Use 메서드를 실행하여 아이템 사용(구현된 클래스의 메서드가 불림)
-                item.Use(gameObject);
-                // 아이템 습득 소리 재생
-                playerAudioPlayer.PlayOneShot(itemPickupClip);
-                ItemPickedUp?.Invoke();
-            }
+        PrunePickupContacts();
+        IItem item = other.GetComponentInParent<IItem>();
+        if (item == null) return;
+        // 플레이어의 여러 몸 Collider가 같은 아이템에 닿아도 방문당 한 번만 시도한다.
+        if (pickupContacts.ContainsKey(other)) return;
+        pickupContacts.Add(other, item);
+        if (overlappingItems.TryGetValue(item, out int colliderCount)) {
+            overlappingItems[item] = colliderCount + 1;
+            return;
         }
+        overlappingItems.Add(item, 1);
+        GameSessionManager session = GameSessionManager.instance;
+        if (dead || Time.timeScale <= 0f || (GameManager.instance != null && GameManager.instance.isGameover) ||
+            (session != null && (session.IsPaused || session.IsRebinding))) return;
+        if (!item.Use(gameObject)) return;
+        item.PlayPickupSound(playerAudioPlayer);
+        ItemPickedUp?.Invoke();
     }
+
+    private void OnTriggerExit(Collider other) {
+        if (!pickupContacts.ContainsKey(other) || StillOverlapsPlayer(other)) return;
+        RemovePickupContact(other);
+    }
+
+    private bool StillOverlapsPlayer(Collider other) {
+        if (other == null || !other.enabled || !other.gameObject.activeInHierarchy) return false;
+        // 몸/무기 Collider가 꺼질 때 Exit가 누락돼도 완전히 벗어나면 방문을 해제한다.
+        foreach (Collider own in GetComponentsInChildren<Collider>(true)) {
+            if (!own.enabled || !own.gameObject.activeInHierarchy || own.attachedRigidbody != playerBody) continue;
+            if (Physics.ComputePenetration(own, own.transform.position, own.transform.rotation,
+                other, other.transform.position, other.transform.rotation, out _, out _)) return true;
+        }
+        return false;
+    }
+
+    private void RemovePickupContact(Collider other) {
+        IItem item = pickupContacts[other];
+        pickupContacts.Remove(other);
+        int remaining = overlappingItems[item] - 1;
+        if (remaining > 0) overlappingItems[item] = remaining;
+        else overlappingItems.Remove(item);
+    }
+
+    private void PrunePickupContacts() {
+        // Collider 파괴 시 Exit가 오지 않을 수 있어 다음 접촉 때 이전 방문을 정리한다.
+        stalePickupContacts.Clear();
+        foreach (var pair in pickupContacts)
+            if (pair.Key == null || !pair.Key.enabled || !pair.Key.gameObject.activeInHierarchy ||
+                pair.Value is UnityEngine.Object itemObject && itemObject == null)
+                stalePickupContacts.Add(pair.Key);
+        foreach (Collider stale in stalePickupContacts) RemovePickupContact(stale);
+        stalePickupContacts.Clear();
+    }
+
+    private void ClearPickupContacts() {
+        pickupContacts.Clear();
+        overlappingItems.Clear();
+        stalePickupContacts.Clear();
+    }
+
+    private void OnDisable() { ClearPickupContacts(); }
 }

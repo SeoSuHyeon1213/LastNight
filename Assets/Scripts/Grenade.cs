@@ -136,9 +136,17 @@ public sealed class Grenade : MonoBehaviour, IThrowable {
         if (explosionEffectPrefab != null) {
             // 수류탄과 별도로 생성해 본체 제거 후에도 폭발 이펙트를 유지한다.
             GameObject effect = Instantiate(explosionEffectPrefab, origin, Quaternion.identity);
+            ParticleSystem[] systems = effect.GetComponentsInChildren<ParticleSystem>(true);
+            foreach (ParticleSystem particles in systems) {
+                // 폭발은 일회성이다. 자동 재생을 초기화하고 반복 프리팹도 한 번만 재생한다.
+                particles.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
+                var main = particles.main;
+                main.loop = false;
+                main.prewarm = false;
+            }
             effect.SetActive(true);
-            foreach (ParticleSystem particles in effect.GetComponentsInChildren<ParticleSystem>())
-                particles.Play(false);
+            foreach (ParticleSystem particles in systems)
+                if (particles.gameObject.activeInHierarchy) particles.Play(false);
             Destroy(effect, explosionEffectLifetime);
         }
         // 본체가 제거된 뒤에도 폭발 위치에서 클립 재생을 완료한다.
