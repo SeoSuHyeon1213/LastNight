@@ -387,3 +387,27 @@
 - [x] 무기 패널을 위쪽 기준 앵커·피벗으로 옮기고 높이를 204로 조정했다. 무기 이름과 보급 행의 간격을 맞췄다. 거점 체류·거점 변경·무기 보급 알림을 중앙 세 줄에 배치하고 빅웨이브 알림은 상단 중앙의 별도 간격에 배치했다.
 - [x] 변경은 MobileGame 씬의 프리팹 오버라이드로 저장했다. Game 씬과 Survival HUD 공용 프리팹은 작업 전후 SHA256 일치로 보존을 확인했다. 기존 HUD 데이터 연결, 재장전·바리케이드 안내, 모바일 씬의 기존 버튼은 유지했다. 이번 작업에 신규 UI 생성이나 C# 변경은 없다.
 - [x] Play Mode의 실제 Game View 해상도 1608×978(참고 이미지 비율), 2340×1080(20:9)에서 Overlay 캡처로 확인했다. 주요 패널이 화면 안에 있고 서로 겹치지 않음을 확인했다. 거점/보급 알림을 검증 중에만 표시하고 플레이 모드 종료로 원래 상태를 복원했다. 임시 해상도 프리셋 제거·기존 Game View 선택 복원 및 편집 모드 복귀 완료.
+
+## 무기 그립 기준점·계산 보완 (2026-10-14)
+
+- [x] `PlayerShooter.OnAnimatorIK`의 총 정렬이 손 IK와 같은 `position + rotation * offset`(스케일 미적용)을 사용한다. 이전에는 `TransformPoint`로 스케일이 적용되어 `Right Position Offset`을 넣으면 총과 손이 다른 위치로 갔다.
+- [x] `WeaponGripProfile`의 `anchorAtAnimatedRightHand`(bool)를 `Anchor Mode`(Auto/RightHand/Shoulder)로 교체했다. Auto는 Weapon Anchor가 있으면 그것을, 없으면 애니메이션 오른손을 따른다. Shoulder는 `RightUpperArm` + `Shoulder Offset`(캐릭터 로컬, 기본 (0, -0.12, 0.25))에 Right Handle을 맞춘다.
+- [x] 기존 값 보존을 위해 무기 프리팹 4개의 YAML 필드명을 직접 변경했다(pistol=RightHand, rifle·sniper·shotgun=Auto). 프로젝트 규칙상 예외 작업이므로 에디터 확인이 필요하다.
+- [x] 사용자가 rifle·sniper 프리팹 스케일·Handle 위치·`Animated Hand Anchor Offset`(x 0.08/0.1)을 에디터에서 정리했다.
+- [ ] Unity 컴파일·Play Mode에서 무기별 손 위치·조준 정렬을 확인한다. 소총류에 Shoulder 모드를 적용할지와 `Shoulder Offset` 값을 결정한다.
+
+## Wave 좀비 보관소 도착 시 대기 전환 (2026-10-14)
+
+- [x] 보관소는 Wave 좀비의 이동 목적지로만 사용한다. 좀비가 보관소를 공격 대상으로 고르지 않고(`CurrentAttackGoal`), 진행 중 타격도 보관소 피해를 적용하지 않는다(`OnAttackHit`). 이에 따라 보관소 파괴 패배는 현재 발생하지 않는다. `BaseStorage`의 체력·패배 코드는 삭제하지 않고 남겨 두었다.
+- [x] 차단 바리케이드가 없고 이동 목적지와 보관소 콜라이더 표면이 모두 `Base Arrival Distance`(기본 3m, 테스트 시작값) 안이면 Idle로 전환한다. 진입로를 막은 바리케이드는 기존처럼 공격한다.
+- [x] 보관소 근처 Idle Wave 좀비가 보관소에서 도착 거리의 2배보다 멀어지면(거점 이동 등) 다시 보관소로 향한다. Idle 상태의 시야 탐지·소음 반응은 기존과 같다.
+- [ ] Play Mode에서 다수 도착 시 밀림·도착 판정, 바리케이드 경유, 거점 이동 후 재출발, 플레이어 발견 후 복귀를 확인한다. `CLAUDE.md` 4절의 "보관소 파괴 시 패배" 설명 갱신 여부를 결정한다.
+
+## 입력 소스 분리·씬별 선택 (2026-10-14)
+
+- [x] `Assets/Scripts/Input/`에 `PlayerInputSource`(공통 추상, `PlayerInputFrame`), `KeyboardMouseInputSource`(기존 PC 입력 이전), `MobileInputSource`(조이스틱 이동, HUD 버튼, 화면 오른쪽 드래그 시점), `MobileInputButton`(누름 유지/1회 눌림, 멀티터치)을 추가했다.
+- [x] `PlayerInput`은 Inspector의 `Source`(비우면 같은 오브젝트의 소스)에서 프레임마다 한 번 읽어 공유한다(`DefaultExecutionOrder(-50)`). 자동 검색·`AddComponent` 대체는 하지 않으며 소스가 없으면 오류 로그 후 비활성화한다.
+- [x] 무기 교체(`PlayerShooter`), 수류탄(`PlayerGrenadeThrower`), 바리케이드 설치(`BarricadeBuilder`)가 키를 직접 읽지 않고 PlayerInput을 사용한다. `throwKey`·`installKey`는 키보드 소스로 옮겼다(기본 G/E 동일). 설치 안내 키 이름은 소스의 `Interact Label`을 쓴다. 일시정지 키는 `GameSessionManager`에 그대로 둔다.
+- [x] scratchpad 복사 csproj의 `dotnet build` 오류 0개(Unity 컴파일 확인이 아님).
+- [ ] 에디터 연결: `PlayerCharacter` 프리팹에 `KeyboardMouseInputSource` 추가(미연결 시 Game 씬 조작 불가). MobileGame 씬에 `MobileInputSource` 배치 → Floating Joystick 연결 → Fire/Reload/Aim/Sprint 버튼에 `MobileInputButton` 추가·연결 → 씬 PlayerCharacter의 PlayerInput `Source`에 MobileInputSource 지정. 수류탄·설치·무기 교체·일시정지 모바일 버튼은 미구성.
+- [ ] Unity 컴파일, Game 씬 기존 조작(이동·사격·조준·무기 교체·수류탄·설치) 회귀, MobileGame 씬 Device Simulator/실기기 터치·시점 감도(`Look Scale`) 확인.

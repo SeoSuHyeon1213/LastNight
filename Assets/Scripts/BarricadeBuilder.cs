@@ -2,11 +2,11 @@ using UnityEngine;
 
 [RequireComponent(typeof(PlankInventory), typeof(PlayerHealth))]
 public sealed class BarricadeBuilder : MonoBehaviour {
-    [SerializeField] private KeyCode installKey = KeyCode.E;
     [SerializeField, Min(0.1f)] private float reach = 2.5f;
     [SerializeField] private LayerMask blockingLayers = Physics.DefaultRaycastLayers;
     private PlankInventory inventory;
     private PlayerHealth player;
+    private PlayerInput playerInput;
     private Barricade target;
     private float progress;
     private bool installing;
@@ -15,7 +15,7 @@ public sealed class BarricadeBuilder : MonoBehaviour {
     private Barricade[] sites = System.Array.Empty<Barricade>();
     public Barricade Target => target;
     public bool IsInstalling => installing;
-    public string InstallKeyLabel => installKey.ToString();
+    public string InstallKeyLabel => playerInput != null ? playerInput.InteractLabel : string.Empty;
     public float Progress => target == null ? 0f : progress / target.installSeconds;
     public int Materials => inventory == null ? 0 : inventory.Count;
     public bool CanShowPrompt => isActiveAndEnabled && player != null && !player.dead &&
@@ -28,6 +28,11 @@ public sealed class BarricadeBuilder : MonoBehaviour {
     private void Awake() {
         inventory = GetComponent<PlankInventory>();
         player = GetComponent<PlayerHealth>();
+        playerInput = GetComponent<PlayerInput>();
+        if (playerInput == null) {
+            Debug.LogError("BarricadeBuilder: 같은 오브젝트에 PlayerInput이 필요합니다.", this);
+            enabled = false;
+        }
     }
 
     private void Update() {
@@ -49,7 +54,7 @@ public sealed class BarricadeBuilder : MonoBehaviour {
             return;
         }
         if (!installing) {
-            if (!Input.GetKeyDown(installKey)) return;
+            if (!playerInput.InteractPressed) return;
             installing = true;
         }
         progress += Time.deltaTime;

@@ -5,25 +5,26 @@ public sealed class PlayerGrenadeThrower : MonoBehaviour {
     [SerializeField] private Grenade grenadePrefab;
     [SerializeField] private Transform throwOrigin;
     [SerializeField] private Camera aimCamera;
-    [SerializeField] private KeyCode throwKey = KeyCode.G;
     [SerializeField, Min(0.01f)] private float spawnClearance = 0.15f;
     [SerializeField] private LayerMask blockingLayers = Physics.DefaultRaycastLayers;
 
     private GrenadeInventory inventory;
     private PlayerHealth playerHealth;
+    private PlayerInput playerInput;
 
     private void Awake() {
         inventory = GetComponent<GrenadeInventory>();
         playerHealth = GetComponent<PlayerHealth>();
-        if (inventory == null || playerHealth == null || grenadePrefab == null ||
+        playerInput = GetComponent<PlayerInput>();
+        if (inventory == null || playerHealth == null || playerInput == null || grenadePrefab == null ||
             throwOrigin == null || aimCamera == null) {
-            Debug.LogError("PlayerGrenadeThrower: GrenadeInventory, PlayerHealth, Grenade Prefab, Throw Origin, Aim Camera를 연결하세요.", this);
+            Debug.LogError("PlayerGrenadeThrower: GrenadeInventory, PlayerHealth, PlayerInput, Grenade Prefab, Throw Origin, Aim Camera를 연결하세요.", this);
             enabled = false;
         }
     }
 
     private void Update() {
-        if (Application.isFocused && Input.GetKeyDown(throwKey)) TryThrow();
+        if (Application.isFocused && playerInput.GrenadePressed) TryThrow();
     }
 
     public bool TryThrow() {

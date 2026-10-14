@@ -22,6 +22,7 @@ public class PlayerShooter : MonoBehaviour {
     private Transform leftElbowBone;
     private Transform rightElbowBone;
     private Transform rightHandBone;
+    private Transform rightShoulderBone;
     private float leftBlend;
     private float rightBlend;
     private float fingerBlend;
@@ -54,6 +55,7 @@ public class PlayerShooter : MonoBehaviour {
         leftElbowBone = playerAnimator.GetBoneTransform(HumanBodyBones.LeftLowerArm);
         rightElbowBone = playerAnimator.GetBoneTransform(HumanBodyBones.RightLowerArm);
         rightHandBone = playerAnimator.GetBoneTransform(HumanBodyBones.RightHand);
+        rightShoulderBone = playerAnimator.GetBoneTransform(HumanBodyBones.RightUpperArm);
         originalCulling = playerAnimator.cullingMode;
         playerAnimator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
         if (primaryGun != null) {
@@ -150,9 +152,10 @@ public class PlayerShooter : MonoBehaviour {
         RestoreFingers();
         GameSessionManager session = GameSessionManager.instance;
         if (Time.timeScale == 0f || (session != null && (session.IsPaused || session.IsRebinding))) return;
-        if (Input.GetKeyDown(KeyCode.Alpha1)) SelectWeapon(0);
-        else if (Input.GetKeyDown(KeyCode.Alpha2)) SelectWeapon(1);
-        else if (Input.mouseScrollDelta.y != 0f) SelectWeapon(1 - activeSlot);
+        int slotRequest = playerInput.WeaponSlotRequest;
+        if (slotRequest == 1) SelectWeapon(0);
+        else if (slotRequest == 2) SelectWeapon(1);
+        else if (slotRequest < 0) SelectWeapon(1 - activeSlot);
         if (gun != null && playerInput.reload && gun.Reload()) playerAnimator.SetTrigger("Reload");
         UIManager ui = UIManager.instance;
         if (gun != null && ui != null && ui.ammoText != null)
@@ -172,10 +175,20 @@ public class PlayerShooter : MonoBehaviour {
             playerAnimator.SetIKHintPositionWeight(AvatarIKHint.RightElbow, 0f);
             return;
         }
-        bool handAnchor = grip != null && grip.anchorAtAnimatedRightHand &&
-            rightHandBone != null && rightHandMount != null;
-        Vector3 animatedHandPosition = handAnchor ? rightHandBone.position : Vector3.zero;
-        if (handAnchor) animatedHandPosition += transform.TransformDirection(grip.animatedHandAnchorOffset);
+        // Auto는 Weapon Anchor가 없으면 팔꿈치가 아닌 애니메이션 오른손을 장착 기준으로 삼는다.
+        WeaponGripProfile.AnchorMode mode = grip != null ? grip.anchorMode : WeaponGripProfile.AnchorMode.Auto;
+        bool shoulderAnchor = mode == WeaponGripProfile.AnchorMode.Shoulder &&
+            rightShoulderBone != null && rightHandMount != null;
+        bool handAnchor = shoulderAnchor || (rightHandBone != null && rightHandMount != null &&
+            (mode == WeaponGripProfile.AnchorMode.RightHand ||
+             (mode == WeaponGripProfile.AnchorMode.Auto && weaponAnchor == null)));
+        Vector3 animatedHandPosition = Vector3.zero;
+        if (shoulderAnchor)
+            animatedHandPosition = rightShoulderBone.position + transform.TransformDirection(grip.shoulderOffset);
+        else if (handAnchor) {
+            animatedHandPosition = rightHandBone.position;
+            if (grip != null) animatedHandPosition += transform.TransformDirection(grip.animatedHandAnchorOffset);
+        }
         if (handAnchor) gunPivot.position = animatedHandPosition;
         else if (weaponAnchor != null && !weaponAnchor.IsChildOf(gunPivot)) gunPivot.position = weaponAnchor.position;
         else if (rightElbowBone != null) gunPivot.position = rightElbowBone.position;
@@ -183,7 +196,9 @@ public class PlayerShooter : MonoBehaviour {
         if (handAnchor) {
             // 총구 정렬로 변한 손잡이 위치를 손목에 되돌리고, 변경된 총구 위치에서 조준을 다시 계산한다.
             for (int i = 0; i < 3; i++) {
-                gunPivot.position += animatedHandPosition - rightHandMount.TransformPoint(grip.rightPositionOffset);
+                Vector3 positionOffset = grip != null ? grip.rightPositionOffset : Vector3.zero;
+                // 손 IK와 같은 방식(스케일 미적용)으로 보정해야 손과 총이 같은 위치에 맞는다.
+                gunPivot.position += animatedHandPosition - (rightHandMount.position + rightHandMount.rotation * positionOffset);
                 if (aim != null) aim.ApplyWeaponAim();
             }
         }

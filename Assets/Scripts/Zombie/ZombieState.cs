@@ -5,5 +5,5 @@ public enum ZombieState {
     Investigate, // 소음 추정 지점으로 이동한다
     Search,      // 소음 지점 도착 또는 추적 대상을 놓친 뒤 잠시 머문다
     Chase,       // 대상을 추적·공격한다
-    AttackBase   // 보관소로 이동해 공격한다 (Wave 역할의 기본 상태)
+    AttackBase   // 보관소로 이동한다. 도착하면 공격하지 않고 Idle로 전환한다 (Wave 역할의 기본 상태)
 }

@@ -45,6 +45,8 @@ public class Zombie : LivingEntity {
     [SerializeField, Min(0.01f)] private float attackReach = 1.5f;
     [SerializeField] private LayerMask attackBlockingLayers = Physics.DefaultRaycastLayers;
     [SerializeField, Min(0f)] private float attackHeight = 1f;
+    [Tooltip("보관소 콜라이더에서 이 거리 안에 도착하면 공격하지 않고 Idle로 전환한다. 다시 이 거리의 두 배 밖으로 멀어지면(거점 이동 등) 보관소로 돌아간다.")]
+    [SerializeField, Min(0.1f)] private float baseArrivalDistance = 3f;
     private bool agentUpdatesRotation;
     private Coroutine pathRoutine;
     private static readonly int AttackTrigger = Animator.StringToHash("HasAttack");
@@ -248,7 +250,7 @@ public class Zombie : LivingEntity {
             }
             if (isAttacking || movementLocked)
             {
-                // 보관소 공격은 쉬지 않고 이어지므로 공격 중에도 플레이어 탐지는 계속한다
+                // 거점 이동 중 바리케이드를 부수는 동안에도 플레이어 탐지는 계속한다
                 if (!hasTarget && State == ZombieState.AttackBase) DetectTarget();
                 yield return new WaitForSeconds(0.25f);
                 continue;
@@ -262,9 +264,13 @@ public class Zombie : LivingEntity {
             }
             else
             {
-                // 추적 대상 없음 : 거점 공격은 보관소로 이동, 조사는 이동 유지, 그 밖에는 정지
+                // 추적 대상 없음 : 거점 이동은 보관소로 이동, 조사는 이동 유지, 그 밖에는 정지
                 if (State == ZombieState.AttackBase) UpdateBaseApproach();
                 else if (State != ZombieState.Investigate) navMeshAgent.isStopped = true;
+                // 보관소 근처에서 대기하던 Wave 좀비는 거점이 옮겨져 멀어지면 다시 보관소로 향한다.
+                if (State == ZombieState.Idle && DefaultState == ZombieState.AttackBase &&
+                    BaseDistance() > baseArrivalDistance * 2f)
+                    EnterDefault();
 
                 DetectTarget();
             }
@@ -334,7 +340,8 @@ public class Zombie : LivingEntity {
         OnTriggerStay(blocker);
     }
 
-    // 보관소 콜라이더의 가장 가까운 지점 앞으로 이동하고, 사거리 안이면 기존 공격 규칙으로 공격한다.
+    // 보관소 콜라이더의 가장 가까운 지점 앞으로 이동하고, 도착하면 보관소를 공격하지 않고 Idle로 전환한다.
+    // 진입로를 막는 바리케이드는 기존 공격 규칙으로 부순다.
     private void UpdateBaseApproach()
     {
         blockingBarricade = null;
@@ -347,14 +354,34 @@ public class Zombie : LivingEntity {
             navMeshAgent.radius, out Vector3 destination, out Barricade blocker))
         {
             blockingBarricade = blocker;
+            if (blocker == null && HorizontalDistance(destination, transform.position) <= baseArrivalDistance &&
+                BaseDistance() <= baseArrivalDistance)
+            {
+                EnterIdle();
+                return;
+            }
             navMeshAgent.isStopped = false;
             navMeshAgent.SetDestination(destination);
-            OnTriggerStay(blocker != null ? blocker.Blocker : baseTarget.AttackCollider);
+            if (blocker != null) OnTriggerStay(blocker.Blocker);
         }
         else
         {
             StopMovement();
         }
+    }
+
+    // 보관소 콜라이더 표면까지의 수평 거리. 보관소가 없으면 무한대.
+    private float BaseDistance()
+    {
+        if (baseTarget == null || baseTarget.AttackCollider == null) return float.PositiveInfinity;
+        return HorizontalDistance(baseTarget.AttackCollider.ClosestPoint(transform.position), transform.position);
+    }
+
+    private static float HorizontalDistance(Vector3 a, Vector3 b)
+    {
+        Vector3 delta = a - b;
+        delta.y = 0f;
+        return delta.magnitude;
     }
 
     // 데미지를 입었을때 실행할 처리
@@ -500,14 +527,13 @@ public class Zombie : LivingEntity {
         zombieAudioPlayer.PlayOneShot(selected);
     }
 
-    // 지금 공격해도 되는 대상: 추적 중이면 앞을 막는 바리케이드 또는 추적 대상, 거점 공격 중이면 보관소
+    // 지금 공격해도 되는 대상: 추적 중이면 앞을 막는 바리케이드 또는 추적 대상. 보관소는 목적지일 뿐 공격하지 않는다.
     protected LivingEntity CurrentAttackGoal()
     {
         if ((hasTarget || State == ZombieState.AttackBase) && blockingBarricade != null && blockingBarricade.IsBlocking)
             return blockingBarricade;
         if (hasTarget)
             return blockingBarricade != null && blockingBarricade.IsBlocking ? blockingBarricade : targetEntity;
-        if (State == ZombieState.AttackBase && baseTarget != null && baseTarget.isActiveAndEnabled) return baseTarget;
         return null;
     }
 
@@ -541,8 +567,8 @@ public class Zombie : LivingEntity {
         }
 
         Vector3 hitNormal = transform.position - currentAttackTarget.transform.position;
-        if (currentAttackTarget is BaseStorage storage) storage.ReceiveZombieDamage(this, damage, hitPoint, hitNormal);
-        else if (currentAttackTarget is Barricade barricade) barricade.ReceiveZombieDamage(this, damage, hitPoint, hitNormal);
+        if (currentAttackTarget is BaseStorage) return;
+        if (currentAttackTarget is Barricade barricade) barricade.ReceiveZombieDamage(this, damage, hitPoint, hitNormal);
         else currentAttackTarget.OnDamage(damage, hitPoint, hitNormal);
     }
 

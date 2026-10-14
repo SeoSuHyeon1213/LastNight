@@ -280,8 +280,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   leftHand: {fileID: 5100065875299798016}
   rightHand: {fileID: 7448952646506240016}
-  anchorAtAnimatedRightHand: 1
+  anchorMode: 1
   animatedHandAnchorOffset: {x: 0.1, y: 0.05, z: 0.06}
+  shoulderOffset: {x: 0, y: -0.12, z: 0.25}
   leftPositionOffset: {x: 0, y: 0, z: 0}
   rightPositionOffset: {x: 0, y: 0, z: 0}
   leftRotationOffset: {x: 0, y: 0, z: 0}

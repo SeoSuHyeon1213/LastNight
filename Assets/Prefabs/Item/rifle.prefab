@@ -57,7 +57,7 @@ Transform:
   m_GameObject: {fileID: 513050003520539757}
   serializedVersion: 2
   m_LocalRotation: {x: 0.509068, y: -0.03759672, z: 0.80280197, w: 0.30813178}
-  m_LocalPosition: {x: -0.009, y: -0.006, z: 0.238}
+  m_LocalPosition: {x: -0, y: -0.006, z: 0.36}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -555,7 +555,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.156, y: 0.03, z: -0.022}
-  m_LocalScale: {x: 0.5, y: 1, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1754006325165423135}
@@ -580,8 +580,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   leftHand: {fileID: 8752593320803641815}
   rightHand: {fileID: 7539293796206892177}
-  anchorAtAnimatedRightHand: 0
-  animatedHandAnchorOffset: {x: 0, y: 0, z: 0}
+  anchorMode: 2
+  animatedHandAnchorOffset: {x: 0.08, y: 0, z: 0}
+  shoulderOffset: {x: 0, y: -0.12, z: 0.25}
   leftPositionOffset: {x: 0, y: 0, z: 0}
   rightPositionOffset: {x: 0, y: 0, z: 0}
   leftRotationOffset: {x: 0, y: 0, z: 0}
@@ -913,7 +914,7 @@ Transform:
   m_GameObject: {fileID: 8600553141294812833}
   serializedVersion: 2
   m_LocalRotation: {x: 0.21990721, y: -0.25821364, z: -0.66326183, w: 0.66712093}
-  m_LocalPosition: {x: 0.038, y: -0.094, z: 0.06}
+  m_LocalPosition: {x: -0, y: -0.094, z: 0.06}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
