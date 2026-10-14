@@ -419,8 +419,8 @@
 - [x] 바리케이드 설치 안내 문구를 입력 소스가 만든다(`PlayerInputSource.FormatInteractPrompt`). PC는 기존 `Press E : ...`를 유지하고 모바일은 `MobileInputSource.Interact Prompt Format`(기본 `Tap {0} : {1}`)을 쓴다.
 - [x] Unity CLI로 MobileGame 일시정지 창·게임오버 버튼을 `MobileGameSessionManager`에 연결하고 `SceneChange`를 제거했다. `Sprint` 버튼의 끊긴 OnClick을 비우고 `MobileInputSource.moveJoystick`에 Floating Joystick을 연결했다. Floating Joystick이 비활성이어서 활성화했다. MobileIntro 버튼은 `MobileSceneChange`에 연결했다.
 - [x] 사용자가 빌드 대상을 Android로, 씬 목록을 `MobileIntro`→`MobileGame`으로 설정했다. Unity 컴파일 오류 0개. Play Mode에서 일시정지→설정→닫기→재개, MobileIntro `StartGame`→MobileGame→`LoadMainScene`→MobileIntro 전환을 오류 없이 확인했다(버튼 탭이 아닌 메서드 직접 호출).
-- [ ] MobileGame HUD에 일시정지 버튼 추가 후 OnClick → `MobileGameSessionManager.PauseGame` 연결. 현재는 안드로이드 뒤로가기로만 일시정지할 수 있다.
-- [ ] MobileGame `SettingDisplay`에 닫기 버튼 추가 후 OnClick → `CloseSettings` 연결. 현재는 뒤로가기로만 닫힌다.
+- [x] 사용자가 MobileGame HUD에 일시정지 버튼(`/HUD/Pause`)을 배치했고 OnClick → `MobileGameSessionManager.PauseGame`을 CLI로 연결했다.
+- [x] 사용자가 배치한 나가기 버튼(`Out`)을 화면 위치를 유지한 채 `SettingDisplay` 아래로 옮기고 OnClick → `CloseSettings`를 연결했다. Play Mode에서 버튼 onClick 호출로 일시정지→설정→나가기→재개 흐름을 오류 없이 확인했다.
 - [ ] MobileIntro `SettingDisplay/CancelRebinding`("CANCEL KEY INPUT") 버튼 삭제. 모바일에는 키 설정이 없어 연결을 비워 두었다.
 - [ ] Floating Joystick 활성화가 의도와 맞는지 확인한다.
 - [ ] 백그라운드 복귀 후 일시정지 유지(재개 버튼으로 재개)가 의도와 맞는지 결정한다.
