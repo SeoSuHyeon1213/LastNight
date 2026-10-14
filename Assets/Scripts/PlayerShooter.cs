@@ -150,7 +150,7 @@ public class PlayerShooter : MonoBehaviour {
 
     private void Update() {
         RestoreFingers();
-        GameSessionManager session = GameSessionManager.instance;
+        GameSessionBase session = GameSessionBase.instance;
         if (Time.timeScale == 0f || (session != null && (session.IsPaused || session.IsRebinding))) return;
         int slotRequest = playerInput.WeaponSlotRequest;
         if (slotRequest == 1) SelectWeapon(0);
@@ -237,7 +237,7 @@ public class PlayerShooter : MonoBehaviour {
     }
 
     private void LateUpdate() {
-        GameSessionManager session = GameSessionManager.instance;
+        GameSessionBase session = GameSessionBase.instance;
         if (gun == null || playerInput == null || Time.timeScale == 0f ||
             (session != null && (session.IsPaused || session.IsRebinding)) ||
             (GameManager.instance != null && GameManager.instance.isGameover)) return;

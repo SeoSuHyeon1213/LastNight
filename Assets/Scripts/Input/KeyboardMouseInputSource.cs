@@ -19,7 +19,7 @@ public sealed class KeyboardMouseInputSource : PlayerInputSource {
 
     public override PlayerInputFrame ReadFrame() {
         var frame = new PlayerInputFrame();
-        GameSessionManager session = GameSessionManager.instance;
+        GameSessionManager session = GameSessionBase.instance as GameSessionManager;
         if (session != null) {
             frame.move = new Vector2(session.StrafeInput, session.MoveInput);
             frame.fire = session.FireHeld;

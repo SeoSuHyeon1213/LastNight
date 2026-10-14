@@ -53,7 +53,7 @@ public class PlayerAimController : MonoBehaviour {
     }
 
     public void UpdateAimFieldOfView() {
-        GameSessionManager session = GameSessionManager.instance;
+        GameSessionBase session = GameSessionBase.instance;
         if (!isActiveAndEnabled || playerInput == null || !playerInput.isActiveAndEnabled ||
             !Application.isFocused || Time.timeScale == 0f ||
             (GameManager.instance != null && GameManager.instance.isGameover) ||

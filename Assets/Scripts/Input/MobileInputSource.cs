@@ -20,6 +20,8 @@ public sealed class MobileInputSource : PlayerInputSource {
     [Tooltip("켜면 달리기 버튼을 누를 때마다 달리기를 켜고 끈다. 끄면 누르는 동안만 달린다.")]
     [SerializeField] private bool toggleRun = true;
     [SerializeField] private string interactLabel = "Build";
+    [Tooltip("HUD 상호작용 안내 문구. {0}: 상호작용 버튼 이름, {1}: 행동 이름")]
+    [SerializeField] private string interactPromptFormat = "Tap {0} : {1}";
 
     [Header("Look")]
     [Tooltip("이 화면 가로 비율보다 오른쪽에서 시작한 터치만 시점 회전에 사용한다.")]
@@ -33,6 +35,15 @@ public sealed class MobileInputSource : PlayerInputSource {
     private Vector2 lookDelta;
 
     public override string InteractLabel => interactLabel;
+
+    public override string FormatInteractPrompt(string action) {
+        try {
+            return string.Format(interactPromptFormat, interactLabel, action);
+        } catch (System.FormatException) {
+            // Inspector에서 잘못 입력한 형식 때문에 HUD 갱신이 멈추지 않게 기본 문구로 대신한다.
+            return base.FormatInteractPrompt(action);
+        }
+    }
 
     public override PlayerInputFrame ReadFrame() {
         var frame = new PlayerInputFrame();

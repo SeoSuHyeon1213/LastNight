@@ -107,7 +107,7 @@ public class PlayerHealth : LivingEntity {
             return;
         }
         overlappingItems.Add(item, 1);
-        GameSessionManager session = GameSessionManager.instance;
+        GameSessionBase session = GameSessionBase.instance;
         if (dead || Time.timeScale <= 0f || (GameManager.instance != null && GameManager.instance.isGameover) ||
             (session != null && (session.IsPaused || session.IsRebinding))) return;
         if (!item.Use(gameObject)) return;

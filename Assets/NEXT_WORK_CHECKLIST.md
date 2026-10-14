@@ -411,3 +411,18 @@
 - [x] scratchpad 복사 csproj의 `dotnet build` 오류 0개(Unity 컴파일 확인이 아님).
 - [ ] 에디터 연결: `PlayerCharacter` 프리팹에 `KeyboardMouseInputSource` 추가(미연결 시 Game 씬 조작 불가). MobileGame 씬에 `MobileInputSource` 배치 → Floating Joystick 연결 → Fire/Reload/Aim/Sprint 버튼에 `MobileInputButton` 추가·연결 → 씬 PlayerCharacter의 PlayerInput `Source`에 MobileInputSource 지정. 수류탄·설치·무기 교체·일시정지 모바일 버튼은 미구성.
 - [ ] Unity 컴파일, Game 씬 기존 조작(이동·사격·조준·무기 교체·수류탄·설치) 회귀, MobileGame 씬 Device Simulator/실기기 터치·시점 감도(`Look Scale`) 확인.
+
+## 모바일 세션·인트로 분리와 씬 연결 (2026-10-14)
+
+- [x] `GameSessionBase`(공통: 일시정지·timeScale, 일시정지/설정 창, 시점 감도, 재시작·메인·종료, `PauseGame`)를 추가하고 `GameSessionManager`(PC: 키 바인딩·재설정, ESC, 커서, 창 모드)가 상속하게 했다. 직렬화 필드 이름을 유지해 기존 패널·슬라이더 참조가 보존됨을 에디터에서 확인했다. 참조 13곳을 `GameSessionBase.instance`로 바꿨다.
+- [x] `MobileGameSessionManager`(HUD 일시정지 버튼용 `PauseGame`, 안드로이드 뒤로가기, 기기에서만 백그라운드 전환 시 자동 일시정지, `MobileIntro`로 메인 이동)와 `MobileSceneChange`(이름으로 `MobileGame` 시작, 시점 감도, 종료 확인, 뒤로가기)를 추가했다.
+- [x] 바리케이드 설치 안내 문구를 입력 소스가 만든다(`PlayerInputSource.FormatInteractPrompt`). PC는 기존 `Press E : ...`를 유지하고 모바일은 `MobileInputSource.Interact Prompt Format`(기본 `Tap {0} : {1}`)을 쓴다.
+- [x] Unity CLI로 MobileGame 일시정지 창·게임오버 버튼을 `MobileGameSessionManager`에 연결하고 `SceneChange`를 제거했다. `Sprint` 버튼의 끊긴 OnClick을 비우고 `MobileInputSource.moveJoystick`에 Floating Joystick을 연결했다. Floating Joystick이 비활성이어서 활성화했다. MobileIntro 버튼은 `MobileSceneChange`에 연결했다.
+- [x] 사용자가 빌드 대상을 Android로, 씬 목록을 `MobileIntro`→`MobileGame`으로 설정했다. Unity 컴파일 오류 0개. Play Mode에서 일시정지→설정→닫기→재개, MobileIntro `StartGame`→MobileGame→`LoadMainScene`→MobileIntro 전환을 오류 없이 확인했다(버튼 탭이 아닌 메서드 직접 호출).
+- [ ] MobileGame HUD에 일시정지 버튼 추가 후 OnClick → `MobileGameSessionManager.PauseGame` 연결. 현재는 안드로이드 뒤로가기로만 일시정지할 수 있다.
+- [ ] MobileGame `SettingDisplay`에 닫기 버튼 추가 후 OnClick → `CloseSettings` 연결. 현재는 뒤로가기로만 닫힌다.
+- [ ] MobileIntro `SettingDisplay/CancelRebinding`("CANCEL KEY INPUT") 버튼 삭제. 모바일에는 키 설정이 없어 연결을 비워 두었다.
+- [ ] Floating Joystick 활성화가 의도와 맞는지 확인한다.
+- [ ] 백그라운드 복귀 후 일시정지 유지(재개 버튼으로 재개)가 의도와 맞는지 결정한다.
+- [ ] 실기기 확인: 터치 이동·시점·버튼, 뒤로가기(게임·설정·인트로·종료 확인), 백그라운드 자동 일시정지, 설치 안내 문구, 해상도별 HUD.
+- [ ] PC 회귀: 이번 작업 중에는 Game·Intro 씬을 Play Mode로 확인하지 않았다. 일시정지·설정·키 재설정·창 모드 버튼과 ESC 동작을 확인한다.

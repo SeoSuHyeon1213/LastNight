@@ -227,7 +227,7 @@ public sealed class SurvivalHud : MonoBehaviour {
         else if (!barricadeBuilder.Target.CanInstall)
             barricadePromptText.text = "Barricade full";
         else
-            barricadePromptText.text = $"Press {barricadeBuilder.InstallKeyLabel} : Install barricade" +
+            barricadePromptText.text = barricadeBuilder.FormatInstallPrompt("Install barricade") +
                 (barricadeBuilder.Materials < 1 ? "\nNeed wood" : "");
     }
     // 수류탄 인벤토리가 초기화되거나 획득/사용될 때 실제 보유량을 전달한다.
@@ -301,7 +301,7 @@ public sealed class SurvivalHud : MonoBehaviour {
     }
 
     private void LateUpdate() {
-        GameSessionManager session = GameSessionManager.instance;
+        GameSessionBase session = GameSessionBase.instance;
         GameObject panel = gameoverUI != null && gameoverUI.activeInHierarchy
             ? gameoverUI : session != null ? session.ActiveMenuPanel : null;
         if (visibility != null) visibility.alpha = panel != null ? 0f : 1f;

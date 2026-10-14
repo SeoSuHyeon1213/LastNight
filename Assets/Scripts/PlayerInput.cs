@@ -28,7 +28,7 @@ public class PlayerInput : MonoBehaviour, Cinemachine.AxisState.IInputAxisProvid
 
     // 카메라가 축을 갱신할 때 읽어 Update 실행 순서에 따른 입력 지연을 피한다.
     public float GetAxisValue(int axis) {
-        GameSessionManager session = GameSessionManager.instance;
+        GameSessionBase session = GameSessionBase.instance;
         if (!isActiveAndEnabled || source == null || !Application.isFocused || Time.timeScale == 0f
             || (GameManager.instance != null && GameManager.instance.isGameover)
             || (session != null && (session.IsPaused || session.IsRebinding)))
@@ -53,10 +53,11 @@ public class PlayerInput : MonoBehaviour, Cinemachine.AxisState.IInputAxisProvid
     // 0: 요청 없음, 1·2: 해당 슬롯, -1: 다른 무기로 전환
     public int WeaponSlotRequest { get; private set; }
     public string InteractLabel => source != null ? source.InteractLabel : string.Empty;
+    public string FormatInteractPrompt(string action) => source != null ? source.FormatInteractPrompt(action) : action;
 
     // 매프레임 사용자 입력을 감지. 다른 컴포넌트보다 먼저 한 번 읽어 같은 프레임 값을 공유한다.
     private void Update() {
-        GameSessionManager sessionManager = GameSessionManager.instance;
+        GameSessionBase sessionManager = GameSessionBase.instance;
         PlayerInputFrame frame = source != null ? source.ReadFrame() : default;
 
         // 게임오버 상태에서는 사용자 입력을 감지하지 않는다

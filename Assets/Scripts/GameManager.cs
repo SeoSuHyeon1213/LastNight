@@ -64,8 +64,8 @@ public class GameManager : MonoBehaviour {
         if (isGameover) return;
         // 게임 오버 상태를 참으로 변경
         isGameover = true;
-        if (GameSessionManager.instance != null) {
-            GameSessionManager.instance.ApplyCursorMode();
+        if (GameSessionBase.instance != null) {
+            GameSessionBase.instance.ApplyCursorMode();
         } else {
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;

@@ -6,11 +6,11 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/Intro.unity
-    guid: 5010b63a3fb1ad24aac7584fb5141c77
+    path: Assets/Scenes/MobileIntro.unity
+    guid: c543ef7e85a5746b0a64f06df4dd1850
   - enabled: 1
-    path: Assets/Scenes/Game.unity
-    guid: c9f790448269fa4419b613707c653354
+    path: Assets/Scenes/MobileGame.unity
+    guid: a8a927bdee7e7c94a820823047b24142
   m_configObjects:
     com.unity.adaptivePerformance.basic.provider_settings: {fileID: 11400000, guid: aaf3ad3e616430b44a7ba0c32dbd0346,
       type: 2}

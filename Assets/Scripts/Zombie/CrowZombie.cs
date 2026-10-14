@@ -96,8 +96,8 @@ public class CrowZombie : SpecialZombie, IEnemyRegistryClient {
     {
         if (dead || Time.timeScale <= 0f || !IsConfigured() ||
             (GameManager.instance != null && GameManager.instance.isGameover) ||
-            (GameSessionManager.instance != null &&
-                (GameSessionManager.instance.IsPaused || GameSessionManager.instance.IsRebinding))) return;
+            (GameSessionBase.instance != null &&
+                (GameSessionBase.instance.IsPaused || GameSessionBase.instance.IsRebinding))) return;
 
         switch (SummonState)
         {

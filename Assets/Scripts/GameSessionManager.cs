@@ -1,21 +1,12 @@
 using System;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-[DisallowMultipleComponent]
-public class GameSessionManager : MonoBehaviour {
+// PC 게임 씬 세션: 키 바인딩·재설정, ESC 일시정지, 커서 잠금, 전체 화면/창 모드.
+public class GameSessionManager : GameSessionBase {
     private enum BindingAction { Forward, Backward, Left, Right, Run, Fire, Reload, Pause }
 
-    public static GameSessionManager instance { get; private set; }
-    public bool IsPaused { get; private set; }
-    public bool IsRebinding => rebindingAction.HasValue;
-    public GameObject ActiveMenuPanel => settingsPanel != null && settingsPanel.activeInHierarchy
-        ? settingsPanel : pausePanel != null && pausePanel.activeInHierarchy ? pausePanel : null;
-
-    [Header("Pause Menu")]
-    [SerializeField] private GameObject pausePanel;
-    [SerializeField] private GameObject settingsPanel;
+    public override bool IsRebinding => rebindingAction.HasValue;
 
     [Header("Settings Labels")]
     [SerializeField] private Text rebindingText;
@@ -45,130 +36,30 @@ public class GameSessionManager : MonoBehaviour {
     private BindingAction? rebindingAction;
     private bool fullscreenMode;
 
-    [Header("Mouse Sensitivity")]
-    [SerializeField] private Slider mouseSensitivityXSlider;
-    [SerializeField] private Slider mouseSensitivityYSlider;
-    [SerializeField] private Text mouseSensitivityXText;
-    [SerializeField] private Text mouseSensitivityYText;
-    private const float MinSensitivity = 0.1f;
-    private const float MaxSensitivity = 3f;
-    private const string SensitivityXKey = "MouseSensitivity.X";
-    private const string SensitivityYKey = "MouseSensitivity.Y";
-    private bool sensitivityDirty;
-    public float MouseSensitivityX { get; private set; } = 1f;
-    public float MouseSensitivityY { get; private set; } = 1f;
-
     public float MoveInput => GetAxis(forwardKey, backwardKey);
     public float StrafeInput => GetAxis(rightKey, leftKey);
     public bool IsRunning => Input.GetKey(runKey);
     public bool FireHeld => Input.GetKey(fireKey);
     public bool ReloadPressed => Input.GetKeyDown(reloadKey);
 
-    private void Awake() {
-        if (instance != null && instance != this) {
-            Destroy(this);
-            return;
-        }
-
-        instance = this;
-        ValidateUiReferences();
+    protected override void InitializeDevice() {
         LoadBindings();
-        InitializeMouseSensitivity();
         fullscreenMode = PlayerPrefs.GetInt("DisplayFullscreen", 1) == 1;
         ApplyDisplayMode();
-        RefreshSettingsLabels();
-        SetPaused(false);
     }
 
-    private void Update() {
+    protected override bool ReadPauseToggle() {
         if (rebindingAction.HasValue) {
             CaptureRebindingKey();
-            return;
+            return false;
         }
 
-        if (Input.GetKeyDown(pauseKey) && (GameManager.instance == null || !GameManager.instance.isGameover))
-            SetPaused(!IsPaused);
+        return Input.GetKeyDown(pauseKey);
     }
 
-    private void OnDestroy() {
-        if (instance != this)
-            return;
-
-        instance = null;
-        if (mouseSensitivityXSlider != null)
-            mouseSensitivityXSlider.onValueChanged.RemoveListener(SetMouseSensitivityX);
-        if (mouseSensitivityYSlider != null)
-            mouseSensitivityYSlider.onValueChanged.RemoveListener(SetMouseSensitivityY);
-        SaveMouseSensitivity();
-        Time.timeScale = 1f;
-    }
-
-    public void SetPaused(bool paused) {
-        if (!paused) SaveMouseSensitivity();
-        IsPaused = paused;
-        rebindingAction = null;
-        Time.timeScale = paused ? 0f : 1f;
-
-        if (pausePanel != null)
-            pausePanel.SetActive(paused);
-        if (settingsPanel != null)
-            settingsPanel.SetActive(false);
-
-        SetRebindingMessage("조작 설정");
-        ApplyCursorMode();
-    }
-
-    public void ResumeGame() {
-        SetPaused(false);
-    }
-
-    public void OpenSettings() {
-        if (!IsPaused)
-            return;
-
-        if (pausePanel != null)
-            pausePanel.SetActive(false);
-        if (settingsPanel != null)
-            settingsPanel.SetActive(true);
-
-        RefreshSettingsLabels();
-    }
-
-    public void CloseSettings() {
-        SaveMouseSensitivity();
+    protected override void OnMenuReset() {
         rebindingAction = null;
         SetRebindingMessage("조작 설정");
-
-        if (settingsPanel != null)
-            settingsPanel.SetActive(false);
-        if (pausePanel != null)
-            pausePanel.SetActive(true);
-    }
-
-    public void RestartScene() {
-        Time.timeScale = 1f;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-    }
-
-    public void LoadMainScene() {
-        if (SceneManager.sceneCountInBuildSettings <= 0) {
-            Debug.LogError("Main scene could not be loaded because build index 0 is not configured.", this);
-            return;
-        }
-
-        Time.timeScale = 1f;
-        SceneManager.LoadScene(0);
-    }
-
-    public void QuitGame() {
-        Time.timeScale = 1f;
-        PlayerPrefs.Save();
-
-#if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
-#else
-        Application.Quit();
-#endif
     }
 
     public void SetFullscreenMode() {
@@ -222,15 +113,15 @@ public class GameSessionManager : MonoBehaviour {
         ApplyCursorMode();
     }
 
-    public void ApplyCursorMode() {
+    public override void ApplyCursorMode() {
         bool releaseCursor = IsPaused || !fullscreenMode ||
             (GameManager.instance != null && GameManager.instance.isGameover);
         Cursor.lockState = releaseCursor ? CursorLockMode.None : CursorLockMode.Locked;
         Cursor.visible = releaseCursor;
     }
 
-    private void RefreshSettingsLabels() {
-        RefreshMouseSensitivityUi();
+    protected override void RefreshSettingsLabels() {
+        base.RefreshSettingsLabels();
         RefreshBindingTexts();
         RefreshDisplayModeIndicators();
     }
@@ -321,72 +212,8 @@ public class GameSessionManager : MonoBehaviour {
         PlayerPrefs.Save();
     }
 
-    private void InitializeMouseSensitivity() {
-        MouseSensitivityX = ClampSensitivity(PlayerPrefs.GetFloat(SensitivityXKey, 1f));
-        MouseSensitivityY = ClampSensitivity(PlayerPrefs.GetFloat(SensitivityYKey, 1f));
-        ConfigureSensitivitySlider(mouseSensitivityXSlider, MouseSensitivityX);
-        ConfigureSensitivitySlider(mouseSensitivityYSlider, MouseSensitivityY);
-        if (mouseSensitivityXSlider != null)
-            mouseSensitivityXSlider.onValueChanged.AddListener(SetMouseSensitivityX);
-        if (mouseSensitivityYSlider != null)
-            mouseSensitivityYSlider.onValueChanged.AddListener(SetMouseSensitivityY);
-        if (mouseSensitivityXSlider == null || mouseSensitivityYSlider == null)
-            Debug.LogWarning("GameSessionManager: X/Y 감도 Slider를 Inspector에 연결하세요.", this);
-    }
-
-    private static float ClampSensitivity(float value) {
-        return float.IsNaN(value) || float.IsInfinity(value) ? 1f : Mathf.Clamp(value, MinSensitivity, MaxSensitivity);
-    }
-
-    private static void ConfigureSensitivitySlider(Slider slider, float value) {
-        if (slider == null) return;
-        slider.minValue = MinSensitivity;
-        slider.maxValue = MaxSensitivity;
-        slider.wholeNumbers = false;
-        slider.SetValueWithoutNotify(value);
-    }
-
-    public void SetMouseSensitivityX(float value) {
-        MouseSensitivityX = ClampSensitivity(value);
-        PlayerPrefs.SetFloat(SensitivityXKey, MouseSensitivityX);
-        sensitivityDirty = true;
-        RefreshMouseSensitivityUi();
-    }
-
-    public void SetMouseSensitivityY(float value) {
-        MouseSensitivityY = ClampSensitivity(value);
-        PlayerPrefs.SetFloat(SensitivityYKey, MouseSensitivityY);
-        sensitivityDirty = true;
-        RefreshMouseSensitivityUi();
-    }
-
-    private void RefreshMouseSensitivityUi() {
-        if (mouseSensitivityXSlider != null) mouseSensitivityXSlider.SetValueWithoutNotify(MouseSensitivityX);
-        if (mouseSensitivityYSlider != null) mouseSensitivityYSlider.SetValueWithoutNotify(MouseSensitivityY);
-        if (mouseSensitivityXText != null) mouseSensitivityXText.text = $"X  {MouseSensitivityX:0.00}x";
-        if (mouseSensitivityYText != null) mouseSensitivityYText.text = $"Y  {MouseSensitivityY:0.00}x";
-    }
-
-    private void SaveMouseSensitivity() {
-        if (!sensitivityDirty) return;
-        PlayerPrefs.Save();
-        sensitivityDirty = false;
-    }
-
-    private void OnApplicationFocus(bool focused) {
-        if (instance == this && !focused) SaveMouseSensitivity();
-    }
-
-    private void OnApplicationQuit() {
-        if (instance == this) SaveMouseSensitivity();
-    }
-
-    private void ValidateUiReferences() {
-        if (pausePanel == null || settingsPanel == null) {
-            Debug.LogError(
-                $"{nameof(GameSessionManager)} on '{name}' requires Pause Panel and Settings Panel references.",
-                this);
-        }
+    protected override void ValidateUiReferences() {
+        base.ValidateUiReferences();
 
         if (rebindingText == null
             || forwardBindingText == null || backwardBindingText == null
