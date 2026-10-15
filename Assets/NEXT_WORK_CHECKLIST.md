@@ -409,5 +409,19 @@
 - [x] `PlayerInput`은 Inspector의 `Source`(비우면 같은 오브젝트의 소스)에서 프레임마다 한 번 읽어 공유한다(`DefaultExecutionOrder(-50)`). 자동 검색·`AddComponent` 대체는 하지 않으며 소스가 없으면 오류 로그 후 비활성화한다.
 - [x] 무기 교체(`PlayerShooter`), 수류탄(`PlayerGrenadeThrower`), 바리케이드 설치(`BarricadeBuilder`)가 키를 직접 읽지 않고 PlayerInput을 사용한다. `throwKey`·`installKey`는 키보드 소스로 옮겼다(기본 G/E 동일). 설치 안내 키 이름은 소스의 `Interact Label`을 쓴다. 일시정지 키는 `GameSessionManager`에 그대로 둔다.
 - [x] scratchpad 복사 csproj의 `dotnet build` 오류 0개(Unity 컴파일 확인이 아님).
-- [ ] 에디터 연결: `PlayerCharacter` 프리팹에 `KeyboardMouseInputSource` 추가(미연결 시 Game 씬 조작 불가). MobileGame 씬에 `MobileInputSource` 배치 → Floating Joystick 연결 → Fire/Reload/Aim/Sprint 버튼에 `MobileInputButton` 추가·연결 → 씬 PlayerCharacter의 PlayerInput `Source`에 MobileInputSource 지정. 수류탄·설치·무기 교체·일시정지 모바일 버튼은 미구성.
-- [ ] Unity 컴파일, Game 씬 기존 조작(이동·사격·조준·무기 교체·수류탄·설치) 회귀, MobileGame 씬 Device Simulator/실기기 터치·시점 감도(`Look Scale`) 확인.
+- [x] PC 씬 연결: `Game` 씬의 플레이어에 `KeyboardMouseInputSource`가 연결되어 있고 Play Mode에서 `PlayerInput.Source`로 초기화됨을 확인했다(2026-10-15). 프리팹 원본 연결과 씬 연결을 구분한다.
+- [ ] `PlayerCharacter` 프리팹 원본에는 입력 소스가 없다. 다른 PC 씬에서 해당 프리팹을 사용할 경우 씬 또는 프리팹에 입력 소스를 명시적으로 연결한다.
+- [ ] 모바일 입력·버튼·조이스틱 연결과 Device Simulator/실기기 확인은 `feature/mobile-session`의 체크리스트에서 관리한다.
+- [x] Unity `6000.3.10f1`에서 PC 공통 세션 변경 후 컴파일 오류 없음(2026-10-15).
+- [ ] Game 씬 실제 키보드·마우스 조작(이동·사격·조준·무기 교체·수류탄·설치) 통합 회귀.
+
+## PC 공통 세션 반영 (2026-10-15)
+
+- [x] 최신 `develop`(`b6f3c26`)을 기준으로 `feature/mobile-session`(`698a372`)의 공통 C# 변경만 선별 반영했다. `GameSessionBase`와 `.meta` GUID를 그대로 가져오고 `GameSessionManager`는 PC 키 바인딩·재설정·ESC 처리·커서·화면 모드를 담당한다. 플레이어·좀비·HUD의 공통 세션 참조도 함께 전환했다.
+- [x] 입력 소스의 `FormatInteractPrompt`를 반영했다. PC의 `Press E : Install barricade`를 Play Mode에서 확인했다. 모바일 전용 스크립트·입력 소스 변경·씬·이미지·Android 설정은 이번 반영에서 제외했다.
+- [x] Editor에서 상속된 패널·감도 참조 6개, 기존 PC 세션 버튼 콜백 15개, `KeyboardMouseInputSource`를 확인했다. 씬·프리팹을 재작성하거나 UI를 생성하지 않았다. PC 빌드 목록 `Intro → Game`과 기존 ProjectSettings를 유지했다.
+- [x] 실제 `Game` 씬 Play Mode에서 세션 초기화·입력 소스·설치 문구·일시정지·커서·카메라 입력 차단·설정 열기·키 재설정 시작/취소·재개·감도 슬라이더/값 제한·화면 모드 API 등 16개 검증이 통과했다. 설정 열기·키 재설정 시작·재개는 기존 버튼의 `onClick.Invoke`, 설정 닫기·화면 모드 전환은 API 호출로 검증했다.
+- [x] 일시정지 중 재시작 후 `Game`의 새 세션과 `timeScale=1`, 메인 복귀 후 `Intro`·정적 세션 해제·`timeScale=1`을 추가 확인했다. 테스트로 바꾼 감도·화면 모드 저장값을 복구하고 Play Mode 종료 후 원래 씬으로 돌아왔다.
+- [ ] 실제 ESC 입력·키 재지정 입력·마우스 클릭을 통한 조작은 별도 수동 확인이 필요하다. 위 메서드/콜백 검증을 실제 입력 검증으로 간주하지 않는다.
+- [ ] 기존 PC UI 연결 문제: `GameSessionManager`의 `fullscreenIndicator`/`windowedIndicator`가 표시용 자식 대신 `Full screen`/`Widowed` 버튼 자체를 가리켜 현재 모드에 따라 다른 모드 버튼이 비활성화된다. Editor에서 표시용 오브젝트 연결과 두 전환 버튼의 접근성을 별도 수정·검증한다. 이번 공통 코드 반영에서는 기존 씬 연결을 유지했다.
+- [ ] Editor 시작 시 `com.unity.collections` 패키지 캐시의 테스트용 `System.Runtime.CompilerServices.Unsafe.dll` 경로 누락 예외가 1회 기록됐다. C# 컴파일 실패는 없었고 위 Play Mode 검증 중 새 오류는 없었다. 로컬 패키지 캐시 점검은 별도 작업으로 남긴다.

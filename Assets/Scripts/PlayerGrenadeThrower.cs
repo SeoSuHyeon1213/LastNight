@@ -28,7 +28,7 @@ public sealed class PlayerGrenadeThrower : MonoBehaviour {
     }
 
     public bool TryThrow() {
-        GameSessionManager session = GameSessionManager.instance;
+        GameSessionBase session = GameSessionBase.instance;
         if (!isActiveAndEnabled || Time.timeScale <= 0f || inventory == null ||
             playerHealth == null || playerHealth.dead || inventory.Count == 0 ||
             (GameManager.instance != null && GameManager.instance.isGameover) ||

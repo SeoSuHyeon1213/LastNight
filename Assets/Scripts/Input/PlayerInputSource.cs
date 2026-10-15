@@ -18,6 +18,11 @@ public abstract class PlayerInputSource : MonoBehaviour {
     // 바리케이드 설치 안내 문구에 표시할 조작 이름
     public abstract string InteractLabel { get; }
 
+    // HUD 상호작용 안내 문구. action은 "Install barricade"처럼 행동 이름이다.
+    public virtual string FormatInteractPrompt(string action) {
+        return $"Press {InteractLabel} : {action}";
+    }
+
     // 버튼의 "누른 프레임" 입력은 읽을 때 소모된다. PlayerInput만 호출한다.
     public abstract PlayerInputFrame ReadFrame();
 

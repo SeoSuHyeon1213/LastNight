@@ -95,7 +95,7 @@ public class PlayerAimCamera : MonoBehaviour {
             Apply(0f);
             return;
         }
-        GameSessionManager session = GameSessionManager.instance;
+        GameSessionBase session = GameSessionBase.instance;
         if (Time.timeScale == 0f || (session != null && (session.IsPaused || session.IsRebinding))) return;
         float target = playerInput.IsAiming ? 1f : 0f;
         Apply(Mathf.MoveTowards(blend, target, Time.deltaTime / transitionDuration));

@@ -55,7 +55,7 @@ public sealed class MeleeWeapon : Gun {
     }
 
     private bool CanAttack() {
-        GameSessionManager session = GameSessionManager.instance;
+        GameSessionBase session = GameSessionBase.instance;
         return isActiveAndEnabled && owner != null && !owner.dead && gunData != null &&
             Time.timeScale > 0f && (GameManager.instance == null || !GameManager.instance.isGameover) &&
             (session == null || (!session.IsPaused && !session.IsRebinding));

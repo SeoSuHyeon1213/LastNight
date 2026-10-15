@@ -16,14 +16,15 @@ public sealed class BarricadeBuilder : MonoBehaviour {
     public Barricade Target => target;
     public bool IsInstalling => installing;
     public string InstallKeyLabel => playerInput != null ? playerInput.InteractLabel : string.Empty;
+    public string FormatInstallPrompt(string action) => playerInput != null ? playerInput.FormatInteractPrompt(action) : action;
     public float Progress => target == null ? 0f : progress / target.installSeconds;
     public int Materials => inventory == null ? 0 : inventory.Count;
     public bool CanShowPrompt => isActiveAndEnabled && player != null && !player.dead &&
         target != null && target.isActiveAndEnabled && Time.timeScale > 0f && Application.isFocused &&
         (target.WorkPosition - (transform.position + Vector3.up)).sqrMagnitude <= reach * reach &&
         (GameManager.instance == null || !GameManager.instance.isGameover) &&
-        (GameSessionManager.instance == null ||
-            (!GameSessionManager.instance.IsPaused && !GameSessionManager.instance.IsRebinding));
+        (GameSessionBase.instance == null ||
+            (!GameSessionBase.instance.IsPaused && !GameSessionBase.instance.IsRebinding));
 
     private void Awake() {
         inventory = GetComponent<PlankInventory>();
@@ -36,7 +37,7 @@ public sealed class BarricadeBuilder : MonoBehaviour {
     }
 
     private void Update() {
-        GameSessionManager session = GameSessionManager.instance;
+        GameSessionBase session = GameSessionBase.instance;
         if (player.dead || !Application.isFocused ||
             (GameManager.instance != null && GameManager.instance.isGameover) ||
             (session != null && session.IsRebinding)) { Cancel(); return; }

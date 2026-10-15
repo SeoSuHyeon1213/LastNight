@@ -491,8 +491,8 @@ public class Zombie : LivingEntity {
 
     private bool CanAdvanceSound => Time.timeScale > 0f &&
         (GameManager.instance == null || !GameManager.instance.isGameover) &&
-        (GameSessionManager.instance == null ||
-            (!GameSessionManager.instance.IsPaused && !GameSessionManager.instance.IsRebinding));
+        (GameSessionBase.instance == null ||
+            (!GameSessionBase.instance.IsPaused && !GameSessionBase.instance.IsRebinding));
     private bool CanPlayLivingSound => isActiveAndEnabled && !dead && CanAdvanceSound;
 
     private void TickIdleSound() {
