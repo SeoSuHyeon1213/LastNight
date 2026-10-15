@@ -421,8 +421,24 @@
 - [x] 사용자가 빌드 대상을 Android로, 씬 목록을 `MobileIntro`→`MobileGame`으로 설정했다. Unity 컴파일 오류 0개. Play Mode에서 일시정지→설정→닫기→재개, MobileIntro `StartGame`→MobileGame→`LoadMainScene`→MobileIntro 전환을 오류 없이 확인했다(버튼 탭이 아닌 메서드 직접 호출).
 - [x] 사용자가 MobileGame HUD에 일시정지 버튼(`/HUD/Pause`)을 배치했고 OnClick → `MobileGameSessionManager.PauseGame`을 CLI로 연결했다.
 - [x] 사용자가 배치한 나가기 버튼(`Out`)을 화면 위치를 유지한 채 `SettingDisplay` 아래로 옮기고 OnClick → `CloseSettings`를 연결했다. Play Mode에서 버튼 onClick 호출로 일시정지→설정→나가기→재개 흐름을 오류 없이 확인했다.
-- [ ] MobileIntro `SettingDisplay/CancelRebinding`("CANCEL KEY INPUT") 버튼 삭제. 모바일에는 키 설정이 없어 연결을 비워 두었다.
+- [x] MobileIntro `SettingDisplay/CancelRebinding`("CANCEL KEY INPUT") 버튼을 Unity CLI로 삭제하고 씬을 저장했다. 삭제 전 씬 내 참조가 부모 계층 외에 없고 OnClick이 비어 있음을 확인했다. Play Mode 진입 시 콘솔 오류 0개(설정 창 열기·닫기 버튼 동작은 미확인).
 - [ ] Floating Joystick 활성화가 의도와 맞는지 확인한다.
 - [ ] 백그라운드 복귀 후 일시정지 유지(재개 버튼으로 재개)가 의도와 맞는지 결정한다.
 - [ ] 실기기 확인: 터치 이동·시점·버튼, 뒤로가기(게임·설정·인트로·종료 확인), 백그라운드 자동 일시정지, 설치 안내 문구, 해상도별 HUD.
 - [ ] PC 회귀: 이번 작업 중에는 Game·Intro 씬을 Play Mode로 확인하지 않았다. 일시정지·설정·키 재설정·창 모드 버튼과 ESC 동작을 확인한다.
+
+## 모바일 Interact 버튼 조건부 표시 (2026-10-15)
+
+- [x] `BarricadeBuilder.CanInstallNow`(설치 안내 표시 조건 + 설치 중이거나 대상이 설치 가능하고 판자 1개 이상)를 추가했다. `MobileInputSource`에 선택 필드 `Barricade Builder`를 추가해, 지정하면 이 값에 따라 `Interact` 버튼 오브젝트를 켜고 끈다. 비워 두면 버튼 표시를 건드리지 않는다.
+- [x] Unity CLI로 MobileGame 씬 PlayerCharacter의 `MobileInputSource.Barricade Builder`에 같은 오브젝트의 BarricadeBuilder를 연결하고 씬을 저장했다. `HUD/Interact`는 비활성으로 시작한다. 저장 시 에디터에 있던 HUD 버튼 위치 변경도 함께 저장되었다.
+- [x] Unity 컴파일 오류 0개. Play Mode에서 시작 시 버튼 숨김 → 바리케이드 옆 이동·판자 지급 시 표시 → 버튼 눌림(`OnPointerDown` 직접 호출)으로 판자 1개 설치 → 8m 이동 시 숨김을 콘솔 오류 없이 확인했다.
+- [ ] 판자 0개·바리케이드 가득 참·일시정지 중 숨김, 실기기 터치로 표시·설치 확인. 판자 부족·가득 참일 때도 버튼을 보여 줄지(현재는 숨김) 결정한다.
+
+## 모바일 60fps 목표 프레임 (2026-10-15)
+
+- [x] `MobileGameSessionManager`(`InitializeDevice`)와 `MobileSceneChange`(`Awake`)가 `Application.targetFrameRate`를 직렬화 필드 `Target Frame Rate`(기본 60, -1=플랫폼 기본값)로 설정한다. 안드로이드는 지정하지 않으면 30fps로 제한된다. PC 씬(`GameSessionManager`·`SceneChange`)은 변경 없음.
+- [x] Unity 컴파일 오류 0개. MobileGame Play Mode에서 `targetFrameRate` -1 → 60 적용, 콘솔 오류 0개 확인. MobileIntro는 Play Mode 미확인.
+- [x] 프레임 의존 로직 점검: `MoveTowards` 보간(카메라 FOV·그립 블렌드·가림 페이드)은 모두 `Time.deltaTime` 기반이라 60fps에서 속도가 바뀌지 않는다.
+- [x] 사용자 요청으로 `PlayerCharacter` 프리팹 Rigidbody `Interpolation`을 Interpolate로 바꿨다(Unity CLI, 프리팹 저장). 씬 오버라이드가 없어 MobileGame·Game 씬 모두 적용된다. 저장 시 스크립트에서 이미 없어진 필드(`PlayerInput` 축 이름, `PlayerHealth.itemPickupClip`)가 정리되고 `PlayerAimController` 기본값이 기록되었다.
+- [ ] 이동 부드러움 확인: 에디터가 백그라운드여서 플레이 루프가 진행되지 않아 프레임 단위 스텝(`EditorApplication.Step`)으로 측정했으나, 스텝 모드에서는 60fps 프레임 시간이 재현되지 않아 None/Interpolate 결과가 같게 나와 판정 불가. 이동 자체와 콘솔 오류 0개는 확인. Game 뷰를 띄운 Play Mode 또는 실기기에서 이동·카메라 끊김을 직접 확인한다.
+- [ ] 실기기에서 60fps 유지 여부와 발열을 프로파일러로 확인한다. 60fps를 유지하지 못하면 프로젝트 설정의 최적화 항목(포스트 프로세싱·그림자·텍스처)을 먼저 적용한다.
