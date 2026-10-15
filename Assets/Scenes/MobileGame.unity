@@ -4249,7 +4249,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 55590661}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.32532525, y: 0.6374478, z: -0.33986545, w: 0.61017644}
+  m_LocalRotation: {x: 0.33999738, y: 0.6099179, z: -0.32518744, w: 0.6376952}
   m_LocalPosition: {x: 426.52, y: 7.5950003, z: 391.27112}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -15856,7 +15856,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: -406.00012, y: -181}
+  m_AnchoredPosition: {x: -435, y: -206.8}
   m_SizeDelta: {x: 150, y: 150}
   m_Pivot: {x: 0.49999994, y: 0.49999988}
 --- !u!114 &225875976
@@ -19488,7 +19488,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 288389977}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.00000011149237, y: 0.00000005583996, z: -0.0000000743923,
+  m_LocalRotation: {x: 0.00000009495193, y: -0.00000006676922, z: 0.000000057879987,
     w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -54180,7 +54180,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 827130062}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.1838556, y: 0.004413622, z: -0.004496828, w: 0.9829331}
+  m_LocalRotation: {x: -0.18385793, y: 0.002695209, z: -0.0027460202, w: 0.9829453}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -54495,7 +54495,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: -226, y: -164}
+  m_AnchoredPosition: {x: -275, y: -164}
   m_SizeDelta: {x: 150, y: 150}
   m_Pivot: {x: 0.50000024, y: 0.49999994}
 --- !u!114 &830897528
@@ -63631,7 +63631,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: -77, y: -175}
+  m_AnchoredPosition: {x: -109, y: -175}
   m_SizeDelta: {x: 150, y: 150}
   m_Pivot: {x: 0.49999985, y: 0.50000006}
 --- !u!114 &960544586
@@ -66317,7 +66317,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: -113, y: 0}
+  m_AnchoredPosition: {x: -125, y: 0}
   m_SizeDelta: {x: 150, y: 150}
   m_Pivot: {x: 0.5000001, y: 0.50000006}
 --- !u!114 &985859504
@@ -80922,6 +80922,7 @@ MonoBehaviour:
   grenadeButton: {fileID: 985859504}
   interactButton: {fileID: 1288208171}
   weaponSwapButton: {fileID: 960544586}
+  barricadeBuilder: {fileID: 1155330944}
   toggleAim: 1
   toggleRun: 1
   interactLabel: Build
@@ -81058,7 +81059,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1157333865}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.08933745, y: -0.005766035, z: 0.007121644, w: 0.99595934}
+  m_LocalRotation: {x: -0.089339904, y: -0.0035060453, z: 0.004330295, w: 0.9959857}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -93117,7 +93118,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1288208170
 RectTransform:
   m_ObjectHideFlags: 0
@@ -93134,7 +93135,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: -339, y: 24}
+  m_AnchoredPosition: {x: -369, y: -5}
   m_SizeDelta: {x: 150, y: 150}
   m_Pivot: {x: 0.50000006, y: 0.5}
 --- !u!114 &1288208171

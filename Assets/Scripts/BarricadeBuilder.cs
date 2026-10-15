@@ -25,6 +25,8 @@ public sealed class BarricadeBuilder : MonoBehaviour {
         (GameManager.instance == null || !GameManager.instance.isGameover) &&
         (GameSessionBase.instance == null ||
             (!GameSessionBase.instance.IsPaused && !GameSessionBase.instance.IsRebinding));
+    // 설치를 시작할 수 있거나 설치 중이다 (모바일 상호작용 버튼 표시용).
+    public bool CanInstallNow => CanShowPrompt && (installing || (target.CanInstall && Materials > 0));
 
     private void Awake() {
         inventory = GetComponent<PlankInventory>();

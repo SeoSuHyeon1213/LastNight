@@ -15,6 +15,8 @@ public sealed class MobileInputSource : PlayerInputSource {
     [SerializeField] private MobileInputButton grenadeButton;
     [SerializeField] private MobileInputButton interactButton;
     [SerializeField] private MobileInputButton weaponSwapButton;
+    [Tooltip("지정하면 바리케이드를 설치할 수 있을 때만 상호작용 버튼을 표시한다.")]
+    [SerializeField] private BarricadeBuilder barricadeBuilder;
     [Tooltip("켜면 조준 버튼을 누를 때마다 조준을 켜고 끈다. 끄면 누르는 동안만 조준한다.")]
     [SerializeField] private bool toggleAim = true;
     [Tooltip("켜면 달리기 버튼을 누를 때마다 달리기를 켜고 끈다. 끄면 누르는 동안만 달린다.")]
@@ -71,6 +73,7 @@ public sealed class MobileInputSource : PlayerInputSource {
     }
 
     private void Update() {
+        UpdateInteractButton();
         lookDelta = Vector2.zero;
         float scale = lookScale * 1080f / Mathf.Max(1, Screen.height);
         for (int i = 0; i < Input.touchCount; i++) {
@@ -90,6 +93,12 @@ public sealed class MobileInputSource : PlayerInputSource {
             }
             lookDelta += touch.deltaPosition * scale;
         }
+    }
+
+    private void UpdateInteractButton() {
+        if (interactButton == null || barricadeBuilder == null) return;
+        bool show = barricadeBuilder.CanInstallNow;
+        if (interactButton.gameObject.activeSelf != show) interactButton.gameObject.SetActive(show);
     }
 
     private void OnDisable() {
