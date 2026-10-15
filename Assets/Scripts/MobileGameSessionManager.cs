@@ -10,6 +10,12 @@ public sealed class MobileGameSessionManager : GameSessionBase {
     [SerializeField] private bool pauseWhenBackgrounded = true;
     [Tooltip("메인 메뉴 버튼으로 이동할 씬 이름. Build Profile의 씬 목록에 포함해야 한다.")]
     [SerializeField] private string mainSceneName = "MobileIntro";
+    [Tooltip("목표 프레임. 안드로이드는 지정하지 않으면 30fps로 제한된다. -1은 플랫폼 기본값.")]
+    [SerializeField, Min(-1)] private int targetFrameRate = 60;
+
+    protected override void InitializeDevice() {
+        Application.targetFrameRate = targetFrameRate;
+    }
 
     protected override bool ReadPauseToggle() {
         // 레거시 Input에서 안드로이드 뒤로가기는 Escape로 들어온다.

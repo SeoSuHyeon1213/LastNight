@@ -13,6 +13,8 @@ public class MobileSceneChange : MonoBehaviour {
     [Header("Scenes")]
     [Tooltip("시작 버튼으로 불러올 씬 이름. Build Profile의 씬 목록에 포함해야 한다.")]
     [SerializeField] private string gameSceneName = "MobileGame";
+    [Tooltip("목표 프레임. 안드로이드는 지정하지 않으면 30fps로 제한된다. -1은 플랫폼 기본값.")]
+    [SerializeField, Min(-1)] private int targetFrameRate = 60;
 
     [Header("Intro Windows")]
     [SerializeField] private GameObject settingsPanel;
@@ -32,6 +34,7 @@ public class MobileSceneChange : MonoBehaviour {
     public float SensitivityY { get; private set; } = 1f;
 
     private void Awake() {
+        Application.targetFrameRate = targetFrameRate;
         LoadSettings();
         ConfigureSlider(sensitivityXSlider, SensitivityX);
         ConfigureSlider(sensitivityYSlider, SensitivityY);
