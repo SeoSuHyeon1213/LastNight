@@ -332,7 +332,7 @@ QualitySettings:
     excludedTargetPlatforms: []
   m_TextureMipmapLimitGroupNames: []
   m_PerPlatformDefaultQuality:
-    Android: 2
+    Android: 4
     EmbeddedLinux: 5
     GameCoreScarlett: 5
     GameCoreXboxOne: 5
