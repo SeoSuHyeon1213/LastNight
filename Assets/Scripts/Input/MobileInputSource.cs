@@ -30,11 +30,16 @@ public sealed class MobileInputSource : PlayerInputSource {
     [SerializeField, Range(0f, 1f)] private float lookAreaMinX = 0.4f;
     [Tooltip("터치 이동 픽셀을 카메라 입력으로 바꾸는 배율. 화면 높이 1080 기준이며 해상도에 맞춰 보정한다.")]
     [SerializeField, Min(0f)] private float lookScale = 0.1f;
+    [Tooltip("최근 몇 프레임의 터치 이동량을 평균할지. 터치 보고 주기와 프레임이 어긋나 생기는 끊김을 줄인다. 1이면 끈다.")]
+    [SerializeField, Range(1, 8)] private int lookSmoothingFrames = 3;
 
     private bool aimToggled;
     private bool runToggled;
     private int lookFingerId = -1;
     private Vector2 lookDelta;
+    // 이동 평균은 총 이동량을 보존하므로 손을 뗀 뒤 남은 몇 프레임 동안 나머지가 반영된다.
+    private readonly Vector2[] lookHistory = new Vector2[8];
+    private int lookHistoryIndex;
 
     public override string InteractLabel => interactLabel;
 
@@ -74,7 +79,18 @@ public sealed class MobileInputSource : PlayerInputSource {
 
     private void Update() {
         UpdateInteractButton();
-        lookDelta = Vector2.zero;
+        Vector2 rawDelta = ReadLookTouch();
+        int frames = Mathf.Clamp(lookSmoothingFrames, 1, lookHistory.Length);
+        lookHistoryIndex = (lookHistoryIndex + 1) % lookHistory.Length;
+        lookHistory[lookHistoryIndex] = rawDelta;
+        Vector2 sum = Vector2.zero;
+        for (int i = 0; i < frames; i++)
+            sum += lookHistory[(lookHistoryIndex - i + lookHistory.Length) % lookHistory.Length];
+        lookDelta = sum / frames;
+    }
+
+    private Vector2 ReadLookTouch() {
+        Vector2 delta = Vector2.zero;
         float scale = lookScale * 1080f / Mathf.Max(1, Screen.height);
         for (int i = 0; i < Input.touchCount; i++) {
             Touch touch = Input.GetTouch(i);
@@ -91,8 +107,9 @@ public sealed class MobileInputSource : PlayerInputSource {
                 lookFingerId = -1;
                 continue;
             }
-            lookDelta += touch.deltaPosition * scale;
+            delta += touch.deltaPosition * scale;
         }
+        return delta;
     }
 
     private void UpdateInteractButton() {
@@ -105,5 +122,6 @@ public sealed class MobileInputSource : PlayerInputSource {
         aimToggled = runToggled = false;
         lookFingerId = -1;
         lookDelta = Vector2.zero;
+        System.Array.Clear(lookHistory, 0, lookHistory.Length);
     }
 }

@@ -442,3 +442,11 @@
 - [x] 사용자 요청으로 `PlayerCharacter` 프리팹 Rigidbody `Interpolation`을 Interpolate로 바꿨다(Unity CLI, 프리팹 저장). 씬 오버라이드가 없어 MobileGame·Game 씬 모두 적용된다. 저장 시 스크립트에서 이미 없어진 필드(`PlayerInput` 축 이름, `PlayerHealth.itemPickupClip`)가 정리되고 `PlayerAimController` 기본값이 기록되었다.
 - [ ] 이동 부드러움 확인: 에디터가 백그라운드여서 플레이 루프가 진행되지 않아 프레임 단위 스텝(`EditorApplication.Step`)으로 측정했으나, 스텝 모드에서는 60fps 프레임 시간이 재현되지 않아 None/Interpolate 결과가 같게 나와 판정 불가. 이동 자체와 콘솔 오류 0개는 확인. Game 뷰를 띄운 Play Mode 또는 실기기에서 이동·카메라 끊김을 직접 확인한다.
 - [ ] 실기기에서 60fps 유지 여부와 발열을 프로파일러로 확인한다. 60fps를 유지하지 못하면 프로젝트 설정의 최적화 항목(포스트 프로세싱·그림자·텍스처)을 먼저 적용한다.
+
+## 모바일 카메라 흔들림 수정 (2026-10-17)
+
+- [x] 원인: 빌드 테스트 녹화(BlueStacks)에서 카메라가 몇 프레임 만에 위아래 끝까지 젖혀지거나 크게 회전했다. 터치 시점 입력은 프레임당 이동량인데 MobileGame FreeLook 축이 속도 모드(`MaxSpeed`, X 400°/s·Y 6/s, 가감속 0.1~0.2초)여서 입력이 최대 속도로 포화되고 손을 뗀 뒤에도 감속 시간 동안 계속 돌았다. 결과가 프레임 시간에 따라 달라진다.
+- [x] MobileGame FreeLook X/Y 축을 `Input Value Gain`으로 바꿨다(X 배율 1 = 1080p 기준 1px ≈ 0.1°, Y 배율 0.01 = 화면 높이 드래그 ≈ 상하 전체 범위, 가감속 0.05초). Unity CLI로 씬 저장. Game 씬은 변경 없음.
+- [x] `MobileInputSource`에 `Look Smoothing Frames`(기본 3, 1=끔)를 추가했다. 최근 N프레임 터치 이동량의 이동 평균으로 터치 보고 주기와 프레임 어긋남에 의한 끊김을 줄인다. 총 이동량은 보존된다.
+- [x] Unity 컴파일 오류 0개. Play Mode에서 1/60초 고정 스텝으로 고르지 않은 드래그(0/12px 교대 20프레임)를 축에 직접 넣어 새 설정이 120px → 11.9°로 고르게 회전하고 손을 떼면 바로 멈추는 것을 확인했다(이전 설정은 상하 축이 한계까지 튀고 회전이 과도함). 터치 평균화 코드는 에디터에서 터치를 재현할 수 없어 미확인.
+- [ ] 실기기·BlueStacks에서 시점 감도(X 배율·Y 배율·`Look Scale`·설정 감도)와 흔들림 확인. MobileGame에 카메라 충돌(CinemachineCollider)이 없어 카메라가 벽·좀비를 통과한다. 좀비가 Default 레이어라 충돌을 켜면 좀비가 지나갈 때 카메라가 당겨질 수 있으므로, 좀비 전용 레이어 분리 후 충돌 추가를 결정한다.

@@ -4249,7 +4249,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 55590661}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.33999738, y: 0.6099179, z: -0.32518744, w: 0.6376952}
+  m_LocalRotation: {x: 0.329734, y: 0.62942857, z: -0.33558992, w: 0.6184453}
   m_LocalPosition: {x: 426.52, y: 7.5950003, z: 391.27112}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -19488,7 +19488,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 288389977}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.00000009495193, y: -0.00000006676922, z: 0.000000057879987,
+  m_LocalRotation: {x: 0.000000055664067, y: -0.00000009892588, z: 0.00000017277763,
     w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -20025,10 +20025,10 @@ MonoBehaviour:
   m_LegacyBlendHint: 0
   m_YAxis:
     Value: 15
-    m_SpeedMode: 0
-    m_MaxSpeed: 6
-    m_AccelTime: 0.2
-    m_DecelTime: 0.1
+    m_SpeedMode: 1
+    m_MaxSpeed: 0.01
+    m_AccelTime: 0.05
+    m_DecelTime: 0.05
     m_InputAxisName: Mouse Y
     m_InputAxisValue: 0
     m_InvertInput: 1
@@ -20049,10 +20049,10 @@ MonoBehaviour:
     m_LegacyVelocityFilterStrength: -1
   m_XAxis:
     Value: 0
-    m_SpeedMode: 0
-    m_MaxSpeed: 400
-    m_AccelTime: 0.1
-    m_DecelTime: 0.1
+    m_SpeedMode: 1
+    m_MaxSpeed: 1
+    m_AccelTime: 0.05
+    m_DecelTime: 0.05
     m_InputAxisName: Mouse X
     m_InputAxisValue: 0
     m_InvertInput: 0
@@ -54180,7 +54180,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 827130062}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.18385793, y: 0.002695209, z: -0.0027460202, w: 0.9829453}
+  m_LocalRotation: {x: -0.18385644, y: 0.0039178953, z: -0.0039917915, w: 0.9829373}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -80929,6 +80929,7 @@ MonoBehaviour:
   interactPromptFormat: 'Tap {0} : {1}'
   lookAreaMinX: 0.4
   lookScale: 0.1
+  lookSmoothingFrames: 3
 --- !u!1001 &1155750859
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -81059,7 +81060,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1157333865}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.089339904, y: -0.0035060453, z: 0.004330295, w: 0.9959857}
+  m_LocalRotation: {x: -0.089338355, y: -0.005111235, z: 0.006312788, w: 0.9959683}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -199164,6 +199165,7 @@ MonoBehaviour:
   backButtonTogglesPause: 1
   pauseWhenBackgrounded: 1
   mainSceneName: MobileIntro
+  targetFrameRate: 60
 --- !u!1001 &8224225546354166674
 PrefabInstance:
   m_ObjectHideFlags: 0
