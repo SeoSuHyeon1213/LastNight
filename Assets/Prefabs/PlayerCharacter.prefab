@@ -4930,7 +4930,7 @@ Rigidbody:
   m_ImplicitTensor: 1
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!82 &3359214587887240190
@@ -5059,12 +5059,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9237a6135a68a748bac9cbbfad81237, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInput
-  lookXAxisName: Mouse X
-  lookYAxisName: Mouse Y
-  moveAxisName: Vertical
-  rotateAxisName: Horizontal
-  fireButtonName: Fire1
-  reloadButtonName: Reload
+  source: {fileID: 0}
 --- !u!114 &2507793360114915657
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5109,6 +5104,9 @@ MonoBehaviour:
   maxYaw: 100
   muzzleClearance: 0.02
   alignmentTolerance: 1
+  aimCamera: {fileID: 0}
+  aimFieldOfView: 30
+  fieldOfViewChangeSpeed: 120
 --- !u!114 &8250935838753833730
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5126,7 +5124,6 @@ MonoBehaviour:
   healthSlider: {fileID: 0}
   deathClip: {fileID: 8300000, guid: 4265c953ea2b74edabac0c972182dcba, type: 3}
   hitClip: {fileID: 8300000, guid: cbfb3a79860ac42c89b09fc131ef4b61, type: 3}
-  itemPickupClip: {fileID: 8300000, guid: 519ad2e4de69341948a938bf2a31e33b, type: 3}
 --- !u!136 &4971886445054763911
 CapsuleCollider:
   m_ObjectHideFlags: 0

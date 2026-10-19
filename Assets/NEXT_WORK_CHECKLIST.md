@@ -425,3 +425,13 @@
 - [ ] 실제 ESC 입력·키 재지정 입력·마우스 클릭을 통한 조작은 별도 수동 확인이 필요하다. 위 메서드/콜백 검증을 실제 입력 검증으로 간주하지 않는다.
 - [ ] 기존 PC UI 연결 문제: `GameSessionManager`의 `fullscreenIndicator`/`windowedIndicator`가 표시용 자식 대신 `Full screen`/`Widowed` 버튼 자체를 가리켜 현재 모드에 따라 다른 모드 버튼이 비활성화된다. Editor에서 표시용 오브젝트 연결과 두 전환 버튼의 접근성을 별도 수정·검증한다. 이번 공통 코드 반영에서는 기존 씬 연결을 유지했다.
 - [ ] Editor 시작 시 `com.unity.collections` 패키지 캐시의 테스트용 `System.Runtime.CompilerServices.Unsafe.dll` 경로 누락 예외가 1회 기록됐다. C# 컴파일 실패는 없었고 위 Play Mode 검증 중 새 오류는 없었다. 로컬 패키지 캐시 점검은 별도 작업으로 남긴다.
+
+## 모바일 브랜치에서 PC 공통 설정 반영 (2026-10-19)
+
+- [x] `feature/mobile-session`의 `ce15e71`까지 비교해 PC에도 적용되는 설정을 `develop`에 선별 반영했다. C# 공통 세션은 이미 반영되어 있어 다시 가져오지 않았다.
+- [x] `aa210dd`의 `PlayerCharacter` Rigidbody `Interpolation = Interpolate`를 Unity Editor에서 프리팹에 저장했다. 저장 시 제거된 필드 정리와 기본값 직렬화도 원본 커밋과 동일하게 발생해 프리팹 전체가 모바일 브랜치와 일치한다. Game 씬 인스턴스의 실제 보간 설정과 PC 입력 소스 초기화를 확인했다.
+- [x] `8db57c4`의 Game 씬 `CinemachineBrain.Update Method = FixedUpdate`를 Editor에서 저장했다. 소스 커밋에 함께 들어 있던 카메라·자식 Transform의 미세 회전 변화는 가져오지 않았다.
+- [x] `13a606c`의 공통 `PlayerSettings.gcIncremental = true`만 Editor API로 저장했다. Android 방향·식별자·아키텍처·압축·그래픽 API·배칭·Define 변경은 제외했다.
+- [x] `ce15e71`의 URP Render Graph `Compatibility Mode = false`를 Editor의 SerializedObject로 저장했다. 현재 렌더러의 사용자 Renderer Feature 목록이 비어 있음을 확인했다. URP 품질 에셋의 자동 생성 프리필터 데이터와 RuntimeSettings 목록, Android 기본 품질 변경은 가져오지 않았다. PC 빌드 목록 `Intro → Game` 및 PC 품질 수준은 유지했다.
+- [x] Unity `6000.3.10f1`에서 컴파일 오류 없음. Game Play Mode에서 Interpolate·FixedUpdate·증분 GC·PC 입력 소스·Render Graph 설정을 확인했고 846프레임 진행 및 Render Graph 인스턴스를 확인했다. 게임 화면 캡처에서 월드와 HUD 렌더링, API를 통한 일시정지·재개를 확인했다. 시작 시 기존 패키지 캐시 DLL 경로 예외는 재현됐으나 검증 중 새 게임 오류는 없었다. 검증용 이미지 에셋을 제거하고 백그라운드 실행 값을 복구했다.
+- [ ] 실제 키보드·마우스로 이동·시점 전환 시 끊김 체감을 확인한다. 이번 실행과 캡처는 부드러움 개선 또는 FPS 향상을 입증하는 측정이 아니다. GC·렌더링의 PC 빌드 성능 비교도 별도 프로파일링이 필요하다.
