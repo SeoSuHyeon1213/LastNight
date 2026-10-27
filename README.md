@@ -1,6 +1,12 @@
 # LastNight
 
-Unity zombie survival prototype.
+## English
+
+LastNight is a single-player, third-person zombie survival prototype built with Unity. Defend your base against waves of zombies while venturing outside to collect ammunition, healing items, and barricade materials. Balance scavenging, rebuilding your defenses, and taking down special zombies to survive the next wave.
+
+## 한국어
+
+LastNight는 Unity로 개발 중인 싱글플레이 3인칭 좀비 서바이벌 프로토타입입니다. 몰려오는 좀비 웨이브로부터 거점을 지키며, 외부로 나가 탄약·회복 아이템·바리케이드 재료를 수집합니다. 보급품 탐색과 방어선 복구, 특수 좀비 처치의 우선순위를 판단하며 다음 웨이브에서 살아남으세요.
 
 ## Development
 
