@@ -61481,12 +61481,54 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ee0596fa41f143638acc3a9bf74dfa0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemSpawner
-  items:
-  - {fileID: 3696993302949540236, guid: 4ae7c904cb07612449ef6e99cfe03024, type: 3}
-  - {fileID: 4549149983006180730, guid: 4bc2e9e63416ea8448aefdd973ce7ef9, type: 3}
-  - {fileID: 8477026171943786866, guid: b4938bf5986e9654f8144e909c98246c, type: 3}
-  - {fileID: 5579497602150060548, guid: a45b44d02c6982648a4024a3858dd391, type: 3}
-  - {fileID: 1330337502049974646, guid: 904ef1a6850849679679a270642bc946, type: 3}
+  houses:
+  - {fileID: 1428406804}
+  - {fileID: 325769942}
+  - {fileID: 884105666}
+  - {fileID: 537688531}
+  - {fileID: 740494525}
+  indoorItems:
+  - prefab: {fileID: 3696993302949540236, guid: 4ae7c904cb07612449ef6e99cfe03024,
+      type: 3}
+    weight: 1
+    amount: 50
+  - prefab: {fileID: 4549149983006180730, guid: 4bc2e9e63416ea8448aefdd973ce7ef9,
+      type: 3}
+    weight: 1
+    amount: 30
+  - prefab: {fileID: 8477026171943786866, guid: b4938bf5986e9654f8144e909c98246c,
+      type: 3}
+    weight: 1
+    amount: 200
+  - prefab: {fileID: 5579497602150060548, guid: a45b44d02c6982648a4024a3858dd391,
+      type: 3}
+    weight: 1
+    amount: 3
+  - prefab: {fileID: 1330337502049974646, guid: 904ef1a6850849679679a270642bc946,
+      type: 3}
+    weight: 1
+    amount: 1
+  outdoorItems:
+  - prefab: {fileID: 3696993302949540236, guid: 4ae7c904cb07612449ef6e99cfe03024,
+      type: 3}
+    weight: 1
+    amount: 100
+  - prefab: {fileID: 4549149983006180730, guid: 4bc2e9e63416ea8448aefdd973ce7ef9,
+      type: 3}
+    weight: 1
+    amount: 60
+  - prefab: {fileID: 8477026171943786866, guid: b4938bf5986e9654f8144e909c98246c,
+      type: 3}
+    weight: 1
+    amount: 400
+  - prefab: {fileID: 5579497602150060548, guid: a45b44d02c6982648a4024a3858dd391,
+      type: 3}
+    weight: 1
+    amount: 6
+  - prefab: {fileID: 1330337502049974646, guid: 904ef1a6850849679679a270642bc946,
+      type: 3}
+    weight: 1
+    amount: 2
   playerTransform: {fileID: 325174005}
   maxDistance: 5
   maxHeightDifference: 0.75
@@ -61498,6 +61540,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1907
   agentTypeId: 0
+  itemLifetime: 5
   timeBetSpawnMax: 7
   timeBetSpawnMin: 2
 --- !u!4 &933234363

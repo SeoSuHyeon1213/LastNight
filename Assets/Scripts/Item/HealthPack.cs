@@ -1,10 +1,12 @@
 ﻿using UnityEngine;
 
 // 체력을 회복하는 아이템
-public class HealthPack : MonoBehaviour, IItem {
+public class HealthPack : MonoBehaviour, IItem, IItemSpawnAmount {
     public float health = 50; // 체력을 회복할 수치
     [SerializeField] private AudioClip pickupClip;
     private bool consumed;
+
+    public void SetSpawnAmount(int amount) { health = Mathf.Max(1, amount); }
 
     public bool Use(GameObject target) {
         if (consumed || !isActiveAndEnabled || target == null || health <= 0f ||

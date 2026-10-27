@@ -1,10 +1,12 @@
 using UnityEngine;
 
 // 게임 점수를 증가시키는 아이템
-public class Coin : MonoBehaviour, IItem {
+public class Coin : MonoBehaviour, IItem, IItemSpawnAmount {
     public int score = 200; // 증가할 점수
     [SerializeField] private AudioClip pickupClip;
     private bool consumed;
+
+    public void SetSpawnAmount(int amount) { score = Mathf.Max(1, amount); }
 
     public bool Use(GameObject target) {
         if (consumed || !isActiveAndEnabled || target == null || score <= 0 ||

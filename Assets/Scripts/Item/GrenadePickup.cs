@@ -1,9 +1,11 @@
 using UnityEngine;
 
-public sealed class GrenadePickup : MonoBehaviour, IItem {
+public sealed class GrenadePickup : MonoBehaviour, IItem, IItemSpawnAmount {
     [Min(1)] public int amount = 1;
     [SerializeField] private AudioClip pickupClip;
     private bool consumed;
+
+    public void SetSpawnAmount(int amount) { this.amount = Mathf.Max(1, amount); }
 
     public bool Use(GameObject target) {
         if (consumed || !isActiveAndEnabled || target == null || amount <= 0) return false;
