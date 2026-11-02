@@ -1,10 +1,12 @@
 using UnityEngine;
 
 // 총알을 충전하는 아이템
-public class AmmoPack : MonoBehaviour, IItem {
+public class AmmoPack : MonoBehaviour, IItem, IItemSpawnAmount {
     public int ammo = 30; // 충전할 총알 수
     [SerializeField] private AudioClip pickupClip;
     private bool consumed;
+
+    public void SetSpawnAmount(int amount) { ammo = Mathf.Max(1, amount); }
 
     public bool Use(GameObject target) {
         if (consumed || !isActiveAndEnabled || target == null || ammo <= 0) return false;
