@@ -17,6 +17,8 @@ public sealed class BaseHouse : MonoBehaviour {
     public string DisplayName => string.IsNullOrEmpty(displayName) ? houseId : displayName;
     public Transform StorageAnchor => storageAnchor;
     public BaseEntryRoute[] EntryRoutes => entryRoutes;
+    public bool HasIndoorZones => indoorZones != null && indoorZones.Length > 0 &&
+        System.Array.TrueForAll(indoorZones, zone => zone != null);
 
     public bool Contains(Vector3 position) {
         if (indoorZones == null) return false;
@@ -32,7 +34,7 @@ public sealed class BaseHouse : MonoBehaviour {
     public bool Validate(NavMeshQueryFilter filter, float navMeshSnapDistance, out string reason) {
         reason = null;
         if (string.IsNullOrWhiteSpace(houseId)) reason = "House Id가 비어 있음";
-        else if (indoorZones == null || indoorZones.Length == 0 || System.Array.Exists(indoorZones, z => z == null))
+        else if (!HasIndoorZones)
             reason = "Indoor Zones가 비었거나 빈 칸이 있음";
         else if (storageAnchor == null) reason = "Storage Anchor 미연결";
         else if (!NavMesh.SamplePosition(storageAnchor.position, out NavMeshHit goal, navMeshSnapDistance, filter))
