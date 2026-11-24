@@ -36,6 +36,14 @@ public sealed class WeaponGripProfile : MonoBehaviour {
     [Range(0f, 1f)] public float reloadRightWeight = 1f;
     [Range(0f, 1f)] public float fingerWeight = 1f;
 
+    [Header("Body Clipping")]
+    [Tooltip("개머리판 끝처럼 몸에 박히면 안 되는 지점. 비워 두면 무기 렌더러 경계의 가장 뒤쪽 중앙을 자동으로 사용합니다.")]
+    public Transform[] bodyClearancePoints = Array.Empty<Transform>();
+    [Tooltip("몸 표면과 유지할 추가 간격(m)")]
+    [Min(0f)] public float bodyClearance = 0.02f;
+    [Tooltip("몸을 피하려고 무기를 총구 방향으로 밀어낼 수 있는 최대 거리(m). 0이면 사용하지 않습니다.")]
+    [Min(0f)] public float maxBodyPush = 0.3f;
+
     [Serializable]
     public struct FingerPose {
         public HumanBodyBones bone;

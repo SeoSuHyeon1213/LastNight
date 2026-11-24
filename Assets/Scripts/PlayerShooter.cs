@@ -32,6 +32,20 @@ public class PlayerShooter : MonoBehaviour {
     private Quaternion[] fingerBase = System.Array.Empty<Quaternion>();
     private WeaponGripProfile.FingerPose[] fingerPoses = System.Array.Empty<WeaponGripProfile.FingerPose>();
     private bool fingersApplied;
+    [Header("Body Clipping")]
+    [Tooltip("개머리판 등 무기 뒤쪽이 몸통을 뚫으면 무기를 총구 방향으로 밀어냅니다.")]
+    [SerializeField] private bool preventBodyClipping = true;
+    [Tooltip("몸통 단면의 좌우 반지름(m). Hips~Neck 사이의 타원 기둥으로 몸통을 근사합니다.")]
+    [SerializeField, Min(0.01f)] private float bodyHalfWidth = 0.17f;
+    [Tooltip("몸통 단면의 앞뒤 반지름(m)")]
+    [SerializeField, Min(0.01f)] private float bodyHalfDepth = 0.12f;
+    private const float DefaultBodyClearance = 0.02f;
+    private const float DefaultMaxBodyPush = 0.3f;
+    private Transform hipsBone;
+    private Transform neckBone;
+    private Transform[] clearancePoints = System.Array.Empty<Transform>();
+    private bool hasAutoClearancePoint;
+    private Vector3 autoClearancePoint;
     private int activeSlot;
     public Gun gun => weapons[activeSlot];
     public Gun PrimaryGun => weapons[0];
@@ -56,6 +70,9 @@ public class PlayerShooter : MonoBehaviour {
         rightElbowBone = playerAnimator.GetBoneTransform(HumanBodyBones.RightLowerArm);
         rightHandBone = playerAnimator.GetBoneTransform(HumanBodyBones.RightHand);
         rightShoulderBone = playerAnimator.GetBoneTransform(HumanBodyBones.RightUpperArm);
+        hipsBone = playerAnimator.GetBoneTransform(HumanBodyBones.Hips);
+        neckBone = playerAnimator.GetBoneTransform(HumanBodyBones.Neck);
+        if (neckBone == null) neckBone = playerAnimator.GetBoneTransform(HumanBodyBones.Head);
         originalCulling = playerAnimator.cullingMode;
         playerAnimator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
         if (primaryGun != null) {
@@ -119,6 +136,7 @@ public class PlayerShooter : MonoBehaviour {
         fingerBase = new Quaternion[fingerPoses.Length];
         for (int i = 0; i < fingers.Length; i++)
             if (WeaponGripProfile.IsFinger(fingerPoses[i].bone)) fingers[i] = playerAnimator.GetBoneTransform(fingerPoses[i].bone);
+        CacheClearancePoints();
         if (aim != null && !(gun is MeleeWeapon)) {
             if (!aimInitialized) aimInitialized = aim.Initialize(gun, gunPivot);
             else aim.SetWeapon(gun);
@@ -202,6 +220,8 @@ public class PlayerShooter : MonoBehaviour {
                 if (aim != null) aim.ApplyWeaponAim();
             }
         }
+        // 손잡이 정렬 뒤에 몸통 침범을 풀어야 밀어낸 위치가 유지되고, 손 IK도 밀린 손잡이를 따라간다.
+        if (PushWeaponOutOfBody() && aim != null) aim.ApplyWeaponAim();
         bool reloading = gun.state == Gun.State.Reloading;
         float step = Time.deltaTime / (grip != null ? Mathf.Max(0.01f, grip.blendSeconds) : 0.2f);
         leftBlend = Mathf.MoveTowards(leftBlend, reloading ? (grip != null ? grip.reloadLeftWeight : 0f) : 1f, step);
@@ -215,6 +235,116 @@ public class PlayerShooter : MonoBehaviour {
         }
         WeaponGrip.ApplyHands(playerAnimator, leftHandMount, rightHandMount, grip, leftBlend, rightBlend, leftHint, rightHint);
         gripFrame = Time.frameCount;
+    }
+
+    // 지정한 기준점이 없으면 무기 렌더러 경계에서 총열 반대쪽 끝의 중앙을 무기 로컬 좌표로 저장한다.
+    private void CacheClearancePoints() {
+        clearancePoints = System.Array.Empty<Transform>();
+        hasAutoClearancePoint = false;
+        if (gun == null || gun is MeleeWeapon) return;
+        if (grip != null && grip.bodyClearancePoints != null && grip.bodyClearancePoints.Length > 0) {
+            clearancePoints = grip.bodyClearancePoints;
+            return;
+        }
+        if (gun.fireTransform == null) return;
+        Transform root = gun.transform;
+        Vector3 axis = root.InverseTransformDirection(gun.fireTransform.forward);
+        if (axis.sqrMagnitude < 0.0001f) return;
+        axis.Normalize();
+        Bounds combined = default;
+        float minAlongAxis = float.MaxValue;
+        bool found = false;
+        foreach (Renderer renderer in gun.GetComponentsInChildren<Renderer>()) {
+            Bounds local;
+            if (renderer is SkinnedMeshRenderer skinned) local = skinned.localBounds;
+            else if (renderer is MeshRenderer && renderer.TryGetComponent(out MeshFilter filter) && filter.sharedMesh != null)
+                local = filter.sharedMesh.bounds;
+            else continue;
+            Vector3 c = local.center, e = local.extents;
+            for (int i = 0; i < 8; i++) {
+                Vector3 corner = c + new Vector3((i & 1) == 0 ? -e.x : e.x, (i & 2) == 0 ? -e.y : e.y, (i & 4) == 0 ? -e.z : e.z);
+                Vector3 point = root.InverseTransformPoint(renderer.transform.TransformPoint(corner));
+                if (!found) combined = new Bounds(point, Vector3.zero);
+                else combined.Encapsulate(point);
+                minAlongAxis = Mathf.Min(minAlongAxis, Vector3.Dot(point, axis));
+                found = true;
+            }
+        }
+        if (!found) return;
+        autoClearancePoint = combined.center + axis * (minAlongAxis - Vector3.Dot(combined.center, axis));
+        hasAutoClearancePoint = true;
+    }
+
+    // Hips~Neck 사이를 타원 기둥으로 보고, 기준점이 그 안에 있으면 총구 방향으로 빠져나올 거리만큼 무기를 민다.
+    private bool PushWeaponOutOfBody() {
+        if (!preventBodyClipping || hipsBone == null || neckBone == null || gun.fireTransform == null) return false;
+        float clearance = grip != null ? grip.bodyClearance : DefaultBodyClearance;
+        float maxPush = grip != null ? grip.maxBodyPush : DefaultMaxBodyPush;
+        if (maxPush <= 0f) return false;
+        Vector3 bottom = hipsBone.position;
+        Vector3 up = neckBone.position - bottom;
+        float height = up.magnitude;
+        if (height < 0.0001f) return false;
+        up /= height;
+        Vector3 right = Vector3.ProjectOnPlane(transform.right, up);
+        if (right.sqrMagnitude < 0.0001f) return false;
+        right.Normalize();
+        Vector3 front = Vector3.Cross(right, up);
+        float rx = bodyHalfWidth + clearance;
+        float rz = bodyHalfDepth + clearance;
+        Vector3 forward = gun.fireTransform.forward;
+        // 타원 단면을 단위 원으로 정규화한 2D 좌표에서 이동 방향을 계산한다.
+        Vector2 dir = new Vector2(Vector3.Dot(forward, right) / rx, Vector3.Dot(forward, front) / rz);
+        float a = dir.sqrMagnitude;
+        if (a < 0.0001f) return false;
+        float push = 0f;
+        int count = clearancePoints.Length > 0 ? clearancePoints.Length : (hasAutoClearancePoint ? 1 : 0);
+        for (int i = 0; i < count; i++) {
+            Vector3 world;
+            if (clearancePoints.Length > 0) {
+                if (clearancePoints[i] == null) continue;
+                world = clearancePoints[i].position;
+            } else world = gun.transform.TransformPoint(autoClearancePoint);
+            Vector3 offset = world - bottom;
+            float h = Vector3.Dot(offset, up);
+            if (h < 0f || h > height) continue;
+            Vector2 p = new Vector2(Vector3.Dot(offset, right) / rx, Vector3.Dot(offset, front) / rz);
+            float c = p.sqrMagnitude - 1f;
+            if (c >= 0f) continue;
+            // |p + t*dir| = 1 의 양의 해
+            float b = Vector2.Dot(p, dir);
+            push = Mathf.Max(push, (-b + Mathf.Sqrt(b * b - a * c)) / a);
+        }
+        if (push <= 0f) return false;
+        gunPivot.position += forward * Mathf.Min(push, maxPush);
+        return true;
+    }
+
+    private void OnDrawGizmosSelected() {
+        if (!preventBodyClipping) return;
+        Animator animator = playerAnimator != null ? playerAnimator : GetComponent<Animator>();
+        if (animator == null || !animator.isHuman) return;
+        Transform hips = animator.GetBoneTransform(HumanBodyBones.Hips);
+        Transform neck = animator.GetBoneTransform(HumanBodyBones.Neck);
+        if (neck == null) neck = animator.GetBoneTransform(HumanBodyBones.Head);
+        if (hips == null || neck == null) return;
+        Vector3 up = neck.position - hips.position;
+        if (up.sqrMagnitude < 0.0001f) return;
+        Vector3 right = Vector3.ProjectOnPlane(transform.right, up.normalized).normalized;
+        Vector3 front = Vector3.Cross(right, up.normalized);
+        Gizmos.color = new Color(1f, 0.5f, 0f, 0.8f);
+        for (int ring = 0; ring <= 4; ring++) {
+            Vector3 center = hips.position + up * (ring / 4f);
+            Vector3 previous = center + right * bodyHalfWidth;
+            for (int s = 1; s <= 24; s++) {
+                float angle = s / 24f * Mathf.PI * 2f;
+                Vector3 next = center + right * (Mathf.Cos(angle) * bodyHalfWidth) + front * (Mathf.Sin(angle) * bodyHalfDepth);
+                Gizmos.DrawLine(previous, next);
+                previous = next;
+            }
+        }
+        if (Application.isPlaying && gun != null && hasAutoClearancePoint && clearancePoints.Length == 0)
+            Gizmos.DrawSphere(gun.transform.TransformPoint(autoClearancePoint), 0.015f);
     }
 
     private void RestoreFingers() {
